@@ -39,9 +39,14 @@ const DatadogAPMForm: React.FC = () => {
 
   const acquireToken = async () => {
     try {
+      const firstAccount = accounts[0];
+      if (!firstAccount) {
+        throw new Error('No account available');
+      }
+      
       const response = await instance.acquireTokenSilent({
         ...armApiRequest,
-        account: accounts[0],
+        account: firstAccount,
       });
       setAccessToken(response.accessToken);
       await loadSubscriptions(response.accessToken);
@@ -147,7 +152,7 @@ const DatadogAPMForm: React.FC = () => {
       }
 
       // Extract resource group from the app service ID
-      const resourceGroupMatch = selectedApp.id.match(/resourceGroups\/([^\/]+)/);
+      const resourceGroupMatch = selectedApp.id.match(/resourceGroups\/([^/]+)/);
       const resourceGroupName = resourceGroupMatch ? resourceGroupMatch[1] : '';
       
       if (!resourceGroupName) {

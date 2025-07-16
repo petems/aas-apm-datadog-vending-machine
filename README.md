@@ -42,7 +42,7 @@ This React application provides a streamlined interface for:
 ```bash
 git clone <your-repo-url>
 cd datadog-apm-azure-vending-machine
-npm install
+yarn install
 ```
 
 ### 2. Configure Environment Variables
@@ -62,7 +62,7 @@ If needed, update the `src/authConfig.ts` file with your specific Azure AD confi
 ### 4. Development
 
 ```bash
-npm start
+yarn start
 ```
 
 This runs the app in development mode. Open [http://localhost:3000](http://localhost:3000) to view it.
@@ -70,8 +70,8 @@ This runs the app in development mode. Open [http://localhost:3000](http://local
 ### 5. Build and Deploy
 
 ```bash
-npm run build
-npm run deploy
+yarn build
+yarn deploy
 ```
 
 This builds the app for production and deploys it to GitHub Pages.
