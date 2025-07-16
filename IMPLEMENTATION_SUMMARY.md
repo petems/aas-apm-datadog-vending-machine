@@ -115,18 +115,18 @@ isWindowsAppService(appService: AzureAppService): boolean {
 
 ### Development
 ```bash
-npm install
-npm start  # Development server
+yarn install
+yarn start  # Development server
 ```
 
 ### Production Build
 ```bash
-npm run build  # Creates optimized build in ./build
+yarn build  # Creates optimized build in ./build
 ```
 
 ### GitHub Pages Deployment
 - Automated via GitHub Actions
-- Manual deployment via `npm run deploy`
+- Manual deployment via `yarn deploy`
 - Environment variable management through GitHub Secrets
 
 ## 🔍 Quality Assurance

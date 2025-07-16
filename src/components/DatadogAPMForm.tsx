@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useMsal } from '@azure/msal-react';
 import { loginRequest, armApiRequest } from '../authConfig';
 import { AzureService } from '../services/azureService';
@@ -30,18 +30,16 @@ const DatadogAPMForm: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [deploymentStatus, setDeploymentStatus] = useState<'idle' | 'deploying' | 'success' | 'error'>('idle');
 
-  useEffect(() => {
-    if (accounts.length > 0) {
-      setIsAuthenticated(true);
-      acquireToken();
-    }
-  }, [accounts]);
-
-  const acquireToken = async () => {
+  const acquireToken = useCallback(async () => {
     try {
+      const firstAccount = accounts[0];
+      if (!firstAccount) {
+        throw new Error('No account available');
+      }
+      
       const response = await instance.acquireTokenSilent({
         ...armApiRequest,
-        account: accounts[0],
+        account: firstAccount,
       });
       setAccessToken(response.accessToken);
       await loadSubscriptions(response.accessToken);
@@ -56,7 +54,14 @@ const DatadogAPMForm: React.FC = () => {
         setError('Failed to acquire access token for Azure API');
       }
     }
-  };
+  }, [instance, accounts]);
+
+  useEffect(() => {
+    if (accounts.length > 0) {
+      setIsAuthenticated(true);
+      acquireToken();
+    }
+  }, [accounts, acquireToken]);
 
   const handleLogin = async () => {
     try {
@@ -147,7 +152,7 @@ const DatadogAPMForm: React.FC = () => {
       }
 
       // Extract resource group from the app service ID
-      const resourceGroupMatch = selectedApp.id.match(/resourceGroups\/([^\/]+)/);
+      const resourceGroupMatch = selectedApp.id.match(/resourceGroups\/([^/]+)/);
       const resourceGroupName = resourceGroupMatch ? resourceGroupMatch[1] : '';
       
       if (!resourceGroupName) {

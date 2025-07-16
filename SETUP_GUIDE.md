@@ -6,6 +6,80 @@ This guide will walk you through setting up the complete Datadog APM Azure vendi
 
 ### Step 1: Azure AD App Registration
 
+Choose one of the following methods to create the Azure AD App Registration:
+
+#### Option A: Terraform (Recommended)
+
+##### Quick Deploy with Azure Cloud Shell
+
+Click the button below to open this repository in Azure Cloud Shell and deploy automatically:
+
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://shell.azure.com/bash?resource=https://github.com/peter-souter/azure-app-services-for-datadog-vending-machine)
+
+This will:
+- Open Azure Cloud Shell in your browser
+- Clone this repository
+- Navigate to the terraform directory
+- Have Terraform and GitHub CLI pre-installed and ready to use
+
+After clicking the button, run these commands in Azure Cloud Shell:
+```bash
+cd azure-app-services-for-datadog-vending-machine/terraform
+terraform init
+cp terraform.tfvars.example terraform.tfvars
+# Edit the terraform.tfvars file with your redirect URIs
+code terraform.tfvars
+# Then deploy
+terraform plan
+terraform apply
+```
+
+##### Local Development Setup
+
+1. **Prerequisites**: Install [Terraform](https://terraform.io/downloads) and [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
+
+2. **Authenticate with Azure**:
+   ```bash
+   az login
+   ```
+
+3. **Configure Terraform**:
+   ```bash
+   cd terraform
+   terraform init
+   cp terraform.tfvars.example terraform.tfvars
+   ```
+
+4. **Edit terraform.tfvars** with your configuration:
+   ```hcl
+   redirect_uris = [
+     "https://yourusername.github.io/your-repo-name/",
+     "http://localhost:3000"
+   ]
+   
+   # Enable automatic GitHub configuration (optional)
+   create_github_secret = true
+   github_owner         = "yourusername"
+   github_repository    = "your-repo-name"
+   ```
+
+5. **Set GitHub Token** (if using GitHub integration):
+   ```bash
+   # Install GitHub CLI if needed: brew install gh
+   gh auth login --scopes repo
+   export GITHUB_TOKEN=$(gh auth token)
+   ```
+
+6. **Deploy the App Registration**:
+   ```bash
+   terraform plan
+   terraform apply
+   ```
+
+7. **Done!** If GitHub integration is enabled, the `REACT_APP_CLIENT_ID` is automatically added to your repository secrets
+
+#### Option B: Manual Setup (Azure Portal)
+
 1. Go to the [Azure Portal](https://portal.azure.com) → Azure Active Directory → App registrations
 2. Click "New registration"
 3. Configure the app registration:
@@ -41,7 +115,7 @@ This guide will walk you through setting up the complete Datadog APM Azure vendi
 
 3. Install dependencies:
    ```bash
-   npm install
+   yarn install
    ```
 
 4. Create environment configuration:
@@ -58,7 +132,7 @@ This guide will walk you through setting up the complete Datadog APM Azure vendi
 
 1. Start the development server:
    ```bash
-   npm start
+   yarn start
    ```
 
 2. Open [http://localhost:3000](http://localhost:3000) in your browser
@@ -94,12 +168,12 @@ This guide will walk you through setting up the complete Datadog APM Azure vendi
 
 1. Build the application:
    ```bash
-   npm run build
+   yarn build
    ```
 
 2. Deploy to GitHub Pages:
    ```bash
-   npm run deploy
+   yarn deploy
    ```
 
 ### Step 5: Update Azure AD Redirect URI
@@ -216,12 +290,12 @@ If you encounter issues:
 To update your deployment:
 
 1. Make your changes locally
-2. Test with `npm start`
+2. Test with `yarn start`
 3. Commit and push to main branch
 4. GitHub Actions will automatically rebuild and deploy
 
 For manual updates:
 ```bash
-npm run build
-npm run deploy
+yarn build
+yarn deploy
 ```
