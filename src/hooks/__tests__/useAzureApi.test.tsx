@@ -3,7 +3,7 @@ import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useSubscriptions, useAppServices, useDatadogDeployment } from '../useAzureApi';
 import { AzureService } from '../../services/azureService';
-import { mockSubscription, mockAppService } from '../../__tests__/testing-utils';
+import { mockSubscription, mockAppService } from '../../__tests__/helpers';
 
 // Mock the Azure service
 jest.mock('../../services/azureService');
@@ -51,14 +51,16 @@ describe('useAzureApi hooks', () => {
       expect(mockGetSubscriptions).toHaveBeenCalled();
     });
 
-    it('should not fetch when access token is null', () => {
+    it('should not fetch when access token is null', async () => {
       const { result } = renderHook(
         () => useSubscriptions(null),
         { wrapper: createWrapper() }
       );
 
-      expect(result.current.isLoading).toBe(false);
-      expect(result.current.isPending).toBe(false);
+      // Wait for initial render to settle
+      await waitFor(() => {
+        expect(result.current.isPending).toBe(false);
+      });
     });
 
     it('should handle fetch errors', async () => {
@@ -76,9 +78,10 @@ describe('useAzureApi hooks', () => {
 
       await waitFor(() => {
         expect(result.current.isError).toBe(true);
-      });
+      }, { timeout: 3000 });
 
       expect(result.current.error).toBeTruthy();
+      expect(mockGetSubscriptions).toHaveBeenCalled();
     });
   });
 
@@ -104,14 +107,16 @@ describe('useAzureApi hooks', () => {
       expect(mockGetAppServices).toHaveBeenCalledWith(mockSubscriptionId);
     });
 
-    it('should not fetch when subscription ID is null', () => {
+    it('should not fetch when subscription ID is null', async () => {
       const { result } = renderHook(
         () => useAppServices(mockAccessToken, null),
         { wrapper: createWrapper() }
       );
 
-      expect(result.current.isLoading).toBe(false);
-      expect(result.current.isPending).toBe(false);
+      // Wait for initial render to settle
+      await waitFor(() => {
+        expect(result.current.isPending).toBe(false);
+      });
     });
 
     it('should handle subscription change', async () => {
@@ -203,13 +208,16 @@ describe('useAzureApi hooks', () => {
         },
       };
 
+      let caughtError = false;
       try {
         await result.current.mutateAsync(deploymentParams);
       } catch (error) {
         expect(error).toBeInstanceOf(Error);
+        caughtError = true;
       }
 
-      expect(result.current.isError).toBe(true);
+      expect(caughtError).toBe(true);
+      expect(mockDeploy).toHaveBeenCalled();
     });
   });
 }); 

@@ -1,5 +1,5 @@
 import { AzureService, AzureApiError } from '../azureService';
-import { mockSubscription, mockAppService, mockLinuxAppService } from '../../__tests__/test-utils';
+import { mockSubscription, mockAppService, mockLinuxAppService } from '../../__tests__/helpers';
 
 // Mock fetch globally
 global.fetch = jest.fn();
@@ -11,7 +11,7 @@ describe('AzureService', () => {
 
   beforeEach(() => {
     service = new AzureService(mockAccessToken);
-    mockFetch.mockClear();
+    mockFetch.mockReset();
   });
 
   afterEach(() => {
@@ -48,18 +48,19 @@ describe('AzureService', () => {
         },
       };
 
-      mockFetch.mockResolvedValueOnce({
+      mockFetch.mockResolvedValue({
         ok: false,
         status: 404,
+        statusText: 'Not Found',
         json: async () => errorResponse,
-      } as Response);
+      } as unknown as Response);
 
       await expect(service.getSubscriptions()).rejects.toThrow(AzureApiError);
       await expect(service.getSubscriptions()).rejects.toThrow('Subscription not found');
     });
 
     it('should handle network errors', async () => {
-      mockFetch.mockRejectedValueOnce(new Error('Network error'));
+      mockFetch.mockRejectedValue(new Error('Network error'));
 
       await expect(service.getSubscriptions()).rejects.toThrow(AzureApiError);
       await expect(service.getSubscriptions()).rejects.toThrow('Network error');

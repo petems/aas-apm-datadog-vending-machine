@@ -1,7 +1,7 @@
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useMsal } from '@azure/msal-react';
 import { useAuth } from '../useAuth';
-import { mockAuthResponse } from '../../__tests__/test-utils';
+import { mockAuthResponse } from '../../__tests__/helpers';
 
 // Mock the useMsal hook
 jest.mock('@azure/msal-react');
