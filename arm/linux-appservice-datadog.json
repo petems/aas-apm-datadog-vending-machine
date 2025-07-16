@@ -1,0 +1,50 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "siteName": {
+      "type": "string"
+    },
+    "location": {
+      "type": "string"
+    },
+    "ddApiKey": {
+      "type": "securestring"
+    },
+    "ddSite": {
+      "type": "string",
+      "defaultValue": "datadoghq.com"
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2022-09-01",
+      "name": "[parameters('siteName')]",
+      "location": "[parameters('location')]",
+      "kind": "app",
+      "properties": {
+        "siteConfig": {
+          "appSettings": [
+            {
+              "name": "DD_API_KEY",
+              "value": "[parameters('ddApiKey')]"
+            },
+            {
+              "name": "DD_SITE",
+              "value": "[parameters('ddSite')]"
+            },
+            {
+              "name": "DD_TRACE_ENABLED",
+              "value": "true"
+            },
+            {
+              "name": "DD_LOGS_INJECTION",
+              "value": "true"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

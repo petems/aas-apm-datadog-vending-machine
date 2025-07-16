@@ -1,0 +1,18 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "siteName": {
+      "value": "my-dd-windows-app"
+    },
+    "location": {
+      "value": "East US"
+    },
+    "ddApiKey": {
+      "value": "REPLACE_ME"
+    },
+    "ddSite": {
+      "value": "datadoghq.com"
+    }
+  }
+}
