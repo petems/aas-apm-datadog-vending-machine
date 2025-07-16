@@ -18,14 +18,6 @@ export const useAuth = () => {
     error: null,
   });
 
-  // Check if user is authenticated
-  useEffect(() => {
-    if (accounts.length > 0) {
-      setAuthState(prev => ({ ...prev, isAuthenticated: true }));
-      acquireToken();
-    }
-  }, [accounts]);
-
   const acquireToken = useCallback(async () => {
     if (accounts.length === 0) return;
 
@@ -67,6 +59,14 @@ export const useAuth = () => {
       }
     }
   }, [instance, accounts]);
+
+  // Check if user is authenticated
+  useEffect(() => {
+    if (accounts.length > 0) {
+      setAuthState(prev => ({ ...prev, isAuthenticated: true }));
+      acquireToken();
+    }
+  }, [accounts, acquireToken]);
 
   const login = useCallback(async () => {
     setAuthState(prev => ({ ...prev, isLoading: true, error: null }));

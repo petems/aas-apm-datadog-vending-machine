@@ -3,7 +3,7 @@ import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useSubscriptions, useAppServices, useDatadogDeployment } from '../useAzureApi';
 import { AzureService } from '../../services/azureService';
-import { mockSubscription, mockAppService } from '../../__tests__/test-utils';
+import { mockSubscription, mockAppService } from '../../__tests__/testing-utils';
 
 // Mock the Azure service
 jest.mock('../../services/azureService');
@@ -58,7 +58,7 @@ describe('useAzureApi hooks', () => {
       );
 
       expect(result.current.isLoading).toBe(false);
-      expect(result.current.isIdle).toBe(true);
+      expect(result.current.isPending).toBe(false);
     });
 
     it('should handle fetch errors', async () => {
@@ -111,7 +111,7 @@ describe('useAzureApi hooks', () => {
       );
 
       expect(result.current.isLoading).toBe(false);
-      expect(result.current.isIdle).toBe(true);
+      expect(result.current.isPending).toBe(false);
     });
 
     it('should handle subscription change', async () => {

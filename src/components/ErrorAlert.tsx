@@ -7,7 +7,7 @@ interface ErrorAlertProps {
 
 const ErrorAlert: React.FC<ErrorAlertProps> = ({ message, onDismiss }) => {
   return (
-    <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+    <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4" role="alert" aria-live="assertive">
       <div className="flex">
         <div className="flex-shrink-0">
           <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
@@ -29,6 +29,7 @@ const ErrorAlert: React.FC<ErrorAlertProps> = ({ message, onDismiss }) => {
                 type="button"
                 className="inline-flex bg-red-50 rounded-md p-1.5 text-red-500 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-red-50 focus:ring-red-600"
                 onClick={onDismiss}
+                aria-label="Dismiss error"
               >
                 <span className="sr-only">Dismiss</span>
                 <svg className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">

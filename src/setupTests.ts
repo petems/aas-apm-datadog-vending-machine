@@ -21,6 +21,7 @@ jest.mock('@azure/msal-browser', () => ({
 }));
 
 jest.mock('@azure/msal-react', () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const React = jest.requireActual('react');
   return {
     useMsal: jest.fn(),
