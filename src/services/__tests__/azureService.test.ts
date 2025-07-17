@@ -133,6 +133,12 @@ describe('AzureService', () => {
       await expect(service.getAppServices('')).rejects.toThrow(
         'Subscription ID is required'
       );
+      await expect(service.getAppServices(undefined as any)).rejects.toThrow(
+        'Subscription ID is required'
+      );
+      await expect(service.getAppServices(null as any)).rejects.toThrow(
+        'Subscription ID is required'
+      );
     });
 
     it('should extract resource group from app service ID', async () => {
@@ -144,7 +150,8 @@ describe('AzureService', () => {
 
       const result = await service.getAppServices(subscriptionId);
 
-      expect(result[0].resourceGroup).toBe('test-rg');
+      expect(result.length).toBeGreaterThan(0);
+      expect(result[0]?.resourceGroup).toBe('test-rg');
     });
   });
 
@@ -220,10 +227,37 @@ describe('AzureService', () => {
       );
     });
 
-    it('should validate required parameters', async () => {
-      await expect(
-        service.deployDatadogAPM('', 'rg', 'name', 'uri', deploymentParams.parameters)
-      ).rejects.toThrow('All deployment parameters are required');
+    it('should validate required parameters (table test)', async () => {
+      const requiredParams = [
+        ['', 'rg', 'name', 'uri', deploymentParams.parameters],
+        ['sub', '', 'name', 'uri', deploymentParams.parameters],
+        ['sub', 'rg', '', 'uri', deploymentParams.parameters],
+        ['sub', 'rg', 'name', '', deploymentParams.parameters],
+        ['sub', 'rg', 'name', 'uri', undefined],
+        ['sub', 'rg', 'name', 'uri', null],
+      ];
+      for (const params of requiredParams) {
+        await expect(
+          service.deployDatadogAPM(
+            params[0] as any, params[1] as any, params[2] as any, params[3] as any, params[4] as any
+          )
+        ).rejects.toThrow('All deployment parameters are required');
+      }
+    });
+  });
+
+  describe('edge and negative cases', () => {
+    it('should throw on invalid method calls', async () => {
+      // @ts-expect-error: purposely calling with no args
+      await expect(service.getAppServices()).rejects.toThrow();
+      // @ts-expect-error: purposely calling with no args
+      await expect(service.deployDatadogAPM()).rejects.toThrow();
+    });
+
+    it('should handle unexpected errors in makeRequest', async () => {
+      // Simulate fetch throwing synchronously
+      (global.fetch as jest.Mock).mockImplementationOnce(() => { throw new Error('Sync error'); });
+      await expect(service.getSubscriptions()).rejects.toThrow('Sync error');
     });
   });
 }); 

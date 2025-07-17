@@ -32,7 +32,7 @@ describe('useAzureApi hooks', () => {
   });
 
   describe('useSubscriptions', () => {
-    it('should fetch subscriptions successfully', async () => {
+    it('fetches subscriptions successfully', async () => {
       const mockGetSubscriptions = jest.fn().mockResolvedValue([mockSubscription]);
       MockedAzureService.mockImplementation(() => ({
         getSubscriptions: mockGetSubscriptions,
@@ -51,19 +51,19 @@ describe('useAzureApi hooks', () => {
       expect(mockGetSubscriptions).toHaveBeenCalled();
     });
 
-    it('should not fetch when access token is null', async () => {
-      const { result } = renderHook(
-        () => useSubscriptions(null),
-        { wrapper: createWrapper() }
-      );
-
-      // Wait for initial render to settle
-      await waitFor(() => {
-        expect(result.current.isPending).toBe(false);
-      });
+    it('does not fetch when access token is null or undefined (table test)', async () => {
+      for (const token of [null, undefined]) {
+        const { result } = renderHook(
+          () => useSubscriptions(token as any),
+          { wrapper: createWrapper() }
+        );
+        await waitFor(() => {
+          expect(result.current.isPending).toBe(false);
+        });
+      }
     });
 
-    it('should handle fetch errors', async () => {
+    it('handles fetch errors', async () => {
       const mockGetSubscriptions = jest.fn().mockRejectedValue(
         new Error('Failed to fetch subscriptions')
       );
@@ -83,12 +83,26 @@ describe('useAzureApi hooks', () => {
       expect(result.current.error).toBeTruthy();
       expect(mockGetSubscriptions).toHaveBeenCalled();
     });
+
+    it('handles unexpected errors in hook', async () => {
+      MockedAzureService.mockImplementation(() => {
+        throw new Error('Unexpected');
+      });
+      const { result } = renderHook(
+        () => useSubscriptions(mockAccessToken),
+        { wrapper: createWrapper() }
+      );
+      await waitFor(() => {
+        expect(result.current.isError).toBe(true);
+      });
+      expect(result.current.error).toBeTruthy();
+    });
   });
 
   describe('useAppServices', () => {
     const mockSubscriptionId = 'test-subscription-id';
 
-    it('should fetch app services successfully', async () => {
+    it('fetches app services successfully', async () => {
       const mockGetAppServices = jest.fn().mockResolvedValue([mockAppService]);
       MockedAzureService.mockImplementation(() => ({
         getAppServices: mockGetAppServices,
@@ -107,19 +121,19 @@ describe('useAzureApi hooks', () => {
       expect(mockGetAppServices).toHaveBeenCalledWith(mockSubscriptionId);
     });
 
-    it('should not fetch when subscription ID is null', async () => {
-      const { result } = renderHook(
-        () => useAppServices(mockAccessToken, null),
-        { wrapper: createWrapper() }
-      );
-
-      // Wait for initial render to settle
-      await waitFor(() => {
-        expect(result.current.isPending).toBe(false);
-      });
+    it('does not fetch when subscription ID is null or undefined (table test)', async () => {
+      for (const subId of [null, undefined]) {
+        const { result } = renderHook(
+          () => useAppServices(mockAccessToken, subId as any),
+          { wrapper: createWrapper() }
+        );
+        await waitFor(() => {
+          expect(result.current.isPending).toBe(false);
+        });
+      }
     });
 
-    it('should handle subscription change', async () => {
+    it('handles subscription change', async () => {
       const mockGetAppServices = jest.fn().mockResolvedValue([mockAppService]);
       MockedAzureService.mockImplementation(() => ({
         getAppServices: mockGetAppServices,
@@ -127,7 +141,7 @@ describe('useAzureApi hooks', () => {
 
       const { result, rerender } = renderHook(
         ({ subscriptionId }) => useAppServices(mockAccessToken, subscriptionId),
-        { 
+        {
           wrapper: createWrapper(),
           initialProps: { subscriptionId: 'subscription-1' }
         }
@@ -144,10 +158,41 @@ describe('useAzureApi hooks', () => {
         expect(mockGetAppServices).toHaveBeenCalledWith('subscription-2');
       });
     });
+
+    it('handles fetch errors', async () => {
+      const mockGetAppServices = jest.fn().mockRejectedValue(
+        new Error('Failed to fetch app services')
+      );
+      MockedAzureService.mockImplementation(() => ({
+        getAppServices: mockGetAppServices,
+      } as any));
+      const { result } = renderHook(
+        () => useAppServices(mockAccessToken, mockSubscriptionId),
+        { wrapper: createWrapper() }
+      );
+      await waitFor(() => {
+        expect(result.current.isError).toBe(true);
+      });
+      expect(result.current.error).toBeTruthy();
+    });
+
+    it('handles unexpected errors in hook', async () => {
+      MockedAzureService.mockImplementation(() => {
+        throw new Error('Unexpected');
+      });
+      const { result } = renderHook(
+        () => useAppServices(mockAccessToken, mockSubscriptionId),
+        { wrapper: createWrapper() }
+      );
+      await waitFor(() => {
+        expect(result.current.isError).toBe(true);
+      });
+      expect(result.current.error).toBeTruthy();
+    });
   });
 
   describe('useDatadogDeployment', () => {
-    it('should deploy successfully', async () => {
+    it('deploys successfully', async () => {
       const mockDeploy = jest.fn().mockResolvedValue({ success: true });
       MockedAzureService.mockImplementation(() => ({
         deployDatadogAPM: mockDeploy,
@@ -182,7 +227,7 @@ describe('useAzureApi hooks', () => {
       );
     });
 
-    it('should handle deployment errors', async () => {
+    it('handles deployment errors', async () => {
       const mockDeploy = jest.fn().mockRejectedValue(
         new Error('Deployment failed')
       );
@@ -218,6 +263,75 @@ describe('useAzureApi hooks', () => {
 
       expect(caughtError).toBe(true);
       expect(mockDeploy).toHaveBeenCalled();
+    });
+
+    it('handles missing/invalid deployment parameters (table test)', async () => {
+      const mockDeploy = jest.fn().mockRejectedValue(new Error('All deployment parameters are required'));
+      MockedAzureService.mockImplementation(() => ({
+        deployDatadogAPM: mockDeploy,
+      } as any));
+      const { result } = renderHook(
+        () => useDatadogDeployment(mockAccessToken),
+        { wrapper: createWrapper() }
+      );
+      const deploymentParams = {
+        subscriptionId: 'test-sub',
+        resourceGroupName: 'test-rg',
+        deploymentName: 'test-deployment',
+        templateUri: 'https://example.com/template.json',
+        parameters: {
+          siteName: 'test-site',
+          location: 'East US',
+          ddApiKey: 'test-api-key',
+          ddSite: 'datadoghq.com',
+        },
+      };
+      const invalidParamsList = [
+        { ...deploymentParams, subscriptionId: '' },
+        { ...deploymentParams, resourceGroupName: '' },
+        { ...deploymentParams, deploymentName: '' },
+        { ...deploymentParams, templateUri: '' },
+        { ...deploymentParams, parameters: undefined },
+      ];
+      for (const params of invalidParamsList) {
+        let caughtError = false;
+        try {
+          await result.current.mutateAsync(params as any);
+        } catch (error) {
+          expect(error).toBeInstanceOf(Error);
+          caughtError = true;
+        }
+        expect(caughtError).toBe(true);
+      }
+    });
+
+    it('handles unexpected errors in hook', async () => {
+      MockedAzureService.mockImplementation(() => {
+        throw new Error('Unexpected');
+      });
+      const { result } = renderHook(
+        () => useDatadogDeployment(mockAccessToken),
+        { wrapper: createWrapper() }
+      );
+      let caughtError = false;
+      try {
+        await result.current.mutateAsync({
+          subscriptionId: 'test-sub',
+          resourceGroupName: 'test-rg',
+          deploymentName: 'test-deployment',
+          templateUri: 'https://example.com/template.json',
+          parameters: {
+            siteName: 'test-site',
+            location: 'East US',
+            ddApiKey: 'test-api-key',
+            ddSite: 'datadoghq.com',
+          },
+        });
+      } catch (error) {
+        expect(error).toBeInstanceOf(Error);
+        caughtError = true;
+      }
+      expect(caughtError).toBe(true);
     });
   });
 }); 
