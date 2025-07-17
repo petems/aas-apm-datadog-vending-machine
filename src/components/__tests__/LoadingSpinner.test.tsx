@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '../../__tests__/helpers';
+import { render, screen } from '../../test-helpers';
 import LoadingSpinner from '../LoadingSpinner';
 
 describe('LoadingSpinner', () => {
@@ -43,13 +43,8 @@ describe('LoadingSpinner', () => {
   });
 
   it('renders with various messages (table test)', () => {
-    const messages = [
-      'Fetching data...',
-      'Please wait',
-      '',
-      undefined,
-    ];
-    messages.forEach((msg) => {
+    const messages = ['Fetching data...', 'Please wait', '', undefined];
+    messages.forEach(msg => {
       render(<LoadingSpinner message={msg as string} />);
       if (msg) {
         expect(screen.getByText(msg)).toBeInTheDocument();

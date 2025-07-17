@@ -1,7 +1,7 @@
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useMsal } from '@azure/msal-react';
 import { useAuth } from '../useAuth';
-import { mockAuthResponse } from '../../__tests__/helpers';
+import { mockAuthResponse } from '../../test-helpers';
 
 // Mock the useMsal hook
 jest.mock('@azure/msal-react');
@@ -72,7 +72,9 @@ describe('useAuth', () => {
       inProgress: 'none' as any,
       logger: mockLogger as any,
     });
-    mockInstance.acquireTokenSilent.mockRejectedValueOnce(new Error('Silent failed'));
+    mockInstance.acquireTokenSilent.mockRejectedValueOnce(
+      new Error('Silent failed')
+    );
     mockInstance.acquireTokenPopup.mockResolvedValueOnce(mockAuthResponse);
     const { result } = renderHook(() => useAuth());
     await waitFor(() => {
@@ -89,11 +91,17 @@ describe('useAuth', () => {
       inProgress: 'none' as any,
       logger: mockLogger as any,
     });
-    mockInstance.acquireTokenSilent.mockRejectedValueOnce(new Error('Silent failed'));
-    mockInstance.acquireTokenPopup.mockRejectedValueOnce(new Error('Popup failed'));
+    mockInstance.acquireTokenSilent.mockRejectedValueOnce(
+      new Error('Silent failed')
+    );
+    mockInstance.acquireTokenPopup.mockRejectedValueOnce(
+      new Error('Popup failed')
+    );
     const { result } = renderHook(() => useAuth());
     await waitFor(() => {
-      expect(result.current.error).toBe('Failed to acquire access token for Azure API');
+      expect(result.current.error).toBe(
+        'Failed to acquire access token for Azure API'
+      );
     });
   });
 
@@ -112,7 +120,9 @@ describe('useAuth', () => {
     await act(async () => {
       await result.current.login();
     });
-    expect(result.current.error).toBe('Authentication failed. Please try again.');
+    expect(result.current.error).toBe(
+      'Authentication failed. Please try again.'
+    );
   });
 
   it('handles logout', () => {
@@ -148,7 +158,13 @@ describe('useAuth', () => {
     const accountScenarios = [
       { accounts: [], expectedAuth: false },
       { accounts: [mockAccount], expectedAuth: true },
-      { accounts: [mockAccount, { ...mockAccount, username: 'other@example.com' }], expectedAuth: true },
+      {
+        accounts: [
+          mockAccount,
+          { ...mockAccount, username: 'other@example.com' },
+        ],
+        expectedAuth: true,
+      },
     ];
     for (const { accounts, expectedAuth } of accountScenarios) {
       mockUseMsal.mockReturnValue({

@@ -1,5 +1,9 @@
 import { AzureService, AzureApiError } from '../azureService';
-import { mockSubscription, mockAppService, mockLinuxAppService } from '../../__tests__/helpers';
+import {
+  mockSubscription,
+  mockAppService,
+  mockLinuxAppService,
+} from '../../test-helpers';
 
 // Mock fetch globally
 global.fetch = jest.fn();
@@ -56,7 +60,9 @@ describe('AzureService', () => {
       } as unknown as Response);
 
       await expect(service.getSubscriptions()).rejects.toThrow(AzureApiError);
-      await expect(service.getSubscriptions()).rejects.toThrow('Subscription not found');
+      await expect(service.getSubscriptions()).rejects.toThrow(
+        'Subscription not found'
+      );
     });
 
     it('should handle network errors', async () => {
@@ -68,19 +74,19 @@ describe('AzureService', () => {
 
     it('should handle timeout errors', async () => {
       jest.useFakeTimers();
-      
+
       // Mock a request that never resolves
       mockFetch.mockImplementationOnce(
         () => new Promise(() => {}) // Never resolves
       );
 
       const promise = service.getSubscriptions();
-      
+
       // Fast-forward time to trigger timeout
       jest.advanceTimersByTime(31000);
-      
+
       await expect(promise).rejects.toThrow('Request timeout');
-      
+
       jest.useRealTimers();
     });
   });
@@ -179,12 +185,16 @@ describe('AzureService', () => {
   describe('getARMTemplateUri', () => {
     it('should return Windows template URI', () => {
       const uri = service.getARMTemplateUri(true);
-      expect(uri).toBe('https://test.github.io/arm/windows-appservice-datadog.json');
+      expect(uri).toBe(
+        'https://test.github.io/arm/windows-appservice-datadog.json'
+      );
     });
 
     it('should return Linux template URI', () => {
       const uri = service.getARMTemplateUri(false);
-      expect(uri).toBe('https://test.github.io/arm/linux-appservice-datadog.json');
+      expect(uri).toBe(
+        'https://test.github.io/arm/linux-appservice-datadog.json'
+      );
     });
   });
 
@@ -239,7 +249,11 @@ describe('AzureService', () => {
       for (const params of requiredParams) {
         await expect(
           service.deployDatadogAPM(
-            params[0] as any, params[1] as any, params[2] as any, params[3] as any, params[4] as any
+            params[0] as any,
+            params[1] as any,
+            params[2] as any,
+            params[3] as any,
+            params[4] as any
           )
         ).rejects.toThrow('All deployment parameters are required');
       }
@@ -256,8 +270,10 @@ describe('AzureService', () => {
 
     it('should handle unexpected errors in makeRequest', async () => {
       // Simulate fetch throwing synchronously
-      (global.fetch as jest.Mock).mockImplementationOnce(() => { throw new Error('Sync error'); });
+      (global.fetch as jest.Mock).mockImplementationOnce(() => {
+        throw new Error('Sync error');
+      });
       await expect(service.getSubscriptions()).rejects.toThrow('Sync error');
     });
   });
-}); 
+});
