@@ -1,11 +1,7 @@
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useMsal } from '@azure/msal-react';
 import { useAuth } from '../useAuth';
-<<<<<<< HEAD
-import { mockAuthResponse } from '../../test-helpers';
-=======
 import { mockAuthResponse } from '../../test-utils';
->>>>>>> origin/master
 
 // Mock the useMsal hook
 jest.mock('@azure/msal-react');
@@ -20,19 +16,11 @@ describe('useAuth', () => {
   };
 
   const mockLogger = {
-<<<<<<< HEAD
     info: jest.fn(),
     error: jest.fn(),
     warning: jest.fn(),
-    verbose: jest.fn(),
-    // Add any other methods if required by IMsalLogger
-=======
-    error: jest.fn(),
-    warning: jest.fn(),
-    info: jest.fn(),
     verbose: jest.fn(),
     trace: jest.fn(),
->>>>>>> origin/master
   };
 
   const mockAccount = {
@@ -84,10 +72,6 @@ describe('useAuth', () => {
       inProgress: 'none' as any,
       logger: mockLogger as any,
     });
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/master
     mockInstance.acquireTokenSilent.mockRejectedValueOnce(
       new Error('Silent failed')
     );
@@ -107,20 +91,20 @@ describe('useAuth', () => {
       inProgress: 'none' as any,
       logger: mockLogger as any,
     });
-<<<<<<< HEAD
-=======
 
->>>>>>> origin/master
+
+
+
     mockInstance.acquireTokenSilent.mockRejectedValueOnce(
       new Error('Silent failed')
     );
     mockInstance.acquireTokenPopup.mockRejectedValueOnce(
       new Error('Popup failed')
     );
-<<<<<<< HEAD
-=======
 
->>>>>>> origin/master
+
+
+
     const { result } = renderHook(() => useAuth());
     await waitFor(() => {
       expect(result.current.error).toBe(
@@ -144,10 +128,7 @@ describe('useAuth', () => {
     await act(async () => {
       await result.current.login();
     });
-<<<<<<< HEAD
-=======
 
->>>>>>> origin/master
     expect(result.current.error).toBe(
       'Authentication failed. Please try again.'
     );
@@ -181,8 +162,6 @@ describe('useAuth', () => {
     });
     expect(result.current.error).toBeNull();
   });
-<<<<<<< HEAD
-
   it('handles multiple accounts (table test)', async () => {
     const accountScenarios = [
       { accounts: [], expectedAuth: false },
@@ -234,6 +213,4 @@ describe('useAuth', () => {
     expect(result.current.isAuthenticated).toBe(false);
     expect(result.current.error).toBeNull();
   });
-=======
->>>>>>> origin/master
 });

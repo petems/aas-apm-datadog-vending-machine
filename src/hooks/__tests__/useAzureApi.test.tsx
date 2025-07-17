@@ -64,7 +64,7 @@ describe('useAzureApi hooks', () => {
         const { result } = renderHook(() => useSubscriptions(token as any), {
           wrapper: createWrapper(),
         });
-        expect(result.current.status).toBe('idle');
+        expect(result.current.status).toBe('pending');
       }
     });
 
@@ -160,7 +160,7 @@ describe('useAzureApi hooks', () => {
           () => useAppServices(mockAccessToken, subId as any),
           { wrapper: createWrapper() }
         );
-        expect(result.current.status).toBe('idle');
+        expect(result.current.status).toBe('pending');
       }
       // Also test explicit null with mock
       const mockGetAppServices = jest.fn();
