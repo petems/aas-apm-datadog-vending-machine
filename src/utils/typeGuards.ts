@@ -59,7 +59,8 @@ export function isValidDatadogApiKey(apiKey: string): boolean {
  */
 export function isValidSubscriptionId(subscriptionId: string): boolean {
   // Azure subscription IDs are UUIDs
-  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  const uuidRegex =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
   return uuidRegex.test(subscriptionId);
 }
 
@@ -67,8 +68,10 @@ export function isValidSubscriptionId(subscriptionId: string): boolean {
  * Checks if an app service is running on Linux
  */
 export function isLinuxAppService(appService: AzureAppService): boolean {
-  return appService.kind.includes('linux') || 
-         Boolean(appService.properties.siteConfig?.linuxFxVersion);
+  return (
+    appService.kind.includes('linux') ||
+    Boolean(appService.properties.siteConfig?.linuxFxVersion)
+  );
 }
 
 /**
@@ -89,7 +92,9 @@ export function extractResourceGroupFromId(resourceId: string): string | null {
 /**
  * Validates an array of Azure subscriptions
  */
-export function validateSubscriptions(subscriptions: any[]): AzureSubscription[] {
+export function validateSubscriptions(
+  subscriptions: any[]
+): AzureSubscription[] {
   return subscriptions.filter(isAzureSubscription);
 }
 

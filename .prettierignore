@@ -1,0 +1,17 @@
+# Test files
+**/*.test.ts
+**/*.test.tsx
+**/__tests__/**/*
+src/test-utils.tsx
+src/setupTests.ts
+
+# Build outputs
+build/
+dist/
+
+# Dependencies
+node_modules/
+
+# Config files that should maintain their formatting
+package.json
+tsconfig*.json 

@@ -64,6 +64,7 @@ describe('Integration Tests', () => {
         instance: mockInstance as any,
         accounts: [mockAuthResponse.account] as any,
         inProgress: 'none' as any,
+        logger: {} as any,
       });
 
       mockInstance.acquireTokenSilent.mockResolvedValue(mockAuthResponse as any);
