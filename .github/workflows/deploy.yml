@@ -14,17 +14,10 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
       
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
+    - name: Setup Node.js and Dependencies
+      uses: ./.github/actions/setup-node-deps
       with:
         node-version: '20'
-        cache: 'yarn'
-        
-    - name: Enable Corepack (for packageManager support)
-      run: corepack enable
-        
-    - name: Install dependencies
-      run: yarn install --frozen-lockfile
       
     - name: Build
       run: yarn build
