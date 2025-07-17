@@ -86,8 +86,10 @@ export class AzureService {
    */
   async getSubscriptions(): Promise<AzureSubscription[]> {
     const url = `${AZURE_ARM_BASE_URL}/subscriptions?api-version=2020-01-01`;
-    const response = await this.makeRequest<{ value: AzureSubscription[] }>(url);
-    
+    const response = await this.makeRequest<{ value: AzureSubscription[] }>(
+      url
+    );
+
     // Return subscriptions
     return response.value;
   }
@@ -97,7 +99,11 @@ export class AzureService {
    */
   async getAppServices(subscriptionId: string): Promise<AzureAppService[]> {
     if (!subscriptionId) {
-      throw new AzureApiError('Subscription ID is required', 400, 'INVALID_INPUT');
+      throw new AzureApiError(
+        'Subscription ID is required',
+        400,
+        'INVALID_INPUT'
+      );
     }
 
     const url = `${AZURE_ARM_BASE_URL}/subscriptions/${subscriptionId}/providers/Microsoft.Web/sites?api-version=2022-09-01`;
@@ -105,10 +111,11 @@ export class AzureService {
 
     // Filter and validate app services
     const filteredServices = response.value
-      .filter(site => 
-        site.kind?.includes('functionapp') || 
-        site.kind?.includes('app') || 
-        site.kind === 'app'
+      .filter(
+        site =>
+          site.kind?.includes('functionapp') ||
+          site.kind?.includes('app') ||
+          site.kind === 'app'
       )
       .map(service => {
         // Extract resource group from ID
@@ -131,7 +138,11 @@ export class AzureService {
     siteName: string
   ): Promise<AzureAppService> {
     if (!subscriptionId || !resourceGroupName || !siteName) {
-      throw new AzureApiError('All parameters are required', 400, 'INVALID_INPUT');
+      throw new AzureApiError(
+        'All parameters are required',
+        400,
+        'INVALID_INPUT'
+      );
     }
 
     const url = `${AZURE_ARM_BASE_URL}/subscriptions/${subscriptionId}/resourceGroups/${resourceGroupName}/providers/Microsoft.Web/sites/${siteName}?api-version=2022-09-01`;
@@ -179,8 +190,17 @@ export class AzureService {
     templateUri: string,
     parameters: DeploymentParameters
   ): Promise<unknown> {
-    if (!subscriptionId || !resourceGroupName || !deploymentName || !templateUri) {
-      throw new AzureApiError('All deployment parameters are required', 400, 'INVALID_INPUT');
+    if (
+      !subscriptionId ||
+      !resourceGroupName ||
+      !deploymentName ||
+      !templateUri
+    ) {
+      throw new AzureApiError(
+        'All deployment parameters are required',
+        400,
+        'INVALID_INPUT'
+      );
     }
 
     const url = `${AZURE_ARM_BASE_URL}/subscriptions/${subscriptionId}/resourceGroups/${resourceGroupName}/providers/Microsoft.Resources/deployments/${deploymentName}?api-version=2021-04-01`;
@@ -220,7 +240,11 @@ export class AzureService {
     deploymentName: string
   ): Promise<unknown> {
     if (!subscriptionId || !resourceGroupName || !deploymentName) {
-      throw new AzureApiError('All parameters are required', 400, 'INVALID_INPUT');
+      throw new AzureApiError(
+        'All parameters are required',
+        400,
+        'INVALID_INPUT'
+      );
     }
 
     const url = `${AZURE_ARM_BASE_URL}/subscriptions/${subscriptionId}/resourceGroups/${resourceGroupName}/providers/Microsoft.Resources/deployments/${deploymentName}?api-version=2021-04-01`;

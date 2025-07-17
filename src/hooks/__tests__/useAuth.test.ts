@@ -1,7 +1,7 @@
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useMsal } from '@azure/msal-react';
 import { useAuth } from '../useAuth';
-import { mockAuthResponse } from '../../__tests__/helpers';
+import { mockAuthResponse } from '../../test-utils';
 
 // Mock the useMsal hook
 jest.mock('@azure/msal-react');
@@ -13,6 +13,14 @@ describe('useAuth', () => {
     acquireTokenPopup: jest.fn(),
     loginPopup: jest.fn(),
     logoutPopup: jest.fn(),
+  };
+
+  const mockLogger = {
+    error: jest.fn(),
+    warning: jest.fn(),
+    info: jest.fn(),
+    verbose: jest.fn(),
+    trace: jest.fn(),
   };
 
   const mockAccount = {
@@ -30,6 +38,7 @@ describe('useAuth', () => {
       instance: mockInstance as any,
       accounts: [],
       inProgress: 'none' as any,
+      logger: mockLogger as any,
     });
   });
 
@@ -47,6 +56,7 @@ describe('useAuth', () => {
       instance: mockInstance as any,
       accounts: [mockAccount],
       inProgress: 'none' as any,
+      logger: mockLogger as any,
     });
 
     mockInstance.acquireTokenSilent.mockResolvedValueOnce(mockAuthResponse);
@@ -64,9 +74,12 @@ describe('useAuth', () => {
       instance: mockInstance as any,
       accounts: [mockAccount],
       inProgress: 'none' as any,
+      logger: mockLogger as any,
     });
 
-    mockInstance.acquireTokenSilent.mockRejectedValueOnce(new Error('Silent failed'));
+    mockInstance.acquireTokenSilent.mockRejectedValueOnce(
+      new Error('Silent failed')
+    );
     mockInstance.acquireTokenPopup.mockResolvedValueOnce(mockAuthResponse);
 
     const { result } = renderHook(() => useAuth());
@@ -84,15 +97,22 @@ describe('useAuth', () => {
       instance: mockInstance as any,
       accounts: [mockAccount],
       inProgress: 'none' as any,
+      logger: mockLogger as any,
     });
 
-    mockInstance.acquireTokenSilent.mockRejectedValueOnce(new Error('Silent failed'));
-    mockInstance.acquireTokenPopup.mockRejectedValueOnce(new Error('Popup failed'));
+    mockInstance.acquireTokenSilent.mockRejectedValueOnce(
+      new Error('Silent failed')
+    );
+    mockInstance.acquireTokenPopup.mockRejectedValueOnce(
+      new Error('Popup failed')
+    );
 
     const { result } = renderHook(() => useAuth());
 
     await waitFor(() => {
-      expect(result.current.error).toBe('Failed to acquire access token for Azure API');
+      expect(result.current.error).toBe(
+        'Failed to acquire access token for Azure API'
+      );
     });
   });
 
@@ -117,7 +137,9 @@ describe('useAuth', () => {
       await result.current.login();
     });
 
-    expect(result.current.error).toBe('Authentication failed. Please try again.');
+    expect(result.current.error).toBe(
+      'Authentication failed. Please try again.'
+    );
   });
 
   it('should handle logout', () => {
@@ -125,6 +147,7 @@ describe('useAuth', () => {
       instance: mockInstance as any,
       accounts: [mockAccount],
       inProgress: 'none' as any,
+      logger: mockLogger as any,
     });
 
     const { result } = renderHook(() => useAuth());
@@ -153,4 +176,4 @@ describe('useAuth', () => {
 
     expect(result.current.error).toBeNull();
   });
-}); 
+});

@@ -2,7 +2,12 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useMsal } from '@azure/msal-react';
 import { loginRequest, armApiRequest } from '../authConfig';
 import { AzureService } from '../services/azureService';
-import { AzureSubscription, AzureAppService, DatadogSite, DeploymentParameters } from '../types';
+import {
+  AzureSubscription,
+  AzureAppService,
+  DatadogSite,
+  DeploymentParameters,
+} from '../types';
 import LoadingSpinner from './LoadingSpinner';
 import ErrorAlert from './ErrorAlert';
 
@@ -16,7 +21,7 @@ const DATADOG_SITES: DatadogSite[] = [
 
 const DatadogAPMForm: React.FC = () => {
   const { instance, accounts } = useMsal();
-  
+
   // State management
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [accessToken, setAccessToken] = useState<string | null>(null);
@@ -24,11 +29,14 @@ const DatadogAPMForm: React.FC = () => {
   const [selectedSubscription, setSelectedSubscription] = useState('');
   const [appServices, setAppServices] = useState<AzureAppService[]>([]);
   const [selectedAppService, setSelectedAppService] = useState('');
-  const [selectedDatadogSite, setSelectedDatadogSite] = useState('datadoghq.com');
+  const [selectedDatadogSite, setSelectedDatadogSite] =
+    useState('datadoghq.com');
   const [ddApiKey, setDdApiKey] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [deploymentStatus, setDeploymentStatus] = useState<'idle' | 'deploying' | 'success' | 'error'>('idle');
+  const [deploymentStatus, setDeploymentStatus] = useState<
+    'idle' | 'deploying' | 'success' | 'error'
+  >('idle');
 
   const acquireToken = useCallback(async () => {
     try {
@@ -36,7 +44,7 @@ const DatadogAPMForm: React.FC = () => {
       if (!firstAccount) {
         throw new Error('No account available');
       }
-      
+
       const response = await instance.acquireTokenSilent({
         ...armApiRequest,
         account: firstAccount,
@@ -44,7 +52,10 @@ const DatadogAPMForm: React.FC = () => {
       setAccessToken(response.accessToken);
       await loadSubscriptions(response.accessToken);
     } catch (error) {
-      console.error('Silent token acquisition failed, falling back to redirect', error);
+      console.error(
+        'Silent token acquisition failed, falling back to redirect',
+        error
+      );
       try {
         const response = await instance.acquireTokenPopup(armApiRequest);
         setAccessToken(response.accessToken);
@@ -97,7 +108,9 @@ const DatadogAPMForm: React.FC = () => {
       setSubscriptions(subs);
     } catch (error) {
       console.error('Failed to load subscriptions', error);
-      setError('Failed to load Azure subscriptions. Please check your permissions.');
+      setError(
+        'Failed to load Azure subscriptions. Please check your permissions.'
+      );
     } finally {
       setIsLoading(false);
     }
@@ -105,7 +118,7 @@ const DatadogAPMForm: React.FC = () => {
 
   const loadAppServices = async (subscriptionId: string) => {
     if (!accessToken) return;
-    
+
     try {
       setIsLoading(true);
       const azureService = new AzureService(accessToken);
@@ -148,16 +161,20 @@ const DatadogAPMForm: React.FC = () => {
       setError(null);
 
       const azureService = new AzureService(accessToken);
-      const selectedApp = appServices.find(app => app.id === selectedAppService);
-      
+      const selectedApp = appServices.find(
+        app => app.id === selectedAppService
+      );
+
       if (!selectedApp) {
         throw new Error('Selected app service not found');
       }
 
       // Extract resource group from the app service ID
-      const resourceGroupMatch = selectedApp.id.match(/resourceGroups\/([^/]+)/);
+      const resourceGroupMatch = selectedApp.id.match(
+        /resourceGroups\/([^/]+)/
+      );
       const resourceGroupName = resourceGroupMatch ? resourceGroupMatch[1] : '';
-      
+
       if (!resourceGroupName) {
         throw new Error('Could not determine resource group name');
       }
@@ -186,7 +203,9 @@ const DatadogAPMForm: React.FC = () => {
       setDeploymentStatus('success');
     } catch (error) {
       console.error('Deployment failed', error);
-      setError(`Deployment failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      setError(
+        `Deployment failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
       setDeploymentStatus('error');
     } finally {
       setIsLoading(false);
@@ -201,7 +220,8 @@ const DatadogAPMForm: React.FC = () => {
             Azure Authentication Required
           </h2>
           <p className="text-gray-600 mb-6">
-            Please sign in to your Azure account to access your subscriptions and app services.
+            Please sign in to your Azure account to access your subscriptions
+            and app services.
           </p>
           <button
             onClick={handleLogin}
@@ -228,19 +248,22 @@ const DatadogAPMForm: React.FC = () => {
         </button>
       </div>
 
-      {error && (
-        <ErrorAlert 
-          message={error} 
-          onDismiss={() => setError(null)} 
-        />
-      )}
+      {error && <ErrorAlert message={error} onDismiss={() => setError(null)} />}
 
       {deploymentStatus === 'success' && (
         <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
           <div className="flex">
             <div className="flex-shrink-0">
-              <svg className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              <svg
+                className="h-5 w-5 text-green-400"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                  clipRule="evenodd"
+                />
               </svg>
             </div>
             <div className="ml-3">
@@ -248,17 +271,28 @@ const DatadogAPMForm: React.FC = () => {
                 Deployment Successful!
               </h3>
               <div className="mt-2 text-sm text-green-700">
-                <p>Datadog APM has been successfully enabled on your App Service.</p>
+                <p>
+                  Datadog APM has been successfully enabled on your App Service.
+                </p>
               </div>
             </div>
           </div>
         </div>
       )}
 
-      <form onSubmit={(e) => { e.preventDefault(); handleDeploy(); }} className="space-y-6">
+      <form
+        onSubmit={e => {
+          e.preventDefault();
+          handleDeploy();
+        }}
+        className="space-y-6"
+      >
         {/* Subscription Selection */}
         <div>
-          <label htmlFor="subscription" className="block text-sm font-medium text-gray-700 mb-2">
+          <label
+            htmlFor="subscription"
+            className="block text-sm font-medium text-gray-700 mb-2"
+          >
             Azure Subscription *
           </label>
           {isLoading && subscriptions.length === 0 ? (
@@ -267,12 +301,12 @@ const DatadogAPMForm: React.FC = () => {
             <select
               id="subscription"
               value={selectedSubscription}
-              onChange={(e) => handleSubscriptionChange(e.target.value)}
+              onChange={e => handleSubscriptionChange(e.target.value)}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               required
             >
               <option value="">Select a subscription</option>
-              {subscriptions.map((sub) => (
+              {subscriptions.map(sub => (
                 <option key={sub.subscriptionId} value={sub.subscriptionId}>
                   {sub.displayName} ({sub.subscriptionId})
                 </option>
@@ -283,7 +317,10 @@ const DatadogAPMForm: React.FC = () => {
 
         {/* App Service Selection */}
         <div>
-          <label htmlFor="appService" className="block text-sm font-medium text-gray-700 mb-2">
+          <label
+            htmlFor="appService"
+            className="block text-sm font-medium text-gray-700 mb-2"
+          >
             App Service / Function App *
           </label>
           {isLoading && selectedSubscription && appServices.length === 0 ? (
@@ -292,13 +329,13 @@ const DatadogAPMForm: React.FC = () => {
             <select
               id="appService"
               value={selectedAppService}
-              onChange={(e) => setSelectedAppService(e.target.value)}
+              onChange={e => setSelectedAppService(e.target.value)}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               disabled={!selectedSubscription}
               required
             >
               <option value="">Select an app service</option>
-              {appServices.map((app) => (
+              {appServices.map(app => (
                 <option key={app.id} value={app.id}>
                   {app.name} ({app.kind || 'app'}) - {app.location}
                 </option>
@@ -309,17 +346,20 @@ const DatadogAPMForm: React.FC = () => {
 
         {/* Datadog Site Selection */}
         <div>
-          <label htmlFor="datadogSite" className="block text-sm font-medium text-gray-700 mb-2">
+          <label
+            htmlFor="datadogSite"
+            className="block text-sm font-medium text-gray-700 mb-2"
+          >
             Datadog Site *
           </label>
           <select
             id="datadogSite"
             value={selectedDatadogSite}
-            onChange={(e) => setSelectedDatadogSite(e.target.value)}
+            onChange={e => setSelectedDatadogSite(e.target.value)}
             className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             required
           >
-            {DATADOG_SITES.map((site) => (
+            {DATADOG_SITES.map(site => (
               <option key={site.value} value={site.value}>
                 {site.label}
               </option>
@@ -329,27 +369,36 @@ const DatadogAPMForm: React.FC = () => {
 
         {/* Datadog API Key */}
         <div>
-          <label htmlFor="ddApiKey" className="block text-sm font-medium text-gray-700 mb-2">
+          <label
+            htmlFor="ddApiKey"
+            className="block text-sm font-medium text-gray-700 mb-2"
+          >
             Datadog API Key *
           </label>
           <input
             type="password"
             id="ddApiKey"
             value={ddApiKey}
-            onChange={(e) => setDdApiKey(e.target.value)}
+            onChange={e => setDdApiKey(e.target.value)}
             className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             placeholder="Enter your Datadog API key"
             required
           />
           <p className="mt-1 text-xs text-gray-500">
-            You can find your API key in your Datadog account under Organization Settings → API Keys
+            You can find your API key in your Datadog account under Organization
+            Settings → API Keys
           </p>
         </div>
 
         {/* Deploy Button */}
         <button
           type="submit"
-          disabled={isLoading || deploymentStatus === 'deploying' || !selectedAppService || !ddApiKey}
+          disabled={
+            isLoading ||
+            deploymentStatus === 'deploying' ||
+            !selectedAppService ||
+            !ddApiKey
+          }
           className="w-full bg-purple-600 text-white py-3 px-4 rounded-lg hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors duration-200 flex items-center justify-center"
         >
           {deploymentStatus === 'deploying' ? (
@@ -365,7 +414,8 @@ const DatadogAPMForm: React.FC = () => {
 
       <div className="mt-6 text-xs text-gray-500">
         <p>
-          * Required fields. This will deploy ARM templates to configure Datadog APM monitoring on your selected App Service.
+          * Required fields. This will deploy ARM templates to configure Datadog
+          APM monitoring on your selected App Service.
         </p>
       </div>
     </div>

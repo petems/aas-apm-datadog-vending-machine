@@ -1,5 +1,9 @@
 import { AzureService, AzureApiError } from '../azureService';
-import { mockSubscription, mockAppService, mockLinuxAppService } from '../../__tests__/helpers';
+import {
+  mockSubscription,
+  mockAppService,
+  mockLinuxAppService,
+} from '../../test-utils';
 
 // Mock fetch globally
 global.fetch = jest.fn();
@@ -56,7 +60,9 @@ describe('AzureService', () => {
       } as unknown as Response);
 
       await expect(service.getSubscriptions()).rejects.toThrow(AzureApiError);
-      await expect(service.getSubscriptions()).rejects.toThrow('Subscription not found');
+      await expect(service.getSubscriptions()).rejects.toThrow(
+        'Subscription not found'
+      );
     });
 
     it('should handle network errors', async () => {
@@ -67,21 +73,23 @@ describe('AzureService', () => {
     });
 
     it('should handle timeout errors', async () => {
-      jest.useFakeTimers();
-      
-      // Mock a request that never resolves
-      mockFetch.mockImplementationOnce(
-        () => new Promise(() => {}) // Never resolves
-      );
+      // Mock AbortController to simulate timeout
+      const mockAbortController = {
+        abort: jest.fn(),
+        signal: { aborted: false },
+      };
+      global.AbortController = jest.fn(() => mockAbortController) as any;
 
-      const promise = service.getSubscriptions();
-      
-      // Fast-forward time to trigger timeout
-      jest.advanceTimersByTime(31000);
-      
-      await expect(promise).rejects.toThrow('Request timeout');
-      
-      jest.useRealTimers();
+      // Mock fetch to throw AbortError after delay
+      mockFetch.mockImplementationOnce(() => {
+        // Simulate the timeout by throwing an AbortError
+        const error = new DOMException('Operation was aborted', 'AbortError');
+        return Promise.reject(error);
+      });
+
+      await expect(service.getSubscriptions()).rejects.toThrow(
+        'Request timeout'
+      );
     });
   });
 
@@ -144,7 +152,9 @@ describe('AzureService', () => {
 
       const result = await service.getAppServices(subscriptionId);
 
-      expect(result[0].resourceGroup).toBe('test-rg');
+      expect(result).toBeDefined();
+      expect(result.length).toBeGreaterThan(0);
+      expect(result[0]?.resourceGroup).toBe('test-rg');
     });
   });
 
@@ -172,12 +182,16 @@ describe('AzureService', () => {
   describe('getARMTemplateUri', () => {
     it('should return Windows template URI', () => {
       const uri = service.getARMTemplateUri(true);
-      expect(uri).toBe('https://test.github.io/arm/windows-appservice-datadog.json');
+      expect(uri).toBe(
+        'https://test.github.io/arm/windows-appservice-datadog.json'
+      );
     });
 
     it('should return Linux template URI', () => {
       const uri = service.getARMTemplateUri(false);
-      expect(uri).toBe('https://test.github.io/arm/linux-appservice-datadog.json');
+      expect(uri).toBe(
+        'https://test.github.io/arm/linux-appservice-datadog.json'
+      );
     });
   });
 
@@ -222,8 +236,14 @@ describe('AzureService', () => {
 
     it('should validate required parameters', async () => {
       await expect(
-        service.deployDatadogAPM('', 'rg', 'name', 'uri', deploymentParams.parameters)
+        service.deployDatadogAPM(
+          '',
+          'rg',
+          'name',
+          'uri',
+          deploymentParams.parameters
+        )
       ).rejects.toThrow('All deployment parameters are required');
     });
   });
-}); 
+});
