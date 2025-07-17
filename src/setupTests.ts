@@ -19,6 +19,13 @@ jest.mock('@azure/msal-browser', () => ({
     loginPopup: jest.fn(),
     logoutPopup: jest.fn(),
   })),
+  LogLevel: {
+    Error: 0,
+    Warning: 1,
+    Info: 2,
+    Verbose: 3,
+    Trace: 4,
+  },
 }));
 
 jest.mock('@azure/msal-react', () => {
@@ -39,7 +46,9 @@ beforeAll(() => {
   console.error = (...args: any[]) => {
     if (
       typeof args[0] === 'string' &&
-      args[0].includes('Warning: ReactDOM.render is deprecated')
+      (args[0].includes('Warning: ReactDOM.render is deprecated') ||
+       args[0].includes('Warning: An update to') ||
+       args[0].includes('act(...)'))
     ) {
       return;
     }

@@ -79,6 +79,6 @@ export default [
     },
   },
   {
-    ignores: ['dist', 'build', 'node_modules', '*.config.js', '*.config.mjs'],
+    ignores: ['dist', 'build', 'node_modules', '*.config.js', '*.config.mjs', 'coverage'],
   },
 ]; 

@@ -44,6 +44,15 @@ const customRender = (
 export * from '@testing-library/react';
 export { customRender as render };
 
+// Helper for creating properly typed MSAL context mocks
+export const createMockMsalContext = (overrides = {}) => ({
+  instance: {} as any,
+  accounts: [] as any,
+  inProgress: 'none' as any,
+  logger: {} as any,
+  ...overrides,
+});
+
 // Mock data generators
 export const mockSubscription = {
   subscriptionId: 'test-sub-id',

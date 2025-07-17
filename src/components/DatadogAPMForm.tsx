@@ -286,6 +286,8 @@ const DatadogAPMForm: React.FC = () => {
           handleDeploy();
         }}
         className="space-y-6"
+        aria-label="Datadog APM Configuration Form"
+        data-testid="datadog-form"
       >
         {/* Subscription Selection */}
         <div>
@@ -306,7 +308,7 @@ const DatadogAPMForm: React.FC = () => {
               required
             >
               <option value="">Select a subscription</option>
-              {subscriptions.map(sub => (
+              {subscriptions?.map(sub => (
                 <option key={sub.subscriptionId} value={sub.subscriptionId}>
                   {sub.displayName} ({sub.subscriptionId})
                 </option>
@@ -335,7 +337,7 @@ const DatadogAPMForm: React.FC = () => {
               required
             >
               <option value="">Select an app service</option>
-              {appServices.map(app => (
+              {appServices?.map(app => (
                 <option key={app.id} value={app.id}>
                   {app.name} ({app.kind || 'app'}) - {app.location}
                 </option>

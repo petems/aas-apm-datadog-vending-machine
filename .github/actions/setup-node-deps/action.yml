@@ -1,0 +1,25 @@
+name: 'Setup Node.js and Dependencies'
+description: 'Sets up Node.js with specified version, enables corepack, and installs dependencies'
+
+inputs:
+  node-version:
+    description: 'Node.js version to use'
+    required: false
+    default: '20'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+        cache: 'yarn'
+
+    - name: Enable Corepack (for packageManager support)
+      shell: bash
+      run: corepack enable
+
+    - name: Install dependencies
+      shell: bash
+      run: yarn install --frozen-lockfile 
