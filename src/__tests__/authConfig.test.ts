@@ -1,9 +1,10 @@
 import { msalConfig, loginRequest, armApiRequest } from '../authConfig';
-import { LogLevel } from '@azure/msal-browser';
+import { Configuration, LogLevel } from '@azure/msal-browser';
+import * as msal from '@azure/msal-browser';
 
 // Mock window.location for testing
 const mockLocation = {
-  origin: 'https://test.example.com',
+  origin: 'https://test.github.io',
 };
 
 Object.defineProperty(window, 'location', {
@@ -15,8 +16,8 @@ describe('authConfig', () => {
   describe('msalConfig', () => {
     it('has correct auth configuration', () => {
       expect(msalConfig.auth.authority).toBe('https://login.microsoftonline.com/common');
-      expect(msalConfig.auth.redirectUri).toBe(window.location.origin);
-      expect(msalConfig.auth.postLogoutRedirectUri).toBe(window.location.origin);
+      expect(msalConfig.auth.redirectUri).toBe('https://test.github.io');
+      expect(msalConfig.auth.postLogoutRedirectUri).toBe('https://test.github.io');
     });
 
     it('uses CLIENT_ID from environment or fallback', () => {

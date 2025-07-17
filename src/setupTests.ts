@@ -19,6 +19,13 @@ jest.mock('@azure/msal-browser', () => ({
     loginPopup: jest.fn(),
     logoutPopup: jest.fn(),
   })),
+  LogLevel: {
+    Error: 0,
+    Warning: 1,
+    Info: 2,
+    Verbose: 3,
+    Trace: 4,
+  },
 }));
 
 jest.mock('@azure/msal-react', () => {
