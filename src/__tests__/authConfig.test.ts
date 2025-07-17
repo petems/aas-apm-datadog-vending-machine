@@ -46,8 +46,8 @@ describe('authConfig', () => {
     });
 
     it('has correct cache configuration', () => {
-      expect(msalConfig.cache.cacheLocation).toBe('sessionStorage');
-      expect(msalConfig.cache.storeAuthStateInCookie).toBe(false);
+          expect(msalConfig.cache?.cacheLocation).toBe('sessionStorage');
+    expect(msalConfig.cache?.storeAuthStateInCookie).toBe(false);
     });
 
     it('has logger configuration with proper callback', () => {

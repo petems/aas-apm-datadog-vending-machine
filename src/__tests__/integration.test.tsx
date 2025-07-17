@@ -26,9 +26,9 @@ describe('Integration Tests', () => {
     jest.clearAllMocks();
     
     // Mock Azure service methods
-    mockAzureService.getSubscriptions = jest.fn().mockResolvedValue([mockSubscription]);
-    mockAzureService.getAppServices = jest.fn().mockResolvedValue([mockAppService]);
-    mockAzureService.deployDatadogExtension = jest.fn().mockResolvedValue({ success: true });
+    (mockAzureService as any).prototype.getSubscriptions = jest.fn().mockResolvedValue([mockSubscription]);
+    (mockAzureService as any).prototype.getAppServices = jest.fn().mockResolvedValue([mockAppService]);
+    (mockAzureService as any).prototype.deployDatadogExtension = jest.fn().mockResolvedValue({ success: true });
   });
 
   describe('Unauthenticated User Flow', () => {
@@ -37,6 +37,7 @@ describe('Integration Tests', () => {
         instance: mockInstance as any,
         accounts: [],
         inProgress: 'none' as any,
+        logger: {} as any,
       });
     });
 
