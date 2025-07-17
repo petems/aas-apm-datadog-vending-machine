@@ -178,7 +178,7 @@ export class AzureService {
       throw new AzureApiError('All deployment parameters are required', 400, 'INVALID_INPUT');
     }
 
-    const url = `${AZURE_ARM_BASE_URL}/subscriptions/${subscriptionId}/resourcegroups/${resourceGroupName}/providers/Microsoft.Resources/deployments/${deploymentName}?api-version=2021-04-01`;
+    const url = `${AZURE_ARM_BASE_URL}/subscriptions/${subscriptionId}/resourceGroups/${resourceGroupName}/providers/Microsoft.Resources/deployments/${deploymentName}?api-version=2021-04-01`;
 
     const deploymentPayload = {
       properties: {
@@ -218,7 +218,7 @@ export class AzureService {
       throw new AzureApiError('All parameters are required', 400, 'INVALID_INPUT');
     }
 
-    const url = `${AZURE_ARM_BASE_URL}/subscriptions/${subscriptionId}/resourcegroups/${resourceGroupName}/providers/Microsoft.Resources/deployments/${deploymentName}?api-version=2021-04-01`;
+    const url = `${AZURE_ARM_BASE_URL}/subscriptions/${subscriptionId}/resourceGroups/${resourceGroupName}/providers/Microsoft.Resources/deployments/${deploymentName}?api-version=2021-04-01`;
     return this.makeRequest(url);
   }
 }
