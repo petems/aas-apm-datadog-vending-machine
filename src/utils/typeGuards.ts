@@ -4,7 +4,7 @@ import { AzureSubscription, AzureAppService, DatadogSite } from '../types';
  * Type guard to check if an object is a valid Azure Subscription
  */
 export function isAzureSubscription(obj: any): obj is AzureSubscription {
-  return (
+  return !!(
     obj &&
     typeof obj === 'object' &&
     typeof obj.subscriptionId === 'string' &&
@@ -18,7 +18,7 @@ export function isAzureSubscription(obj: any): obj is AzureSubscription {
  * Type guard to check if an object is a valid Azure App Service
  */
 export function isAzureAppService(obj: any): obj is AzureAppService {
-  return (
+  return !!(
     obj &&
     typeof obj === 'object' &&
     typeof obj.id === 'string' &&
@@ -37,7 +37,7 @@ export function isAzureAppService(obj: any): obj is AzureAppService {
  * Type guard to check if an object is a valid Datadog Site
  */
 export function isDatadogSite(obj: any): obj is DatadogSite {
-  return (
+  return !!(
     obj &&
     typeof obj === 'object' &&
     typeof obj.value === 'string' &&
@@ -58,9 +58,9 @@ export function isValidDatadogApiKey(apiKey: string): boolean {
  * Validates if a string is a valid Azure subscription ID format
  */
 export function isValidSubscriptionId(subscriptionId: string): boolean {
-  // Azure subscription IDs are UUIDs
+  // Azure subscription IDs are UUIDs (relaxed format)
   const uuidRegex =
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   return uuidRegex.test(subscriptionId);
 }
 

@@ -6,8 +6,19 @@ import { AzureService } from '../../services/azureService';
 import { mockSubscription, mockAppService, mockAuthResponse } from '../../test-utils';
 
 // Mock the Azure service
-jest.mock('../../services/azureService');
-const mockAzureService = AzureService as jest.Mocked<typeof AzureService>;
+const mockGetSubscriptions = jest.fn();
+const mockGetAppServices = jest.fn();
+const mockDeployDatadogExtension = jest.fn();
+
+jest.mock('../../services/azureService', () => {
+  return {
+    AzureService: jest.fn().mockImplementation(() => ({
+      getSubscriptions: mockGetSubscriptions,
+      getAppServices: mockGetAppServices,
+      deployDatadogExtension: mockDeployDatadogExtension,
+    })),
+  };
+});
 
 // Mock useMsal hook
 const mockUseMsal = useMsal as jest.MockedFunction<typeof useMsal>;
@@ -35,15 +46,16 @@ describe('DatadogAPMForm', () => {
       instance: mockInstance as any,
       accounts: mockAccounts as any,
       inProgress: 'none' as any,
+      logger: {} as any,
     });
 
     // Mock successful token acquisition
     mockInstance.acquireTokenSilent.mockResolvedValue(mockAuthResponse as any);
     
     // Mock Azure service methods
-    mockAzureService.getSubscriptions = jest.fn().mockResolvedValue([mockSubscription]);
-    mockAzureService.getAppServices = jest.fn().mockResolvedValue([mockAppService]);
-    mockAzureService.deployDatadogExtension = jest.fn().mockResolvedValue({ success: true });
+    mockGetSubscriptions.mockResolvedValue([mockSubscription]);
+    mockGetAppServices.mockResolvedValue([mockAppService]);
+    mockDeployDatadogExtension.mockResolvedValue({ success: true });
   });
 
   it('renders login button when not authenticated', () => {
@@ -51,6 +63,7 @@ describe('DatadogAPMForm', () => {
       instance: mockInstance as any,
       accounts: [],
       inProgress: 'none' as any,
+      logger: {} as any,
     });
 
     render(<DatadogAPMForm />);
@@ -63,6 +76,7 @@ describe('DatadogAPMForm', () => {
       instance: mockInstance as any,
       accounts: [],
       inProgress: 'none' as any,
+      logger: {} as any,
     });
 
     render(<DatadogAPMForm />);
@@ -77,7 +91,7 @@ describe('DatadogAPMForm', () => {
     render(<DatadogAPMForm />);
     
     await waitFor(() => {
-      expect(mockAzureService.getSubscriptions).toHaveBeenCalled();
+      expect(mockGetSubscriptions).toHaveBeenCalled();
     });
 
     expect(screen.getByDisplayValue(mockSubscription.displayName)).toBeInTheDocument();
@@ -96,7 +110,7 @@ describe('DatadogAPMForm', () => {
     fireEvent.change(subscriptionSelect, { target: { value: mockSubscription.subscriptionId } });
 
     await waitFor(() => {
-      expect(mockAzureService.getAppServices).toHaveBeenCalledWith('mock-access-token', mockSubscription.subscriptionId);
+      expect(mockGetAppServices).toHaveBeenCalledWith('mock-access-token', mockSubscription.subscriptionId);
     });
   });
 
@@ -138,7 +152,7 @@ describe('DatadogAPMForm', () => {
 
     // Wait for app services to load
     await waitFor(() => {
-      expect(mockAzureService.getAppServices).toHaveBeenCalled();
+      expect(mockGetAppServices).toHaveBeenCalled();
     });
 
     // Select app service
@@ -192,7 +206,7 @@ describe('DatadogAPMForm', () => {
   });
 
   it('shows error message when deployment fails', async () => {
-    mockAzureService.deployDatadogExtension = jest.fn().mockRejectedValue(new Error('Deployment failed'));
+    mockAzureService.deployDatadogExtension.mockRejectedValue(new Error('Deployment failed'));
 
     render(<DatadogAPMForm />);
     
@@ -229,7 +243,7 @@ describe('DatadogAPMForm', () => {
     render(<DatadogAPMForm />);
     
     await waitFor(() => {
-      expect(screen.getByText(/token acquisition failed/i)).toBeInTheDocument();
+      expect(screen.getByText(/Failed to acquire access token for Azure API/i)).toBeInTheDocument();
     });
   });
 
@@ -252,7 +266,7 @@ describe('DatadogAPMForm', () => {
 
   it('shows loading state during deployment', async () => {
     // Make deployment hang to test loading state
-    mockAzureService.deployDatadogExtension = jest.fn().mockImplementation(
+    mockAzureService.deployDatadogExtension.mockImplementation(
       () => new Promise(resolve => setTimeout(resolve, 1000))
     );
 
