@@ -1,0 +1,189 @@
+diff --git a/src/__tests__/App.test.tsx b/src/__tests__/App.test.tsx
+new file mode 100644
+index 0000000..10c60b3
+--- /dev/null
++++ b/src/__tests__/App.test.tsx
+@@ -0,0 +1,21 @@
++
++import React from 'react';
++import { render } from '@testing-library/react';
++import { MemoryRouter } from 'react-router-dom';
++import App from '../App';
++import { MsalProvider } from '@azure/msal-react';
++import { PublicClientApplication } from '@azure/msal-browser';
++import { msalConfig } from '../../authConfig';
++
++describe('App component', () => {
++  it('renders without crashing', () => {
++    const msalInstance = new PublicClientApplication(msalConfig);
++    render(
++      <MsalProvider instance={msalInstance}>
++        <MemoryRouter initialEntries={['/']}>
++          <App />
++        </MemoryRouter>
++      </MsalProvider>
++    );
++  });
++});
+diff --git a/src/__tests__/index.test.tsx b/src/__tests__/index.test.tsx
+new file mode 100644
+index 0000000..a19d5a4
+--- /dev/null
++++ b/src/__tests__/index.test.tsx
+@@ -0,0 +1,14 @@
++
++import React from 'react';
++import ReactDOM from 'react-dom/client';
++
++jest.mock('react-dom/client', () => ({
++  createRoot: jest.fn(() => ({
++    render: jest.fn(),
++  })),
++}));
++
++test('renders App without crashing', () => {
++  require('../index'); // will invoke the render logic
++  expect(ReactDOM.createRoot).toHaveBeenCalled();
++});
+diff --git a/src/components/__tests__/DatadogAPMForm.test.tsx b/src/components/__tests__/DatadogAPMForm.test.tsx
+new file mode 100644
+index 0000000..8bfd500
+--- /dev/null
++++ b/src/components/__tests__/DatadogAPMForm.test.tsx
+@@ -0,0 +1,21 @@
++
++import React from 'react';
++import { render, screen, fireEvent } from '@testing-library/react';
++import DatadogAPMForm from '../DatadogAPMForm';
++
++describe('DatadogAPMForm', () => {
++  test('renders form fields', () => {
++    render(<DatadogAPMForm />);
++    expect(screen.getByLabelText(/service name/i)).toBeInTheDocument();
++    expect(screen.getByLabelText(/environment/i)).toBeInTheDocument();
++  });
++
++  test('submits with valid input', () => {
++    render(<DatadogAPMForm />);
++    fireEvent.change(screen.getByLabelText(/service name/i), { target: { value: 'my-service' } });
++    fireEvent.change(screen.getByLabelText(/environment/i), { target: { value: 'production' } });
++
++    fireEvent.click(screen.getByRole('button', { name: /submit/i }));
++    expect(screen.getByRole('button', { name: /submit/i })).toBeDisabled();
++  });
++});
+diff --git a/src/components/__tests__/ErrorAlert.test.tsx b/src/components/__tests__/ErrorAlert.test.tsx
+new file mode 100644
+index 0000000..ed54f70
+--- /dev/null
++++ b/src/components/__tests__/ErrorAlert.test.tsx
+@@ -0,0 +1,11 @@
++
++import React from 'react';
++import { render, screen } from '@testing-library/react';
++import ErrorAlert from '../ErrorAlert';
++
++describe('ErrorAlert', () => {
++  it('renders error message', () => {
++    render(<ErrorAlert message="Something went wrong" />);
++    expect(screen.getByText(/something went wrong/i)).toBeInTheDocument();
++  });
++});
+diff --git a/src/components/__tests__/LoadingSpinner.test.tsx b/src/components/__tests__/LoadingSpinner.test.tsx
+new file mode 100644
+index 0000000..0396594
+--- /dev/null
++++ b/src/components/__tests__/LoadingSpinner.test.tsx
+@@ -0,0 +1,11 @@
++
++import React from 'react';
++import { render } from '@testing-library/react';
++import LoadingSpinner from '../LoadingSpinner';
++
++describe('LoadingSpinner', () => {
++  it('renders spinner element', () => {
++    const { container } = render(<LoadingSpinner />);
++    expect(container.firstChild).toHaveClass('spinner'); // Assuming it has spinner class
++  });
++});
+diff --git a/src/hooks/__tests__/useAuth.test.ts b/src/hooks/__tests__/useAuth.test.ts
+new file mode 100644
+index 0000000..7ebe1f1
+--- /dev/null
++++ b/src/hooks/__tests__/useAuth.test.ts
+@@ -0,0 +1,19 @@
++
++import { renderHook } from '@testing-library/react';
++import { useAuth } from '../useAuth';
++import { MsalProvider } from '@azure/msal-react';
++import { PublicClientApplication } from '@azure/msal-browser';
++import { msalConfig } from '../../authConfig';
++
++describe('useAuth', () => {
++  it('returns expected auth state', () => {
++    const wrapper = ({ children }) => (
++      <MsalProvider instance={new PublicClientApplication(msalConfig)}>
++        {children}
++      </MsalProvider>
++    );
++
++    const { result } = renderHook(() => useAuth(), { wrapper });
++    expect(result.current).toHaveProperty('accounts');
++  });
++});
+diff --git a/src/hooks/__tests__/useAzureApi.test.tsx b/src/hooks/__tests__/useAzureApi.test.tsx
+new file mode 100644
+index 0000000..935ed7a
+--- /dev/null
++++ b/src/hooks/__tests__/useAzureApi.test.tsx
+@@ -0,0 +1,10 @@
++
++import { renderHook } from '@testing-library/react';
++import { useAzureApi } from '../useAzureApi';
++
++describe('useAzureApi', () => {
++  it('returns expected methods', () => {
++    const { result } = renderHook(() => useAzureApi());
++    expect(typeof result.current.fetchAppServices).toBe('function');
++  });
++});
+diff --git a/src/pages/__tests__/Home.test.tsx b/src/pages/__tests__/Home.test.tsx
+new file mode 100644
+index 0000000..ce20d19
+--- /dev/null
++++ b/src/pages/__tests__/Home.test.tsx
+@@ -0,0 +1,11 @@
++
++import React from 'react';
++import { render, screen } from '@testing-library/react';
++import Home from '../pages/Home';
++
++describe('Home page', () => {
++  it('renders welcome message', () => {
++    render(<Home />);
++    expect(screen.getByText(/welcome/i)).toBeInTheDocument();
++  });
++});
+diff --git a/src/services/__tests__/azureService.test.ts b/src/services/__tests__/azureService.test.ts
+new file mode 100644
+index 0000000..d0420d0
+--- /dev/null
++++ b/src/services/__tests__/azureService.test.ts
+@@ -0,0 +1,17 @@
++
++import { fetchAppServices } from '../azureService';
++
++global.fetch = jest.fn(() =>
++  Promise.resolve({
++    ok: true,
++    json: () => Promise.resolve([{ name: 'app1' }]),
++  })
++) as jest.Mock;
++
++describe('azureService', () => {
++  it('fetches app services', async () => {
++    const data = await fetchAppServices();
++    expect(data).toEqual([{ name: 'app1' }]);
++    expect(fetch).toHaveBeenCalledTimes(1);
++  });
++});
