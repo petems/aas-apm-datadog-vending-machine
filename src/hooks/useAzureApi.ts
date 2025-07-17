@@ -1,18 +1,28 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AzureService, AzureApiError } from '../services/azureService';
-import { 
-  AzureSubscription, 
-  AzureAppService, 
-  DeploymentParameters 
+import {
+  AzureSubscription,
+  AzureAppService,
+  DeploymentParameters,
 } from '../types';
 
 // Query keys
 const QUERY_KEYS = {
   subscriptions: ['azure', 'subscriptions'] as const,
-  appServices: (subscriptionId: string) => 
+  appServices: (subscriptionId: string) =>
     ['azure', 'appServices', subscriptionId] as const,
-  appServiceDetails: (subscriptionId: string, resourceGroup: string, siteName: string) =>
-    ['azure', 'appServiceDetails', subscriptionId, resourceGroup, siteName] as const,
+  appServiceDetails: (
+    subscriptionId: string,
+    resourceGroup: string,
+    siteName: string
+  ) =>
+    [
+      'azure',
+      'appServiceDetails',
+      subscriptionId,
+      resourceGroup,
+      siteName,
+    ] as const,
 };
 
 // Hook for fetching subscriptions
@@ -38,7 +48,7 @@ export const useSubscriptions = (accessToken: string | null) => {
 
 // Hook for fetching app services
 export const useAppServices = (
-  accessToken: string | null, 
+  accessToken: string | null,
   subscriptionId: string | null
 ) => {
   return useQuery({
@@ -79,7 +89,11 @@ export const useAppServiceDetails = (
         throw new Error('All parameters are required');
       }
       const azureService = new AzureService(accessToken);
-      return azureService.getAppServiceDetails(subscriptionId, resourceGroup, siteName);
+      return azureService.getAppServiceDetails(
+        subscriptionId,
+        resourceGroup,
+        siteName
+      );
     },
     enabled: !!accessToken && !!subscriptionId && !!resourceGroup && !!siteName,
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -99,7 +113,7 @@ export const useDatadogDeployment = (accessToken: string | null) => {
       parameters: DeploymentParameters;
     }) => {
       if (!accessToken) throw new Error('No access token available');
-      
+
       const azureService = new AzureService(accessToken);
       return azureService.deployDatadogAPM(
         params.subscriptionId,
@@ -111,13 +125,16 @@ export const useDatadogDeployment = (accessToken: string | null) => {
     },
     onSuccess: () => {
       // Invalidate related queries on successful deployment
-      queryClient.invalidateQueries({ 
-        queryKey: ['azure'] 
+      queryClient.invalidateQueries({
+        queryKey: ['azure'],
       });
     },
     retry: (failureCount, error) => {
       // Don't retry auth errors or client errors
-      if (error instanceof AzureApiError && (error.status === 401 || error.status === 400)) {
+      if (
+        error instanceof AzureApiError &&
+        (error.status === 401 || error.status === 400)
+      ) {
         return false;
       }
       return failureCount < 1; // Only retry once for deployment
@@ -133,16 +150,35 @@ export const useDeploymentStatus = (
   deploymentName: string | null
 ) => {
   return useQuery({
-    queryKey: ['azure', 'deployment', subscriptionId, resourceGroupName, deploymentName],
+    queryKey: [
+      'azure',
+      'deployment',
+      subscriptionId,
+      resourceGroupName,
+      deploymentName,
+    ],
     queryFn: async () => {
-      if (!accessToken || !subscriptionId || !resourceGroupName || !deploymentName) {
+      if (
+        !accessToken ||
+        !subscriptionId ||
+        !resourceGroupName ||
+        !deploymentName
+      ) {
         throw new Error('All parameters are required');
       }
       const azureService = new AzureService(accessToken);
-      return azureService.getDeploymentStatus(subscriptionId, resourceGroupName, deploymentName);
+      return azureService.getDeploymentStatus(
+        subscriptionId,
+        resourceGroupName,
+        deploymentName
+      );
     },
-    enabled: !!accessToken && !!subscriptionId && !!resourceGroupName && !!deploymentName,
+    enabled:
+      !!accessToken &&
+      !!subscriptionId &&
+      !!resourceGroupName &&
+      !!deploymentName,
     refetchInterval: 5000, // Poll every 5 seconds while enabled
     staleTime: 0, // Always fetch fresh data for deployment status
   });
-}; 
+};

@@ -23,8 +23,8 @@ function App() {
                 Azure Vending Machine
               </h2>
               <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                Quickly enable Datadog Application Performance Monitoring on your Azure App Services 
-                with automated ARM template deployments.
+                Quickly enable Datadog Application Performance Monitoring on
+                your Azure App Services with automated ARM template deployments.
               </p>
             </div>
 
@@ -34,10 +34,10 @@ function App() {
             {/* Footer */}
             <div className="text-center mt-12 text-sm text-gray-500">
               <p>
-                Built with React + TypeScript + Azure MSAL • 
-                <a 
-                  href="https://docs.datadoghq.com/serverless/azure_app_services/" 
-                  target="_blank" 
+                Built with React + TypeScript + Azure MSAL •
+                <a
+                  href="https://docs.datadoghq.com/serverless/azure_app_services/"
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="ml-1 text-blue-600 hover:text-blue-800"
                 >

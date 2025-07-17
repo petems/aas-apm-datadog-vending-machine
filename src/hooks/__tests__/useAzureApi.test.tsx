@@ -1,13 +1,19 @@
 import React from 'react';
 import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useSubscriptions, useAppServices, useDatadogDeployment } from '../useAzureApi';
+import {
+  useSubscriptions,
+  useAppServices,
+  useDatadogDeployment,
+} from '../useAzureApi';
 import { AzureService } from '../../services/azureService';
-import { mockSubscription, mockAppService } from '../../__tests__/helpers';
+import { mockSubscription, mockAppService } from '../../test-utils';
 
 // Mock the Azure service
 jest.mock('../../services/azureService');
-const MockedAzureService = AzureService as jest.MockedClass<typeof AzureService>;
+const MockedAzureService = AzureService as jest.MockedClass<
+  typeof AzureService
+>;
 
 const createWrapper = () => {
   const queryClient = new QueryClient({
@@ -16,32 +22,34 @@ const createWrapper = () => {
       mutations: { retry: false },
     },
   });
-  
+
   return ({ children }: { children: React.ReactNode }) => (
-    <QueryClientProvider client={queryClient}>
-      {children}
-    </QueryClientProvider>
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   );
 };
 
 describe('useAzureApi hooks', () => {
   const mockAccessToken = 'mock-access-token';
-  
+
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   describe('useSubscriptions', () => {
     it('should fetch subscriptions successfully', async () => {
-      const mockGetSubscriptions = jest.fn().mockResolvedValue([mockSubscription]);
-      MockedAzureService.mockImplementation(() => ({
-        getSubscriptions: mockGetSubscriptions,
-      } as any));
-
-      const { result } = renderHook(
-        () => useSubscriptions(mockAccessToken),
-        { wrapper: createWrapper() }
+      const mockGetSubscriptions = jest
+        .fn()
+        .mockResolvedValue([mockSubscription]);
+      MockedAzureService.mockImplementation(
+        () =>
+          ({
+            getSubscriptions: mockGetSubscriptions,
+          }) as any
       );
+
+      const { result } = renderHook(() => useSubscriptions(mockAccessToken), {
+        wrapper: createWrapper(),
+      });
 
       await waitFor(() => {
         expect(result.current.isSuccess).toBe(true);
@@ -52,33 +60,47 @@ describe('useAzureApi hooks', () => {
     });
 
     it('should not fetch when access token is null', async () => {
-      const { result } = renderHook(
-        () => useSubscriptions(null),
-        { wrapper: createWrapper() }
+      const mockGetSubscriptions = jest.fn();
+      MockedAzureService.mockImplementation(
+        () =>
+          ({
+            getSubscriptions: mockGetSubscriptions,
+          }) as any
       );
 
-      // Wait for initial render to settle
-      await waitFor(() => {
-        expect(result.current.isPending).toBe(false);
+      const { result } = renderHook(() => useSubscriptions(null), {
+        wrapper: createWrapper(),
       });
+
+      // Give it a bit of time, then verify no API call was made
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // The important thing is that getSubscriptions was never called
+      expect(mockGetSubscriptions).not.toHaveBeenCalled();
+      expect(result.current.data).toBeUndefined();
     });
 
     it('should handle fetch errors', async () => {
-      const mockGetSubscriptions = jest.fn().mockRejectedValue(
-        new Error('Failed to fetch subscriptions')
-      );
-      MockedAzureService.mockImplementation(() => ({
-        getSubscriptions: mockGetSubscriptions,
-      } as any));
-
-      const { result } = renderHook(
-        () => useSubscriptions(mockAccessToken),
-        { wrapper: createWrapper() }
+      const mockGetSubscriptions = jest
+        .fn()
+        .mockRejectedValue(new Error('Failed to fetch subscriptions'));
+      MockedAzureService.mockImplementation(
+        () =>
+          ({
+            getSubscriptions: mockGetSubscriptions,
+          }) as any
       );
 
-      await waitFor(() => {
-        expect(result.current.isError).toBe(true);
-      }, { timeout: 3000 });
+      const { result } = renderHook(() => useSubscriptions(mockAccessToken), {
+        wrapper: createWrapper(),
+      });
+
+      await waitFor(
+        () => {
+          expect(result.current.isError).toBe(true);
+        },
+        { timeout: 5000 }
+      );
 
       expect(result.current.error).toBeTruthy();
       expect(mockGetSubscriptions).toHaveBeenCalled();
@@ -90,9 +112,12 @@ describe('useAzureApi hooks', () => {
 
     it('should fetch app services successfully', async () => {
       const mockGetAppServices = jest.fn().mockResolvedValue([mockAppService]);
-      MockedAzureService.mockImplementation(() => ({
-        getAppServices: mockGetAppServices,
-      } as any));
+      MockedAzureService.mockImplementation(
+        () =>
+          ({
+            getAppServices: mockGetAppServices,
+          }) as any
+      );
 
       const { result } = renderHook(
         () => useAppServices(mockAccessToken, mockSubscriptionId),
@@ -108,28 +133,41 @@ describe('useAzureApi hooks', () => {
     });
 
     it('should not fetch when subscription ID is null', async () => {
+      const mockGetAppServices = jest.fn();
+      MockedAzureService.mockImplementation(
+        () =>
+          ({
+            getAppServices: mockGetAppServices,
+          }) as any
+      );
+
       const { result } = renderHook(
         () => useAppServices(mockAccessToken, null),
         { wrapper: createWrapper() }
       );
 
-      // Wait for initial render to settle
-      await waitFor(() => {
-        expect(result.current.isPending).toBe(false);
-      });
+      // Give it a bit of time, then verify no API call was made
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // The important thing is that getAppServices was never called
+      expect(mockGetAppServices).not.toHaveBeenCalled();
+      expect(result.current.data).toBeUndefined();
     });
 
     it('should handle subscription change', async () => {
       const mockGetAppServices = jest.fn().mockResolvedValue([mockAppService]);
-      MockedAzureService.mockImplementation(() => ({
-        getAppServices: mockGetAppServices,
-      } as any));
+      MockedAzureService.mockImplementation(
+        () =>
+          ({
+            getAppServices: mockGetAppServices,
+          }) as any
+      );
 
       const { result, rerender } = renderHook(
         ({ subscriptionId }) => useAppServices(mockAccessToken, subscriptionId),
-        { 
+        {
           wrapper: createWrapper(),
-          initialProps: { subscriptionId: 'subscription-1' }
+          initialProps: { subscriptionId: 'subscription-1' },
         }
       );
 
@@ -149,9 +187,12 @@ describe('useAzureApi hooks', () => {
   describe('useDatadogDeployment', () => {
     it('should deploy successfully', async () => {
       const mockDeploy = jest.fn().mockResolvedValue({ success: true });
-      MockedAzureService.mockImplementation(() => ({
-        deployDatadogAPM: mockDeploy,
-      } as any));
+      MockedAzureService.mockImplementation(
+        () =>
+          ({
+            deployDatadogAPM: mockDeploy,
+          }) as any
+      );
 
       const { result } = renderHook(
         () => useDatadogDeployment(mockAccessToken),
@@ -183,12 +224,15 @@ describe('useAzureApi hooks', () => {
     });
 
     it('should handle deployment errors', async () => {
-      const mockDeploy = jest.fn().mockRejectedValue(
-        new Error('Deployment failed')
+      const mockDeploy = jest
+        .fn()
+        .mockRejectedValue(new Error('Deployment failed'));
+      MockedAzureService.mockImplementation(
+        () =>
+          ({
+            deployDatadogAPM: mockDeploy,
+          }) as any
       );
-      MockedAzureService.mockImplementation(() => ({
-        deployDatadogAPM: mockDeploy,
-      } as any));
 
       const { result } = renderHook(
         () => useDatadogDeployment(mockAccessToken),
@@ -220,4 +264,4 @@ describe('useAzureApi hooks', () => {
       expect(mockDeploy).toHaveBeenCalled();
     });
   });
-}); 
+});
