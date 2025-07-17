@@ -2,22 +2,14 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useMsal } from '@azure/msal-react';
 import { loginRequest, armApiRequest } from '../authConfig';
 import { AzureService } from '../services/azureService';
+import { DATADOG_SITES } from '../types/index';
 import {
   AzureSubscription,
   AzureAppService,
-  DatadogSite,
   DeploymentParameters,
 } from '../types';
 import LoadingSpinner from './LoadingSpinner';
 import ErrorAlert from './ErrorAlert';
-
-const DATADOG_SITES: DatadogSite[] = [
-  { value: 'datadoghq.com', label: 'US1 (datadoghq.com)' },
-  { value: 'datadoghq.eu', label: 'EU1 (datadoghq.eu)' },
-  { value: 'us3.datadoghq.com', label: 'US3 (us3.datadoghq.com)' },
-  { value: 'us5.datadoghq.com', label: 'US5 (us5.datadoghq.com)' },
-  { value: 'ap1.datadoghq.com', label: 'AP1 (ap1.datadoghq.com)' },
-];
 
 const DatadogAPMForm: React.FC = () => {
   const { instance, accounts } = useMsal();
@@ -141,14 +133,6 @@ const DatadogAPMForm: React.FC = () => {
     }
   };
 
-  const getARMTemplateUri = (isWindows: boolean): string => {
-    const { origin, pathname } = window.location;
-    const basePath = pathname.endsWith('/') ? pathname : `${pathname}/`;
-    return `${origin}${basePath}arm/${
-      isWindows ? 'windows' : 'linux'
-    }-appservice-datadog.json`;
-  };
-
   const handleDeploy = async () => {
     if (!accessToken || !selectedAppService || !ddApiKey) {
       setError('Please fill in all required fields');
@@ -181,7 +165,7 @@ const DatadogAPMForm: React.FC = () => {
 
       // Determine if it's Windows or Linux
       const isWindows = azureService.isWindowsAppService(selectedApp);
-      const templateUri = getARMTemplateUri(isWindows);
+      const templateUri = azureService.getARMTemplateUri(isWindows);
 
       const deploymentParameters: DeploymentParameters = {
         siteName: selectedApp.name,
