@@ -162,8 +162,11 @@ export class AzureService {
    * Get ARM template URI based on platform
    */
   getARMTemplateUri(isWindows: boolean): string {
-    const baseUrl = window.location.origin;
-    return `${baseUrl}/arm/${isWindows ? 'windows' : 'linux'}-appservice-datadog.json`;
+    const { origin, pathname } = window.location;
+    const basePath = pathname.endsWith('/') ? pathname : `${pathname}/`;
+    return `${origin}${basePath}arm/${
+      isWindows ? 'windows' : 'linux'
+    }-appservice-datadog.json`;
   }
 
   /**
