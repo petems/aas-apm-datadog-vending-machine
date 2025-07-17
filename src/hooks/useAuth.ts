@@ -32,7 +32,7 @@ export const useAuth = () => {
         ...armApiRequest,
         account: firstAccount,
       });
-      
+
       setAuthState(prev => ({
         ...prev,
         accessToken: response.accessToken,
@@ -40,7 +40,7 @@ export const useAuth = () => {
       }));
     } catch (error) {
       console.warn('Silent token acquisition failed, trying popup', error);
-      
+
       try {
         // Fallback to popup
         const response = await instance.acquireTokenPopup(armApiRequest);
@@ -70,7 +70,7 @@ export const useAuth = () => {
 
   const login = useCallback(async () => {
     setAuthState(prev => ({ ...prev, isLoading: true, error: null }));
-    
+
     try {
       await instance.loginPopup(loginRequest);
     } catch (error) {
@@ -104,4 +104,4 @@ export const useAuth = () => {
     clearError,
     refreshToken: acquireToken,
   };
-}; 
+};

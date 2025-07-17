@@ -94,6 +94,16 @@ export const QUERY_KEYS = {
   subscriptions: ['azure', 'subscriptions'] as const,
   appServices: (subscriptionId: string) =>
     ['azure', 'appServices', subscriptionId] as const,
-  appServiceDetails: (subscriptionId: string, resourceGroup: string, siteName: string) =>
-    ['azure', 'appServiceDetails', subscriptionId, resourceGroup, siteName] as const,
-} as const; 
+  appServiceDetails: (
+    subscriptionId: string,
+    resourceGroup: string,
+    siteName: string
+  ) =>
+    [
+      'azure',
+      'appServiceDetails',
+      subscriptionId,
+      resourceGroup,
+      siteName,
+    ] as const,
+} as const;

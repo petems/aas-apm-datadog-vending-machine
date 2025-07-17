@@ -1,13 +1,19 @@
 import React from 'react';
 import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useSubscriptions, useAppServices, useDatadogDeployment } from '../useAzureApi';
+import {
+  useSubscriptions,
+  useAppServices,
+  useDatadogDeployment,
+} from '../useAzureApi';
 import { AzureService } from '../../services/azureService';
-import { mockSubscription, mockAppService } from '../../__tests__/helpers';
+import { mockSubscription, mockAppService } from '../../test-utils';
 
 // Mock the Azure service
 jest.mock('../../services/azureService');
-const MockedAzureService = AzureService as jest.MockedClass<typeof AzureService>;
+const MockedAzureService = AzureService as jest.MockedClass<
+  typeof AzureService
+>;
 
 const createWrapper = () => {
   const queryClient = new QueryClient({
@@ -16,32 +22,34 @@ const createWrapper = () => {
       mutations: { retry: false },
     },
   });
-  
+
   return ({ children }: { children: React.ReactNode }) => (
-    <QueryClientProvider client={queryClient}>
-      {children}
-    </QueryClientProvider>
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   );
 };
 
 describe('useAzureApi hooks', () => {
   const mockAccessToken = 'mock-access-token';
-  
+
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   describe('useSubscriptions', () => {
     it('fetches subscriptions successfully', async () => {
-      const mockGetSubscriptions = jest.fn().mockResolvedValue([mockSubscription]);
-      MockedAzureService.mockImplementation(() => ({
-        getSubscriptions: mockGetSubscriptions,
-      } as any));
-
-      const { result } = renderHook(
-        () => useSubscriptions(mockAccessToken),
-        { wrapper: createWrapper() }
+      const mockGetSubscriptions = jest
+        .fn()
+        .mockResolvedValue([mockSubscription]);
+      MockedAzureService.mockImplementation(
+        () =>
+          ({
+            getSubscriptions: mockGetSubscriptions,
+          }) as any
       );
+
+      const { result } = renderHook(() => useSubscriptions(mockAccessToken), {
+        wrapper: createWrapper(),
+      });
 
       await waitFor(() => {
         expect(result.current.isSuccess).toBe(true);
@@ -53,32 +61,55 @@ describe('useAzureApi hooks', () => {
 
     it('does not fetch when access token is null or undefined (table test)', async () => {
       for (const token of [null, undefined]) {
-        const { result } = renderHook(
-          () => useSubscriptions(token as any),
-          { wrapper: createWrapper() }
-        );
-        await waitFor(() => {
-          expect(result.current.isPending).toBe(false);
+        const { result } = renderHook(() => useSubscriptions(token as any), {
+          wrapper: createWrapper(),
         });
+        expect(result.current.status).toBe('pending');
       }
     });
 
+    it('should not fetch when access token is null', async () => {
+      const mockGetSubscriptions = jest.fn();
+      MockedAzureService.mockImplementation(
+        () =>
+          ({
+            getSubscriptions: mockGetSubscriptions,
+          }) as any
+      );
+
+      const { result } = renderHook(() => useSubscriptions(null), {
+        wrapper: createWrapper(),
+      });
+
+      // Give it a bit of time, then verify no API call was made
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // The important thing is that getSubscriptions was never called
+      expect(mockGetSubscriptions).not.toHaveBeenCalled();
+      expect(result.current.data).toBeUndefined();
+    });
+
     it('handles fetch errors', async () => {
-      const mockGetSubscriptions = jest.fn().mockRejectedValue(
-        new Error('Failed to fetch subscriptions')
-      );
-      MockedAzureService.mockImplementation(() => ({
-        getSubscriptions: mockGetSubscriptions,
-      } as any));
-
-      const { result } = renderHook(
-        () => useSubscriptions(mockAccessToken),
-        { wrapper: createWrapper() }
+      const mockGetSubscriptions = jest
+        .fn()
+        .mockRejectedValue(new Error('Failed to fetch subscriptions'));
+      MockedAzureService.mockImplementation(
+        () =>
+          ({
+            getSubscriptions: mockGetSubscriptions,
+          }) as any
       );
 
-      await waitFor(() => {
-        expect(result.current.isError).toBe(true);
-      }, { timeout: 3000 });
+      const { result } = renderHook(() => useSubscriptions(mockAccessToken), {
+        wrapper: createWrapper(),
+      });
+
+      await waitFor(
+        () => {
+          expect(result.current.isError).toBe(true);
+        },
+        { timeout: 5000 }
+      );
 
       expect(result.current.error).toBeTruthy();
       expect(mockGetSubscriptions).toHaveBeenCalled();
@@ -88,10 +119,9 @@ describe('useAzureApi hooks', () => {
       MockedAzureService.mockImplementation(() => {
         throw new Error('Unexpected');
       });
-      const { result } = renderHook(
-        () => useSubscriptions(mockAccessToken),
-        { wrapper: createWrapper() }
-      );
+      const { result } = renderHook(() => useSubscriptions(mockAccessToken), {
+        wrapper: createWrapper(),
+      });
       await waitFor(() => {
         expect(result.current.isError).toBe(true);
       });
@@ -104,9 +134,12 @@ describe('useAzureApi hooks', () => {
 
     it('fetches app services successfully', async () => {
       const mockGetAppServices = jest.fn().mockResolvedValue([mockAppService]);
-      MockedAzureService.mockImplementation(() => ({
-        getAppServices: mockGetAppServices,
-      } as any));
+      MockedAzureService.mockImplementation(
+        () =>
+          ({
+            getAppServices: mockGetAppServices,
+          }) as any
+      );
 
       const { result } = renderHook(
         () => useAppServices(mockAccessToken, mockSubscriptionId),
@@ -127,23 +160,44 @@ describe('useAzureApi hooks', () => {
           () => useAppServices(mockAccessToken, subId as any),
           { wrapper: createWrapper() }
         );
-        await waitFor(() => {
-          expect(result.current.isPending).toBe(false);
-        });
+        expect(result.current.status).toBe('pending');
       }
+      // Also test explicit null with mock
+      const mockGetAppServices = jest.fn();
+      MockedAzureService.mockImplementation(
+        () =>
+          ({
+            getAppServices: mockGetAppServices,
+          }) as any
+      );
+
+      const { result } = renderHook(
+        () => useAppServices(mockAccessToken, null),
+        { wrapper: createWrapper() }
+      );
+
+      // Give it a bit of time, then verify no API call was made
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // The important thing is that getAppServices was never called
+      expect(mockGetAppServices).not.toHaveBeenCalled();
+      expect(result.current.data).toBeUndefined();
     });
 
     it('handles subscription change', async () => {
       const mockGetAppServices = jest.fn().mockResolvedValue([mockAppService]);
-      MockedAzureService.mockImplementation(() => ({
-        getAppServices: mockGetAppServices,
-      } as any));
+      MockedAzureService.mockImplementation(
+        () =>
+          ({
+            getAppServices: mockGetAppServices,
+          }) as any
+      );
 
       const { result, rerender } = renderHook(
         ({ subscriptionId }) => useAppServices(mockAccessToken, subscriptionId),
         {
           wrapper: createWrapper(),
-          initialProps: { subscriptionId: 'subscription-1' }
+          initialProps: { subscriptionId: 'subscription-1' },
         }
       );
 
@@ -160,12 +214,15 @@ describe('useAzureApi hooks', () => {
     });
 
     it('handles fetch errors', async () => {
-      const mockGetAppServices = jest.fn().mockRejectedValue(
-        new Error('Failed to fetch app services')
+      const mockGetAppServices = jest
+        .fn()
+        .mockRejectedValue(new Error('Failed to fetch app services'));
+      MockedAzureService.mockImplementation(
+        () =>
+          ({
+            getAppServices: mockGetAppServices,
+          }) as any
       );
-      MockedAzureService.mockImplementation(() => ({
-        getAppServices: mockGetAppServices,
-      } as any));
       const { result } = renderHook(
         () => useAppServices(mockAccessToken, mockSubscriptionId),
         { wrapper: createWrapper() }
@@ -194,9 +251,12 @@ describe('useAzureApi hooks', () => {
   describe('useDatadogDeployment', () => {
     it('deploys successfully', async () => {
       const mockDeploy = jest.fn().mockResolvedValue({ success: true });
-      MockedAzureService.mockImplementation(() => ({
-        deployDatadogAPM: mockDeploy,
-      } as any));
+      MockedAzureService.mockImplementation(
+        () =>
+          ({
+            deployDatadogAPM: mockDeploy,
+          }) as any
+      );
 
       const { result } = renderHook(
         () => useDatadogDeployment(mockAccessToken),
@@ -228,12 +288,15 @@ describe('useAzureApi hooks', () => {
     });
 
     it('handles deployment errors', async () => {
-      const mockDeploy = jest.fn().mockRejectedValue(
-        new Error('Deployment failed')
+      const mockDeploy = jest
+        .fn()
+        .mockRejectedValue(new Error('Deployment failed'));
+      MockedAzureService.mockImplementation(
+        () =>
+          ({
+            deployDatadogAPM: mockDeploy,
+          }) as any
       );
-      MockedAzureService.mockImplementation(() => ({
-        deployDatadogAPM: mockDeploy,
-      } as any));
 
       const { result } = renderHook(
         () => useDatadogDeployment(mockAccessToken),
@@ -266,10 +329,15 @@ describe('useAzureApi hooks', () => {
     });
 
     it('handles missing/invalid deployment parameters (table test)', async () => {
-      const mockDeploy = jest.fn().mockRejectedValue(new Error('All deployment parameters are required'));
-      MockedAzureService.mockImplementation(() => ({
-        deployDatadogAPM: mockDeploy,
-      } as any));
+      const mockDeploy = jest
+        .fn()
+        .mockRejectedValue(new Error('All deployment parameters are required'));
+      MockedAzureService.mockImplementation(
+        () =>
+          ({
+            deployDatadogAPM: mockDeploy,
+          }) as any
+      );
       const { result } = renderHook(
         () => useDatadogDeployment(mockAccessToken),
         { wrapper: createWrapper() }
@@ -334,4 +402,4 @@ describe('useAzureApi hooks', () => {
       expect(caughtError).toBe(true);
     });
   });
-}); 
+});

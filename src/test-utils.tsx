@@ -1,3 +1,4 @@
+/* eslint-env jest */
 import React, { ReactElement } from 'react';
 import { render, RenderOptions } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -30,9 +31,7 @@ const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <MsalProvider instance={mockMsalInstance}>
-        {children}
-      </MsalProvider>
+      <MsalProvider instance={mockMsalInstance}>{children}</MsalProvider>
     </QueryClientProvider>
   );
 };
@@ -90,4 +89,4 @@ export const mockAuthResponse = {
   scopes: ['https://management.azure.com/user_impersonation'],
   idToken: 'mock-id-token',
   fromCache: false,
-}; 
+};
