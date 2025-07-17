@@ -31,8 +31,12 @@ export const useSubscriptions = (accessToken: string | null) => {
     queryKey: QUERY_KEYS.subscriptions,
     queryFn: async (): Promise<AzureSubscription[]> => {
       if (!accessToken) throw new Error('No access token available');
-      const azureService = new AzureService(accessToken);
-      return azureService.getSubscriptions();
+      try {
+        const azureService = new AzureService(accessToken);
+        return azureService.getSubscriptions();
+      } catch (error) {
+        throw error;
+      }
     },
     enabled: !!accessToken,
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -57,8 +61,12 @@ export const useAppServices = (
       if (!accessToken || !subscriptionId) {
         throw new Error('Access token and subscription ID are required');
       }
-      const azureService = new AzureService(accessToken);
-      return azureService.getAppServices(subscriptionId);
+      try {
+        const azureService = new AzureService(accessToken);
+        return azureService.getAppServices(subscriptionId);
+      } catch (error) {
+        throw error;
+      }
     },
     enabled: !!accessToken && !!subscriptionId,
     staleTime: 2 * 60 * 1000, // 2 minutes

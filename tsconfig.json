@@ -31,7 +31,8 @@
       "@/services/*": ["services/*"],
       "@/types/*": ["types/*"],
       "@/utils/*": ["utils/*"]
-    }
+    },
+    "types": ["jest", "@testing-library/jest-dom"]
   },
   "include": [
     "src",

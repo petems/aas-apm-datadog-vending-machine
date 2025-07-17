@@ -286,6 +286,8 @@ const DatadogAPMForm: React.FC = () => {
           handleDeploy();
         }}
         className="space-y-6"
+        aria-label="Datadog APM Configuration Form"
+        data-testid="datadog-form"
       >
         {/* Subscription Selection */}
         <div>

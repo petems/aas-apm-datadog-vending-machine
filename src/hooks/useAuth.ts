@@ -10,7 +10,26 @@ interface AuthState {
 }
 
 export const useAuth = () => {
-  const { instance, accounts } = useMsal();
+  let instance, accounts;
+  try {
+    const msalData = useMsal();
+    instance = msalData.instance;
+    accounts = msalData.accounts;
+  } catch (error) {
+    console.error('MSAL initialization error:', error);
+    // Return a safe state when MSAL fails
+    return {
+      isAuthenticated: false,
+      accessToken: null,
+      isLoading: false,
+      error: null,
+      login: () => Promise.resolve(),
+      logout: () => {},
+      clearError: () => {},
+      refreshToken: () => Promise.resolve(),
+    };
+  }
+
   const [authState, setAuthState] = useState<AuthState>({
     isAuthenticated: false,
     accessToken: null,

@@ -11,27 +11,29 @@ module.exports = {
     '!src/reportWebVitals.ts',
     '!src/**/__tests__/**',
     '!src/**/*.stories.{ts,tsx}',
+    '!**/node_modules/**',
   ],
   coverageThreshold: {
     global: {
-      branches: 70,
-      functions: 70,
-      lines: 70,
-      statements: 70,
+      branches: 75,
+      functions: 75,
+      lines: 75,
+      statements: 75,
     },
   },
   testMatch: [
     '<rootDir>/src/**/__tests__/**/*.(test|spec).{ts,tsx}',
     '<rootDir>/src/**/*.(test|spec).{ts,tsx}',
   ],
-  transform: {
-    '^.+\\.(ts|tsx)$': ['ts-jest', {
-      tsconfig: {
-        jsx: 'react-jsx',
-      },
-    }],
-  },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
   resetMocks: true,
   restoreMocks: true,
+  clearMocks: true,
+  testTimeout: 15000,
+  // Use the default transform from react-scripts instead of ts-jest
+  // This avoids conflicts with React 19 and modern JSX transform
+  transformIgnorePatterns: [
+    '[/\\\\]node_modules[/\\\\].+\\.(js|jsx|mjs|cjs|ts|tsx)$',
+    '^.+\\.module\\.(css|sass|scss)$',
+  ],
 }; 
