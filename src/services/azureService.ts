@@ -255,4 +255,16 @@ export class AzureService {
     const url = `${AZURE_ARM_BASE_URL}/subscriptions/${subscriptionId}/resourceGroups/${resourceGroupName}/providers/Microsoft.Resources/deployments/${deploymentName}?api-version=2021-04-01`;
     return this.makeRequest(url);
   }
+
+  /**
+   * Fetch all resource groups in a subscription
+   */
+  async getResourceGroups(subscriptionId: string): Promise<Array<{ id: string; name: string }>> {
+    if (!subscriptionId) {
+      throw new AzureApiError('Subscription ID is required', 400, 'INVALID_INPUT');
+    }
+    const url = `${AZURE_ARM_BASE_URL}/subscriptions/${subscriptionId}/resourcegroups?api-version=2021-04-01`;
+    const response = await this.makeRequest<{ value: Array<{ id: string; name: string }> }>(url);
+    return response.value;
+  }
 }
