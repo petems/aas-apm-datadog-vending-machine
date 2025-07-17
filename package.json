@@ -13,7 +13,10 @@
     "deploy": "gh-pages -d build",
     "lint": "eslint src --fix",
     "format": "prettier --write \"src/**/*.{ts,tsx,json,css,md}\"",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "check-peers": "npx check-peer-dependencies",
+    "check-peers:solutions": "npx check-peer-dependencies --findSolutions",
+    "explain-peer-requirements": "./scripts/yarn-explain-peer-requirements.sh"
   },
   "keywords": [
     "datadog",
@@ -39,6 +42,9 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@babel/core": "^7.26.0",
+    "@babel/plugin-syntax-flow": "^7.24.0",
+    "@babel/plugin-transform-react-jsx": "^7.25.0",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.1.4",
     "@testing-library/react": "^16.0.0",
