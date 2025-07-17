@@ -142,8 +142,10 @@ export class AzureService {
    * Determine if an App Service is running on Windows or Linux
    */
   isWindowsAppService(appService: AzureAppService): boolean {
+    const kind = appService.kind?.toLowerCase() || '';
+
     // Check the kind property for Linux indicators
-    if (appService.kind?.toLowerCase().includes('linux')) {
+    if (kind.includes('linux')) {
       return false;
     }
 

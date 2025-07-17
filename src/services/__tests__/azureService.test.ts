@@ -162,6 +162,11 @@ describe('AzureService', () => {
     it('should identify Linux app services by linuxFxVersion', () => {
       expect(service.isWindowsAppService(mockLinuxAppService)).toBe(false);
     });
+
+    it('should default to Windows when kind is missing', () => {
+      const noKindApp = { ...mockAppService, kind: undefined };
+      expect(service.isWindowsAppService(noKindApp as any)).toBe(true);
+    });
   });
 
   describe('getARMTemplateUri', () => {
