@@ -4,7 +4,7 @@ import {
   AzureSubscription,
   AzureAppService,
   DeploymentParameters,
-} from '../types';
+} from '../types/index';
 
 // Query keys
 const QUERY_KEYS = {
