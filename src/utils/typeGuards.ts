@@ -82,8 +82,8 @@ export function isWindowsAppService(appService: AzureAppService): boolean {
  * Extracts the resource group name from an Azure resource ID
  */
 export function extractResourceGroupFromId(resourceId: string): string | null {
-  const match = resourceId.match(/\/resourceGroups\/([^\/]+)\//);
-  return match ? match[1] : null;
+  const match = resourceId.match(/\/resourceGroups\/([^/]+)\//);
+  return match?.[1] ?? null;
 }
 
 /**

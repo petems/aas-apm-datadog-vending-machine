@@ -10,26 +10,6 @@ interface AuthState {
 }
 
 export const useAuth = () => {
-  let instance, accounts;
-  try {
-    const msalData = useMsal();
-    instance = msalData.instance;
-    accounts = msalData.accounts;
-  } catch (error) {
-    console.error('MSAL initialization error:', error);
-    // Return a safe state when MSAL fails
-    return {
-      isAuthenticated: false,
-      accessToken: null,
-      isLoading: false,
-      error: null,
-      login: () => Promise.resolve(),
-      logout: () => {},
-      clearError: () => {},
-      refreshToken: () => Promise.resolve(),
-    };
-  }
-
   const [authState, setAuthState] = useState<AuthState>({
     isAuthenticated: false,
     accessToken: null,
@@ -37,8 +17,21 @@ export const useAuth = () => {
     error: null,
   });
 
+  let instance: any = null;
+  let accounts: any = [];
+  let msalError = false;
+
+  try {
+    const msalData = useMsal();
+    instance = msalData.instance;
+    accounts = msalData.accounts;
+  } catch (error) {
+    console.error('MSAL initialization error:', error);
+    msalError = true;
+  }
+
   const acquireToken = useCallback(async () => {
-    if (accounts.length === 0) return;
+    if (msalError || !instance || accounts.length === 0) return;
 
     const firstAccount = accounts[0];
     if (!firstAccount) return;
@@ -77,17 +70,26 @@ export const useAuth = () => {
         }));
       }
     }
-  }, [instance, accounts]);
+  }, [instance, accounts, msalError]);
 
   // Check if user is authenticated
   useEffect(() => {
-    if (accounts.length > 0) {
+    if (!msalError && accounts.length > 0) {
       setAuthState(prev => ({ ...prev, isAuthenticated: true }));
       acquireToken();
     }
-  }, [accounts, acquireToken]);
+  }, [accounts, acquireToken, msalError]);
 
   const login = useCallback(async () => {
+    if (msalError || !instance) {
+      setAuthState(prev => ({
+        ...prev,
+        error: 'MSAL not available. Please refresh the page.',
+        isLoading: false,
+      }));
+      return;
+    }
+
     setAuthState(prev => ({ ...prev, isLoading: true, error: null }));
 
     try {
@@ -100,10 +102,12 @@ export const useAuth = () => {
         isLoading: false,
       }));
     }
-  }, [instance]);
+  }, [instance, msalError]);
 
   const logout = useCallback(() => {
-    instance.logoutPopup();
+    if (instance) {
+      instance.logoutPopup();
+    }
     setAuthState({
       isAuthenticated: false,
       accessToken: null,
