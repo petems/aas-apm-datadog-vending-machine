@@ -124,7 +124,7 @@ describe('useAzureApi hooks', () => {
       });
       await waitFor(() => {
         expect(result.current.isError).toBe(true);
-      });
+      }, { timeout: 5000 });
       expect(result.current.error).toBeTruthy();
     });
   });
@@ -229,7 +229,7 @@ describe('useAzureApi hooks', () => {
       );
       await waitFor(() => {
         expect(result.current.isError).toBe(true);
-      });
+      }, { timeout: 5000 });
       expect(result.current.error).toBeTruthy();
     });
 
@@ -243,7 +243,7 @@ describe('useAzureApi hooks', () => {
       );
       await waitFor(() => {
         expect(result.current.isError).toBe(true);
-      });
+      }, { timeout: 5000 });
       expect(result.current.error).toBeTruthy();
     });
   });

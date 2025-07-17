@@ -6,19 +6,38 @@ import { AzureService } from '../../services/azureService';
 import { mockSubscription, mockAppService, mockAuthResponse } from '../../test-utils';
 
 // Mock the Azure service
-const mockGetSubscriptions = jest.fn();
-const mockGetAppServices = jest.fn();
-const mockDeployDatadogExtension = jest.fn();
-
 jest.mock('../../services/azureService', () => {
+  const mockGetSubscriptions = jest.fn();
+  const mockGetAppServices = jest.fn();
+  const mockDeployDatadogAPM = jest.fn();
+  const mockIsWindowsAppService = jest.fn();
+  const mockGetARMTemplateUri = jest.fn();
+
   return {
     AzureService: jest.fn().mockImplementation(() => ({
       getSubscriptions: mockGetSubscriptions,
       getAppServices: mockGetAppServices,
-      deployDatadogExtension: mockDeployDatadogExtension,
+      deployDatadogAPM: mockDeployDatadogAPM,
+      isWindowsAppService: mockIsWindowsAppService,
+      getARMTemplateUri: mockGetARMTemplateUri,
     })),
+    // Export the mocks so we can access them in tests
+    __mockGetSubscriptions: mockGetSubscriptions,
+    __mockGetAppServices: mockGetAppServices,
+    __mockDeployDatadogAPM: mockDeployDatadogAPM,
+    __mockIsWindowsAppService: mockIsWindowsAppService,
+    __mockGetARMTemplateUri: mockGetARMTemplateUri,
   };
 });
+
+// Import the mocks
+const {
+  __mockGetSubscriptions: mockGetSubscriptions,
+  __mockGetAppServices: mockGetAppServices,
+  __mockDeployDatadogAPM: mockDeployDatadogAPM,
+  __mockIsWindowsAppService: mockIsWindowsAppService,
+  __mockGetARMTemplateUri: mockGetARMTemplateUri,
+} = require('../../services/azureService');
 
 // Mock useMsal hook
 const mockUseMsal = useMsal as jest.MockedFunction<typeof useMsal>;
@@ -53,9 +72,14 @@ describe('DatadogAPMForm', () => {
     mockInstance.acquireTokenSilent.mockResolvedValue(mockAuthResponse as any);
     
     // Mock Azure service methods
-    mockGetSubscriptions.mockResolvedValue([mockSubscription]);
+    mockGetSubscriptions.mockImplementation(() => {
+      console.log('mockGetSubscriptions called');
+      return Promise.resolve([mockSubscription]);
+    });
     mockGetAppServices.mockResolvedValue([mockAppService]);
-    mockDeployDatadogExtension.mockResolvedValue({ success: true });
+    mockDeployDatadogAPM.mockResolvedValue({ success: true });
+    mockIsWindowsAppService.mockReturnValue(true);
+    mockGetARMTemplateUri.mockReturnValue('https://example.com/template.json');
   });
 
   it('renders login button when not authenticated', () => {
@@ -180,7 +204,7 @@ describe('DatadogAPMForm', () => {
     fireEvent.change(subscriptionSelect, { target: { value: mockSubscription.subscriptionId } });
 
     await waitFor(() => {
-      expect(mockAzureService.getAppServices).toHaveBeenCalled();
+      expect(mockGetAppServices).toHaveBeenCalled();
     });
 
     const appServiceSelect = screen.getByRole('combobox', { name: /app service/i });
@@ -193,20 +217,23 @@ describe('DatadogAPMForm', () => {
     fireEvent.submit(form);
 
     await waitFor(() => {
-      expect(mockAzureService.deployDatadogExtension).toHaveBeenCalledWith(
-        'mock-access-token',
+      expect(mockDeployDatadogAPM).toHaveBeenCalledWith(
+        mockSubscription.subscriptionId,
+        expect.any(String), // resourceGroupName
+        expect.stringMatching(/datadog-apm-.*/), // deploymentName
+        expect.any(String), // templateUri
         expect.objectContaining({
-          subscriptionId: mockSubscription.subscriptionId,
-          appServiceId: mockAppService.id,
-          datadogSite: 'datadoghq.com',
-          datadogApiKey: 'test-api-key',
+          siteName: mockAppService.name,
+          location: mockAppService.location,
+          ddApiKey: 'test-api-key',
+          ddSite: 'datadoghq.com',
         })
       );
     });
   });
 
   it('shows error message when deployment fails', async () => {
-    mockAzureService.deployDatadogExtension.mockRejectedValue(new Error('Deployment failed'));
+    mockDeployDatadogAPM.mockRejectedValue(new Error('Deployment failed'));
 
     render(<DatadogAPMForm />);
     
@@ -219,7 +246,7 @@ describe('DatadogAPMForm', () => {
     fireEvent.change(subscriptionSelect, { target: { value: mockSubscription.subscriptionId } });
 
     await waitFor(() => {
-      expect(mockAzureService.getAppServices).toHaveBeenCalled();
+      expect(mockGetAppServices).toHaveBeenCalled();
     });
 
     const appServiceSelect = screen.getByRole('combobox', { name: /app service/i });
@@ -266,7 +293,7 @@ describe('DatadogAPMForm', () => {
 
   it('shows loading state during deployment', async () => {
     // Make deployment hang to test loading state
-    mockAzureService.deployDatadogExtension.mockImplementation(
+    mockDeployDatadogAPM.mockImplementation(
       () => new Promise(resolve => setTimeout(resolve, 1000))
     );
 
@@ -281,7 +308,7 @@ describe('DatadogAPMForm', () => {
     fireEvent.change(subscriptionSelect, { target: { value: mockSubscription.subscriptionId } });
 
     await waitFor(() => {
-      expect(mockAzureService.getAppServices).toHaveBeenCalled();
+      expect(mockGetAppServices).toHaveBeenCalled();
     });
 
     const appServiceSelect = screen.getByRole('combobox', { name: /app service/i });
