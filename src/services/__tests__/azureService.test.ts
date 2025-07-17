@@ -3,7 +3,11 @@ import {
   mockSubscription,
   mockAppService,
   mockLinuxAppService,
+<<<<<<< HEAD
 } from '../../test-helpers';
+=======
+} from '../../test-utils';
+>>>>>>> origin/master
 
 // Mock fetch globally
 global.fetch = jest.fn();
@@ -73,6 +77,7 @@ describe('AzureService', () => {
     });
 
     it('should handle timeout errors', async () => {
+<<<<<<< HEAD
       jest.useFakeTimers();
 
       // Mock a request that never resolves
@@ -88,6 +93,25 @@ describe('AzureService', () => {
       await expect(promise).rejects.toThrow('Request timeout');
 
       jest.useRealTimers();
+=======
+      // Mock AbortController to simulate timeout
+      const mockAbortController = {
+        abort: jest.fn(),
+        signal: { aborted: false },
+      };
+      global.AbortController = jest.fn(() => mockAbortController) as any;
+
+      // Mock fetch to throw AbortError after delay
+      mockFetch.mockImplementationOnce(() => {
+        // Simulate the timeout by throwing an AbortError
+        const error = new DOMException('Operation was aborted', 'AbortError');
+        return Promise.reject(error);
+      });
+
+      await expect(service.getSubscriptions()).rejects.toThrow(
+        'Request timeout'
+      );
+>>>>>>> origin/master
     });
   });
 
@@ -156,6 +180,10 @@ describe('AzureService', () => {
 
       const result = await service.getAppServices(subscriptionId);
 
+<<<<<<< HEAD
+=======
+      expect(result).toBeDefined();
+>>>>>>> origin/master
       expect(result.length).toBeGreaterThan(0);
       expect(result[0]?.resourceGroup).toBe('test-rg');
     });
@@ -237,6 +265,7 @@ describe('AzureService', () => {
       );
     });
 
+<<<<<<< HEAD
     it('should validate required parameters (table test)', async () => {
       const requiredParams = [
         ['', 'rg', 'name', 'uri', deploymentParams.parameters],
@@ -276,4 +305,18 @@ describe('AzureService', () => {
       await expect(service.getSubscriptions()).rejects.toThrow('Sync error');
     });
   });
+=======
+    it('should validate required parameters', async () => {
+      await expect(
+        service.deployDatadogAPM(
+          '',
+          'rg',
+          'name',
+          'uri',
+          deploymentParams.parameters
+        )
+      ).rejects.toThrow('All deployment parameters are required');
+    });
+  });
+>>>>>>> origin/master
 });

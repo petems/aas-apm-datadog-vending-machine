@@ -6,6 +6,7 @@ Object.defineProperty(window, 'location', {
   value: {
     origin: 'https://test.github.io',
     href: 'https://test.github.io',
+    pathname: '/',
   },
   writable: true,
 });

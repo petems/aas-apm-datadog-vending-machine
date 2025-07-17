@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent } from '../../test-helpers';
+import { render, screen, fireEvent } from '../../test-utils';
 import ErrorAlert from '../ErrorAlert';
 
 describe('ErrorAlert', () => {

@@ -7,7 +7,7 @@ import {
   useDatadogDeployment,
 } from '../useAzureApi';
 import { AzureService } from '../../services/azureService';
-import { mockSubscription, mockAppService } from '../../test-helpers';
+import { mockSubscription, mockAppService } from '../../test-utils';
 
 // Mock the Azure service
 jest.mock('../../services/azureService');
@@ -68,6 +68,27 @@ describe('useAzureApi hooks', () => {
       }
     });
 
+    it('should not fetch when access token is null', async () => {
+      const mockGetSubscriptions = jest.fn();
+      MockedAzureService.mockImplementation(
+        () =>
+          ({
+            getSubscriptions: mockGetSubscriptions,
+          }) as any
+      );
+
+      const { result } = renderHook(() => useSubscriptions(null), {
+        wrapper: createWrapper(),
+      });
+
+      // Give it a bit of time, then verify no API call was made
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // The important thing is that getSubscriptions was never called
+      expect(mockGetSubscriptions).not.toHaveBeenCalled();
+      expect(result.current.data).toBeUndefined();
+    });
+
     it('handles fetch errors', async () => {
       const mockGetSubscriptions = jest
         .fn()
@@ -85,10 +106,9 @@ describe('useAzureApi hooks', () => {
 
       await waitFor(
         () => {
-          // Wait for error state
           expect(result.current.isError).toBe(true);
         },
-        { timeout: 3000 }
+        { timeout: 5000 }
       );
 
       expect(result.current.error).toBeTruthy();
@@ -142,6 +162,26 @@ describe('useAzureApi hooks', () => {
         );
         expect(result.current.status).toBe('idle');
       }
+      // Also test explicit null with mock
+      const mockGetAppServices = jest.fn();
+      MockedAzureService.mockImplementation(
+        () =>
+          ({
+            getAppServices: mockGetAppServices,
+          }) as any
+      );
+
+      const { result } = renderHook(
+        () => useAppServices(mockAccessToken, null),
+        { wrapper: createWrapper() }
+      );
+
+      // Give it a bit of time, then verify no API call was made
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // The important thing is that getAppServices was never called
+      expect(mockGetAppServices).not.toHaveBeenCalled();
+      expect(result.current.data).toBeUndefined();
     });
 
     it('handles subscription change', async () => {

@@ -194,12 +194,16 @@ export class AzureService {
       !subscriptionId ||
       !resourceGroupName ||
       !deploymentName ||
+<<<<<<< HEAD
       !templateUri ||
       !parameters ||
       typeof parameters.siteName === 'undefined' ||
       typeof parameters.location === 'undefined' ||
       typeof parameters.ddApiKey === 'undefined' ||
       typeof parameters.ddSite === 'undefined'
+=======
+      !templateUri
+>>>>>>> origin/master
     ) {
       throw new AzureApiError(
         'All deployment parameters are required',
