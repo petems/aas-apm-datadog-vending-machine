@@ -45,6 +45,20 @@ cd datadog-apm-azure-vending-machine
 yarn install
 ```
 
+### Check Peer Dependencies
+
+This project uses Yarn 1.x (Classic). To check for peer dependency issues:
+
+```bash
+# Check peer dependencies
+yarn check-peers
+
+# Get solutions for peer dependency conflicts
+yarn check-peers:solutions
+```
+
+For more details about peer dependency management in this project, see [PEER_DEPENDENCIES_GUIDE.md](./PEER_DEPENDENCIES_GUIDE.md).
+
 ### 2. Configure Environment Variables
 
 Create a `.env` file in the root directory:
