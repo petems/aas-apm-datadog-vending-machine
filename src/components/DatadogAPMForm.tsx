@@ -140,6 +140,22 @@ const DatadogAPMForm: React.FC = () => {
     }
   };
 
+  const loadAppServicesInResourceGroup = async (subscriptionId: string, resourceGroupName: string) => {
+    if (!accessToken) return;
+
+    try {
+      setIsLoading(true);
+      const azureService = new AzureService(accessToken);
+      const services = await azureService.getAppServicesInResourceGroup(subscriptionId, resourceGroupName);
+      setAppServices(services);
+    } catch (error) {
+      console.error('Failed to load app services in resource group', error);
+      setError('Failed to load App Services in the selected resource group. Please check your permissions.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleSubscriptionChange = (subscriptionId: string) => {
     setSelectedSubscription(subscriptionId);
     setSelectedResourceGroup('');
@@ -156,14 +172,7 @@ const DatadogAPMForm: React.FC = () => {
     setSelectedAppService('');
     setAppServices([]);
     if (resourceGroupName && accessToken && selectedSubscription) {
-      // Pseudocode: fetch app services in the selected resource group
-      // You may need to update AzureService to support this if not already
-      // Example:
-      // const azureService = new AzureService(accessToken);
-      // const services = await azureService.getAppServicesInResourceGroup(selectedSubscription, resourceGroupName);
-      // setAppServices(services);
-      // For now, fallback to all app services in the subscription (existing logic)
-      loadAppServices(selectedSubscription);
+      loadAppServicesInResourceGroup(selectedSubscription, resourceGroupName);
     }
   };
 

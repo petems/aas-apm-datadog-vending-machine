@@ -130,6 +130,37 @@ export class AzureService {
   }
 
   /**
+   * Fetch all App Services and Function Apps in a specific resource group
+   */
+  async getAppServicesInResourceGroup(subscriptionId: string, resourceGroupName: string): Promise<AzureAppService[]> {
+    if (!subscriptionId || !resourceGroupName) {
+      throw new AzureApiError('Subscription ID and Resource Group Name are required', 400, 'INVALID_INPUT');
+    }
+
+    const url = `${AZURE_ARM_BASE_URL}/subscriptions/${subscriptionId}/resourceGroups/${resourceGroupName}/providers/Microsoft.Web/sites?api-version=2022-09-01`;
+    const response = await this.makeRequest<{ value: AzureAppService[] }>(url);
+
+    // Filter and validate app services
+    const filteredServices = response.value
+      .filter(
+        site =>
+          site.kind?.includes('functionapp') ||
+          site.kind?.includes('app') ||
+          site.kind === 'app'
+      )
+      .map(service => {
+        // Extract resource group from ID
+        const resourceGroupMatch = service.id.match(/resourceGroups\/([^/]+)/);
+        return {
+          ...service,
+          resourceGroup: resourceGroupMatch?.[1] || '',
+        };
+      });
+
+    return filteredServices;
+  }
+
+  /**
    * Get detailed information about a specific App Service
    */
   async getAppServiceDetails(
