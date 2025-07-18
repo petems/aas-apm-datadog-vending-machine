@@ -78,6 +78,11 @@ export type AppState = {
   loadingState: LoadingState;
 };
 
+export type ResourceGroup = {
+  id: string;
+  name: string;
+};
+
 // Constants
 export const DATADOG_SITES: DatadogSite[] = [
   { value: 'datadoghq.com', label: 'US1 (datadoghq.com)' },

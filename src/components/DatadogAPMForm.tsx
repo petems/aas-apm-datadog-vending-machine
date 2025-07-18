@@ -7,6 +7,7 @@ import {
   AzureSubscription,
   AzureAppService,
   DeploymentParameters,
+  ResourceGroup,
 } from '../types';
 import LoadingSpinner from './LoadingSpinner';
 import ErrorAlert from './ErrorAlert';
@@ -29,6 +30,8 @@ const DatadogAPMForm: React.FC = () => {
   const [deploymentStatus, setDeploymentStatus] = useState<
     'idle' | 'deploying' | 'success' | 'error'
   >('idle');
+  const [resourceGroups, setResourceGroups] = useState<ResourceGroup[]>([]);
+  const [selectedResourceGroup, setSelectedResourceGroup] = useState('');
 
   const acquireToken = useCallback(async () => {
     try {
@@ -108,6 +111,19 @@ const DatadogAPMForm: React.FC = () => {
     }
   };
 
+  const loadResourceGroups = async (token: string, subscriptionId: string) => {
+    try {
+      setIsLoading(true);
+      const azureService = new AzureService(token);
+      const groups = await azureService.getResourceGroups(subscriptionId);
+      setResourceGroups(groups);
+    } catch (error) {
+      setError('Failed to load resource groups. Please check your permissions.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const loadAppServices = async (subscriptionId: string) => {
     if (!accessToken) return;
 
@@ -124,12 +140,39 @@ const DatadogAPMForm: React.FC = () => {
     }
   };
 
+  const loadAppServicesInResourceGroup = async (subscriptionId: string, resourceGroupName: string) => {
+    if (!accessToken) return;
+
+    try {
+      setIsLoading(true);
+      const azureService = new AzureService(accessToken);
+      const services = await azureService.getAppServicesInResourceGroup(subscriptionId, resourceGroupName);
+      setAppServices(services);
+    } catch (error) {
+      console.error('Failed to load app services in resource group', error);
+      setError('Failed to load App Services in the selected resource group. Please check your permissions.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleSubscriptionChange = (subscriptionId: string) => {
     setSelectedSubscription(subscriptionId);
+    setSelectedResourceGroup('');
+    setResourceGroups([]);
     setSelectedAppService('');
     setAppServices([]);
-    if (subscriptionId) {
-      loadAppServices(subscriptionId);
+    if (subscriptionId && accessToken) {
+      loadResourceGroups(accessToken, subscriptionId);
+    }
+  };
+
+  const handleResourceGroupChange = (resourceGroupName: string) => {
+    setSelectedResourceGroup(resourceGroupName);
+    setSelectedAppService('');
+    setAppServices([]);
+    if (resourceGroupName && accessToken && selectedSubscription) {
+      loadAppServicesInResourceGroup(selectedSubscription, resourceGroupName);
     }
   };
 
@@ -301,34 +344,67 @@ const DatadogAPMForm: React.FC = () => {
           )}
         </div>
 
-        {/* App Service Selection */}
-        <div>
-          <label
-            htmlFor="appService"
-            className="block text-sm font-medium text-gray-700 mb-2"
-          >
-            App Service / Function App *
-          </label>
-          {isLoading && selectedSubscription && appServices.length === 0 ? (
-            <LoadingSpinner size="small" message="Loading app services..." />
-          ) : (
-            <select
-              id="appService"
-              value={selectedAppService}
-              onChange={e => setSelectedAppService(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              disabled={!selectedSubscription}
-              required
+        {/* Resource Group Selection */}
+        {selectedSubscription && (
+          <div>
+            <label
+              htmlFor="resourceGroup"
+              className="block text-sm font-medium text-gray-700 mb-2"
             >
-              <option value="">Select an app service</option>
-              {appServices?.map(app => (
-                <option key={app.id} value={app.id}>
-                  {app.name} ({app.kind || 'app'}) - {app.location}
-                </option>
-              ))}
-            </select>
-          )}
-        </div>
+              Resource Group *
+            </label>
+            {isLoading && resourceGroups.length === 0 ? (
+              <LoadingSpinner size="small" message="Loading resource groups..." />
+            ) : (
+              <select
+                id="resourceGroup"
+                value={selectedResourceGroup}
+                onChange={e => handleResourceGroupChange(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                disabled={!selectedSubscription}
+                required
+              >
+                <option value="">Select a resource group</option>
+                {resourceGroups?.map(group => (
+                  <option key={group.id} value={group.name}>
+                    {group.name}
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
+        )}
+
+        {/* App Service Selection */}
+        {selectedResourceGroup && (
+          <div>
+            <label
+              htmlFor="appService"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
+              App Service / Function App *
+            </label>
+            {isLoading && selectedResourceGroup && appServices.length === 0 ? (
+              <LoadingSpinner size="small" message="Loading app services..." />
+            ) : (
+              <select
+                id="appService"
+                value={selectedAppService}
+                onChange={e => setSelectedAppService(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                disabled={!selectedResourceGroup}
+                required
+              >
+                <option value="">Select an app service</option>
+                {appServices?.map(app => (
+                  <option key={app.id} value={app.id}>
+                    {app.name} ({app.kind || 'app'}) - {app.location}
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
+        )}
 
         {/* Datadog Site Selection */}
         <div>
