@@ -61,6 +61,11 @@ export const mockSubscription = {
   tenantId: 'test-tenant-id',
 };
 
+export const mockResourceGroup = {
+  id: '/subscriptions/test-sub-id/resourceGroups/test-rg',
+  name: 'test-rg',
+};
+
 export const mockAppService = {
   id: '/subscriptions/test-sub-id/resourceGroups/test-rg/providers/Microsoft.Web/sites/test-app',
   name: 'test-app',

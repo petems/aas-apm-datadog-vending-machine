@@ -6,6 +6,12 @@ export interface AzureSubscription {
   tenantId: string;
 }
 
+// Azure Resource Group interface (simplified for UI use)
+export interface ResourceGroup {
+  id: string;
+  name: string;
+}
+
 // Azure App Service interface
 export interface AzureAppService {
   id: string;
