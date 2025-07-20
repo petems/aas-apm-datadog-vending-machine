@@ -67,21 +67,11 @@ publisher_domain      = "yourusername.github.io/project-name"
 This module includes GitHub Actions workflows for:
 
 - **Validation**: Format checking, validation, and security scanning
-- **Planning**: Automatic plan generation on pull requests
-- **Drift Detection**: Daily checks for configuration drift
+- **Documentation**: Automatic documentation generation
 
 ### Required GitHub Secrets
 
-For CI/CD pipelines, configure these secrets:
-
-- `ARM_TENANT_ID`: Azure AD Tenant ID
-- `ARM_CLIENT_ID`: Service Principal Client ID
-- `ARM_CLIENT_SECRET`: Service Principal Client Secret
-- `ARM_SUBSCRIPTION_ID`: Azure Subscription ID
-
-### Optional GitHub Variables
-
-- `SLACK_WEBHOOK_URL`: For drift detection notifications
+For validation workflows, no Azure credentials are needed as validation runs without backend initialization.
 
 ## Security Considerations
 

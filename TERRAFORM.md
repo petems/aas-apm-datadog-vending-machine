@@ -17,7 +17,7 @@ The Terraform configuration provisions:
 
 ## 🚀 CI/CD Workflows
 
-The project includes comprehensive GitHub Actions workflows for Terraform:
+The project includes GitHub Actions workflows for Terraform validation and documentation:
 
 ### 🔍 Validation Workflow (`terraform-validate.yml`)
 - **Trigger**: On push/PR to terraform files
@@ -27,22 +27,6 @@ The project includes comprehensive GitHub Actions workflows for Terraform:
   - Security scanning with Trivy and Checkov
   - TFLint analysis for best practices
   - Auto-comments on PRs with issues
-
-### 📋 Plan Workflow (`terraform-plan.yml`) 
-- **Trigger**: On PR to terraform files
-- **Features**:
-  - Generates execution plan
-  - Comments PR with resource changes summary
-  - Stores plan artifacts
-  - Shows detailed changes in collapsible section
-
-### 🔄 Drift Detection (`terraform-drift-detection.yml`)
-- **Trigger**: Daily at 9 AM UTC or manual
-- **Features**:
-  - Detects configuration drift
-  - Creates GitHub issues for drift
-  - Optional Slack notifications
-  - Maintains drift history
 
 ### 📚 Documentation Updates (`terraform-docs.yml`)
 - **Trigger**: On push to master/main
