@@ -15,12 +15,6 @@ resource "azuread_application" "datadog_vending_machine" {
     }
   }
 
-  # Enable implicit grant flow for SPA
-  implicit_grant {
-    access_token_issuance_enabled = true
-    id_token_issuance_enabled     = true
-  }
-
   # Single Page Application configuration
   single_page_application {
     redirect_uris = local.all_redirect_uris
