@@ -17,7 +17,7 @@ The Terraform configuration provisions:
 
 ## 🚀 CI/CD Workflows
 
-The project includes GitHub Actions workflows for Terraform validation and documentation:
+The project includes a GitHub Actions workflow for Terraform validation:
 
 ### 🔍 Validation Workflow (`terraform-validate.yml`)
 - **Trigger**: On push/PR to terraform files
@@ -27,13 +27,6 @@ The project includes GitHub Actions workflows for Terraform validation and docum
   - Security scanning with Trivy and Checkov
   - TFLint analysis for best practices
   - Auto-comments on PRs with issues
-
-### 📚 Documentation Updates (`terraform-docs.yml`)
-- **Trigger**: On push to master/main
-- **Features**:
-  - Auto-generates module documentation
-  - Creates PR if documentation changes
-  - Uses terraform-docs for consistency
 
 ## 📋 Prerequisites
 

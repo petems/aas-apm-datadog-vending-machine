@@ -57,17 +57,13 @@ publisher_domain_repo = ""  # Leave empty
 publisher_domain      = "yourusername.github.io/project-name"
 ```
 
-<!-- BEGIN_TF_DOCS -->
-<!-- This section will be automatically populated by terraform-docs -->
 
-<!-- END_TF_DOCS -->
 
 ## CI/CD Integration
 
-This module includes GitHub Actions workflows for:
+This module includes a GitHub Actions workflow for:
 
 - **Validation**: Format checking, validation, and security scanning
-- **Documentation**: Automatic documentation generation
 
 ### Required GitHub Secrets
 
@@ -100,7 +96,6 @@ terraform apply
 
 1. Run format check: `terraform fmt -recursive`
 2. Run validation: `terraform validate`
-3. Update documentation: `terraform-docs markdown . --output-file README.md`
 
 ## License
 
