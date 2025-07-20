@@ -100,6 +100,37 @@ This builds the app for production and deploys it to GitHub Pages.
    - Enter your Datadog API key
 5. **Deploy**: Click "Enable Datadog APM" to deploy the ARM template
 
+## Deployment
+
+### GitHub Pages Setup
+
+**⚠️ Critical**: GitHub Pages must be configured for GitHub Actions deployment.
+
+1. **Repository Settings**:
+   - Go to your repository → **Settings** → **Pages**
+   - **Source**: Select **"GitHub Actions"** (NOT "Deploy from a branch")
+   - Save settings
+
+2. **Add GitHub Secret**:
+   - Go to **Settings** → **Secrets and variables** → **Actions**
+   - Add repository secret:
+     - Name: `REACT_APP_CLIENT_ID`
+     - Value: Your Azure AD application client ID
+
+3. **Deploy**:
+   ```bash
+   git push origin master  # Triggers automatic deployment
+   ```
+
+4. **Access**: Your app will be available at:
+   `https://yourusername.github.io/your-repo-name/`
+
+### Troubleshooting Deployment
+
+- **403 Permission Error**: Ensure Pages source is set to "GitHub Actions"
+- **Build Failures**: Check Actions tab for detailed logs
+- **404 Errors**: Wait a few minutes for deployment to propagate
+
 ## Architecture
 
 ### Components
