@@ -143,38 +143,78 @@ terraform apply
 
 ### Step 4: Deploy to GitHub Pages
 
+#### GitHub Pages Setup (Required)
+
+**⚠️ Important**: GitHub Pages must be configured correctly before deployment will work.
+
+1. **Go to Repository Settings → Pages**:
+   - Navigate to your GitHub repository
+   - Click **Settings** tab
+   - Scroll down to **Pages** section
+
+2. **Configure Pages Source**:
+   - **Source**: Select **"GitHub Actions"** (NOT "Deploy from a branch")
+   - Save the settings
+   
+   > 📝 **Note**: This is critical! The old "Deploy from a branch" method won't work with our workflow.
+
 #### Option A: Automatic Deployment (Recommended)
 
-1. Go to your GitHub repository → Settings → Secrets and variables → Actions
-2. Add a new repository secret:
-   - **Name**: `REACT_APP_CLIENT_ID`
-   - **Value**: Your Azure AD application client ID
+1. **Add GitHub Secret**:
+   - Go to your GitHub repository → Settings → Secrets and variables → Actions
+   - Add a new repository secret:
+     - **Name**: `REACT_APP_CLIENT_ID`
+     - **Value**: Your Azure AD application client ID
 
-3. Go to Settings → Pages
-   - **Source**: Deploy from a branch
-   - **Branch**: `gh-pages` (will be created automatically)
+2. **Verify Pages Configuration**:
+   - Settings → Pages
+   - **Source**: Must be set to **"GitHub Actions"**
+   - **URL**: Should show `https://yourusername.github.io/your-repo-name/`
 
-4. Push your changes to the main branch:
+3. **Deploy via Git Push**:
    ```bash
    git add .
    git commit -m "Initial setup with Azure AD configuration"
-   git push origin main
+   git push origin master  # Note: Using 'master' branch as trigger
    ```
 
-5. The GitHub Action will automatically build and deploy your app
-6. Your app will be available at: `https://yourusername.github.io/your-repo-name/`
+4. **Monitor Deployment**:
+   - Go to **Actions** tab in your repository
+   - Watch the "Deploy to GitHub Pages" workflow
+   - Deployment typically takes 2-3 minutes
+   - Your app will be available at: `https://yourusername.github.io/your-repo-name/`
 
 #### Option B: Manual Deployment
 
-1. Build the application:
+1. **Build the application**:
    ```bash
    yarn build
    ```
 
-2. Deploy to GitHub Pages:
+2. **Deploy to GitHub Pages**:
    ```bash
    yarn deploy
    ```
+
+#### Troubleshooting GitHub Pages Deployment
+
+**❌ Error: "Permission denied to github-actions[bot]"**
+- **Cause**: GitHub Pages not configured for GitHub Actions
+- **Fix**: Go to Settings → Pages → Source → Select "GitHub Actions"
+
+**❌ Error: "No such file or directory: build/"**
+- **Cause**: React build failed silently
+- **Fix**: Run `yarn build` locally to check for build errors
+- Check the GitHub Actions logs for detailed error messages
+
+**❌ Error: "Remote branch gh-pages not found"**
+- **Cause**: First deployment or wrong Pages configuration
+- **Fix**: Ensure Source is set to "GitHub Actions" (not branch-based)
+
+**✅ Successful Deployment Indicators**:
+- GitHub Actions workflow completes successfully
+- Pages URL shows your app (may take a few minutes to propagate)
+- No 404 errors when visiting the URL
 
 ### Step 5: Update Azure AD Redirect URI
 
