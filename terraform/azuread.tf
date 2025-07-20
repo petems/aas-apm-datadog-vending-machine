@@ -9,7 +9,7 @@ resource "azuread_application" "datadog_vending_machine" {
   marketing_url         = length(local.all_redirect_uris) > 0 ? local.all_redirect_uris[0] : null
   support_url           = var.github_owner != "" && var.github_repository != "" ? "https://github.com/${var.github_owner}/${var.github_repository}/issues" : null
   privacy_statement_url = var.github_owner != "" && var.github_repository != "" ? "https://github.com/${var.github_owner}/${var.github_repository}#security-considerations" : null
-  terms_of_service_url  = var.github_owner != "" && var.github_repository != "" ? "https://github.com/${var.github_owner}/${var.github_repository}/blob/master/LICENSE" : null
+  terms_of_service_url  = var.github_owner != "" && var.github_repository != "" ? "https://github.com/${var.github_owner}/${var.github_repository}/blob/master/LICENSE.MD" : null
 
   # API permissions
   required_resource_access {
