@@ -8,7 +8,7 @@ import {
   AzureAppService,
   DeploymentParameters,
   ResourceGroup,
-} from '../types';
+} from '../types/index';
 import LoadingSpinner from './LoadingSpinner';
 import ErrorAlert from './ErrorAlert';
 
@@ -118,7 +118,9 @@ const DatadogAPMForm: React.FC = () => {
       const groups = await azureService.getResourceGroups(subscriptionId);
       setResourceGroups(groups);
     } catch (error) {
-      setError('Failed to load resource groups. Please check your permissions.');
+      setError(
+        'Failed to load resource groups. Please check your permissions.'
+      );
     } finally {
       setIsLoading(false);
     }
@@ -140,17 +142,25 @@ const DatadogAPMForm: React.FC = () => {
     }
   };
 
-  const loadAppServicesInResourceGroup = async (subscriptionId: string, resourceGroupName: string) => {
+  const loadAppServicesInResourceGroup = async (
+    subscriptionId: string,
+    resourceGroupName: string
+  ) => {
     if (!accessToken) return;
 
     try {
       setIsLoading(true);
       const azureService = new AzureService(accessToken);
-      const services = await azureService.getAppServicesInResourceGroup(subscriptionId, resourceGroupName);
+      const services = await azureService.getAppServicesInResourceGroup(
+        subscriptionId,
+        resourceGroupName
+      );
       setAppServices(services);
     } catch (error) {
       console.error('Failed to load app services in resource group', error);
-      setError('Failed to load App Services in the selected resource group. Please check your permissions.');
+      setError(
+        'Failed to load App Services in the selected resource group. Please check your permissions.'
+      );
     } finally {
       setIsLoading(false);
     }
@@ -354,7 +364,10 @@ const DatadogAPMForm: React.FC = () => {
               Resource Group *
             </label>
             {isLoading && resourceGroups.length === 0 ? (
-              <LoadingSpinner size="small" message="Loading resource groups..." />
+              <LoadingSpinner
+                size="small"
+                message="Loading resource groups..."
+              />
             ) : (
               <select
                 id="resourceGroup"
