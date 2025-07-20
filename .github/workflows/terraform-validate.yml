@@ -15,6 +15,11 @@ env:
   TERRAFORM_VERSION: '1.9.5'
   TERRAFORM_DIR: './terraform'
 
+permissions:
+  contents: read
+  security-events: write
+  pull-requests: write
+
 jobs:
   validate:
     name: Validate Terraform
