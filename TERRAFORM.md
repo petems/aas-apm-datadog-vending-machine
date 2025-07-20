@@ -24,7 +24,7 @@ The project includes a GitHub Actions workflow for Terraform validation:
 - **Features**:
   - Format checking with `terraform fmt`
   - Configuration validation
-  - Security scanning with Trivy and Checkov
+  - Security scanning with Trivy, Checkov, and tfsec
   - TFLint analysis for best practices
   - Auto-comments on PRs with issues
 

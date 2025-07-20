@@ -148,3 +148,26 @@ jobs:
         run: tflint --format compact
         working-directory: ${{ env.TERRAFORM_DIR }}
 
+  tfsec:
+    name: tfsec Security Analysis
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run tfsec
+        uses: aquasecurity/tfsec-action@v1.0.3
+        with:
+          working_directory: ${{ env.TERRAFORM_DIR }}
+          format: sarif
+          out: tfsec-results.sarif
+          soft_fail: true
+
+      - name: Upload tfsec results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: tfsec-results.sarif
+          category: tfsec
+
