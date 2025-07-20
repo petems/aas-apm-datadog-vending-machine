@@ -16,7 +16,7 @@ variable "redirect_uris" {
   
   validation {
     condition = alltrue([
-      for uri in var.redirect_uris : can(regex("^https://", uri))
+      for uri in var.redirect_uris : can(regex("^https://", uri)) || can(regex("^http://localhost", uri))
     ])
     error_message = "All redirect URIs must use HTTPS (except localhost for development)."
   }

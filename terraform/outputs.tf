@@ -61,9 +61,9 @@ output "next_steps" {
     "1. Your Client ID (${azuread_application.datadog_vending_machine.application_id}) has been automatically added to GitHub secrets",
     "2. The .env.example file has been updated in your repository",
     "3. Deploy your React app - GitHub Actions will use the secret automatically",
-    "4. Grant admin consent in Azure Portal: ${output.azure_portal_url.value}",
+    "4. Grant admin consent in Azure Portal: https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/~/Overview/appId/${azuread_application.datadog_vending_machine.application_id}",
     "",
-    "🔗 View in Azure Portal: ${output.azure_portal_url.value}",
+    "🔗 View in Azure Portal: https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/~/Overview/appId/${azuread_application.datadog_vending_machine.application_id}",
     "🔗 View GitHub Repository: https://github.com/${var.github_owner}/${var.github_repository}",
     ""
   ]) : join("\n", [
@@ -77,9 +77,9 @@ output "next_steps" {
     "   - For GitHub Pages: Add REACT_APP_CLIENT_ID to GitHub repository secrets",
     "3. Update your redirect URIs by running:",
     "   terraform apply -var='redirect_uris=[\"https://yourusername.github.io/your-repo-name/\"]'",
-    "4. Grant admin consent in Azure Portal: ${output.azure_portal_url.value}",
+    "4. Grant admin consent in Azure Portal: https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/~/Overview/appId/${azuread_application.datadog_vending_machine.application_id}",
     "",
-    "🔗 View in Azure Portal: ${output.azure_portal_url.value}",
+    "🔗 View in Azure Portal: https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/~/Overview/appId/${azuread_application.datadog_vending_machine.application_id}",
     "",
     "💡 Tip: Enable GitHub integration by setting github_owner and github_repository variables!",
     ""
