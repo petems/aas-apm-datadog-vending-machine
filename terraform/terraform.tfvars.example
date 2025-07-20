@@ -6,7 +6,7 @@ app_name = "Datadog APM Vending Machine"
 # Add your GitHub Pages URL or other redirect URIs
 redirect_uris = [
   "https://yourusername.github.io/your-repo-name/",
-  "http://localhost:3000"  # For local development
+  "http://localhost:3000/"  # For local development
 ]
 
 environment = "prod"
@@ -23,6 +23,13 @@ tags = {
 create_github_secret = true
 github_owner         = "yourusername"
 github_repository    = "your-repo-name"
+
+# Enhanced Branding (Optional)
+# Improves the Azure AD consent screen experience - makes approval requests clearer
+# support_email = "your-email@example.com"
+
+# Note: App logos must be uploaded manually through Azure Portal → App registrations → Branding
+# The generated logo is available at: public/assets/logo.png (215x215px)
 
 # GitHub token (optional - can use GITHUB_TOKEN environment variable instead)
 # github_token = "github_pat_..."
