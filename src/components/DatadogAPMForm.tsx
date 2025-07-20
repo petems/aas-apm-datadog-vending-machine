@@ -8,7 +8,7 @@ import {
   AzureAppService,
   DeploymentParameters,
   ResourceGroup,
-} from '../types';
+} from '../types/index';
 import LoadingSpinner from './LoadingSpinner';
 import ErrorAlert from './ErrorAlert';
 

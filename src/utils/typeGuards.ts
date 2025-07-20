@@ -69,7 +69,7 @@ export function isValidSubscriptionId(subscriptionId: string): boolean {
  */
 export function isLinuxAppService(appService: AzureAppService): boolean {
   return (
-    appService.kind.includes('linux') ||
+    appService.kind?.includes('linux') ||
     Boolean(appService.properties.siteConfig?.linuxFxVersion)
   );
 }
