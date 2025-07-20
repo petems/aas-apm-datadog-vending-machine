@@ -13,6 +13,43 @@ The Terraform configuration provisions:
 - **SPA Configuration** - Single Page Application settings with redirect URIs
 - **GitHub Repository Secret** - Automatically adds `REACT_APP_CLIENT_ID` to your GitHub repository (optional)
 - **Environment File** - Updates `.env.example` with the client ID (optional)
+- **Publisher Domain Verification** - Optional verification file for root GitHub Pages domain
+
+## 🚀 CI/CD Workflows
+
+The project includes comprehensive GitHub Actions workflows for Terraform:
+
+### 🔍 Validation Workflow (`terraform-validate.yml`)
+- **Trigger**: On push/PR to terraform files
+- **Features**:
+  - Format checking with `terraform fmt`
+  - Configuration validation
+  - Security scanning with Trivy and Checkov
+  - TFLint analysis for best practices
+  - Auto-comments on PRs with issues
+
+### 📋 Plan Workflow (`terraform-plan.yml`) 
+- **Trigger**: On PR to terraform files
+- **Features**:
+  - Generates execution plan
+  - Comments PR with resource changes summary
+  - Stores plan artifacts
+  - Shows detailed changes in collapsible section
+
+### 🔄 Drift Detection (`terraform-drift-detection.yml`)
+- **Trigger**: Daily at 9 AM UTC or manual
+- **Features**:
+  - Detects configuration drift
+  - Creates GitHub issues for drift
+  - Optional Slack notifications
+  - Maintains drift history
+
+### 📚 Documentation Updates (`terraform-docs.yml`)
+- **Trigger**: On push to master/main
+- **Features**:
+  - Auto-generates module documentation
+  - Creates PR if documentation changes
+  - Uses terraform-docs for consistency
 
 ## 📋 Prerequisites
 
