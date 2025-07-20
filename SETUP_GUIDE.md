@@ -246,6 +246,67 @@ The application includes two ARM templates in the `public/arm/` directory:
 - US5: us5.datadoghq.com
 - AP1: ap1.datadoghq.com
 
+## 🔗 Publisher Domain Management
+
+The project includes scripts to manage Azure AD publisher domain verification for improved consent screen trust and professional branding.
+
+### Available Scripts
+
+**Check Publisher Domain Status:**
+```bash
+./scripts/check-publisher-domain.sh [APPLICATION_ID]
+```
+- Shows current publisher domain configuration
+- Verifies domain verification file accessibility
+- Displays verification status and Azure Portal links
+- Auto-detects Application ID from Terraform state
+
+**Update Publisher Domain:**
+```bash
+./scripts/update-publisher-domain.sh [APPLICATION_ID] [DOMAIN]
+```
+- Sets publisher domain for Azure AD application
+- Validates domain verification file before update
+- Uses Microsoft Graph API for secure updates
+- Provides detailed progress and error reporting
+
+### Publisher Domain Setup Process
+
+1. **Create Domain Verification File**
+   ```bash
+   # The verification file is already created at:
+   # public/.well-known/microsoft-identity-association.json
+   ```
+
+2. **Deploy to GitHub Pages**
+   ```bash
+   # The file is automatically deployed with your React app
+   # Accessible at: https://yourdomain/.well-known/microsoft-identity-association.json
+   ```
+
+3. **Set Publisher Domain**
+   ```bash
+   ./scripts/update-publisher-domain.sh auto petems.github.io
+   ```
+
+4. **Verify Configuration**
+   ```bash
+   ./scripts/check-publisher-domain.sh
+   ```
+
+### Benefits
+
+- ✅ **Removes "unverified" warnings** in Azure AD consent screens
+- ✅ **Improves user trust** during authentication flows
+- ✅ **Professional branding** for multi-tenant applications
+- ✅ **Automated verification** and status checking
+
+### Prerequisites
+
+- Azure CLI installed and authenticated (`az login`)
+- Proper permissions for the Azure AD application
+- Domain verification file deployed and accessible
+
 ## 🛡️ Security Notes
 
 1. **API Keys**: Never commit Datadog API keys to your repository
