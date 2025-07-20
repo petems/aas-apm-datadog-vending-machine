@@ -16,10 +16,12 @@ export interface AzureAppService {
   properties: {
     hostNames: string[];
     state: string;
-    siteConfig?: {
-      linuxFxVersion?: string | undefined;
-      windowsFxVersion?: string | undefined;
-    } | undefined;
+    siteConfig?:
+      | {
+          linuxFxVersion?: string | undefined;
+          windowsFxVersion?: string | undefined;
+        }
+      | undefined;
   };
 }
 

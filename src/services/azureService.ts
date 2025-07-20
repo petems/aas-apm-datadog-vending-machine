@@ -132,9 +132,16 @@ export class AzureService {
   /**
    * Fetch all App Services and Function Apps in a specific resource group
    */
-  async getAppServicesInResourceGroup(subscriptionId: string, resourceGroupName: string): Promise<AzureAppService[]> {
+  async getAppServicesInResourceGroup(
+    subscriptionId: string,
+    resourceGroupName: string
+  ): Promise<AzureAppService[]> {
     if (!subscriptionId || !resourceGroupName) {
-      throw new AzureApiError('Subscription ID and Resource Group Name are required', 400, 'INVALID_INPUT');
+      throw new AzureApiError(
+        'Subscription ID and Resource Group Name are required',
+        400,
+        'INVALID_INPUT'
+      );
     }
 
     const url = `${AZURE_ARM_BASE_URL}/subscriptions/${subscriptionId}/resourceGroups/${resourceGroupName}/providers/Microsoft.Web/sites?api-version=2022-09-01`;
@@ -290,12 +297,20 @@ export class AzureService {
   /**
    * Fetch all resource groups in a subscription
    */
-  async getResourceGroups(subscriptionId: string): Promise<Array<{ id: string; name: string }>> {
+  async getResourceGroups(
+    subscriptionId: string
+  ): Promise<Array<{ id: string; name: string }>> {
     if (!subscriptionId) {
-      throw new AzureApiError('Subscription ID is required', 400, 'INVALID_INPUT');
+      throw new AzureApiError(
+        'Subscription ID is required',
+        400,
+        'INVALID_INPUT'
+      );
     }
     const url = `${AZURE_ARM_BASE_URL}/subscriptions/${subscriptionId}/resourcegroups?api-version=2021-04-01`;
-    const response = await this.makeRequest<{ value: Array<{ id: string; name: string }> }>(url);
+    const response = await this.makeRequest<{
+      value: Array<{ id: string; name: string }>;
+    }>(url);
     return response.value;
   }
 }
