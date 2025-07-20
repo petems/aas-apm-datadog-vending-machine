@@ -1,9 +1,16 @@
 # Azure AD Application Registration
 resource "azuread_application" "datadog_vending_machine" {
   display_name     = local.app_name_formatted
-  description      = "Azure vending machine for enabling Datadog APM on App Services (${var.environment})"
+  description      = "Self-service Azure vending machine for enabling Datadog APM monitoring on Azure App Services. Allows users to automatically deploy Datadog monitoring to their existing applications with ARM templates."
   sign_in_audience = "AzureADMultipleOrgs"
   owners           = [data.azuread_client_config.current.object_id]
+  
+  # Enhanced branding for better consent experience
+  marketing_url    = length(local.all_redirect_uris) > 0 ? local.all_redirect_uris[0] : null
+  support_url      = var.github_owner != "" && var.github_repository != "" ? "https://github.com/${var.github_owner}/${var.github_repository}/issues" : null
+  privacy_statement_url = var.github_owner != "" && var.github_repository != "" ? "https://github.com/${var.github_owner}/${var.github_repository}#security-considerations" : null
+  terms_of_service_url  = var.github_owner != "" && var.github_repository != "" ? "https://github.com/${var.github_owner}/${var.github_repository}/blob/master/LICENSE" : null
+  logo_url        = var.app_logo_url != "" ? var.app_logo_url : null
 
   # API permissions
   required_resource_access {
@@ -29,6 +36,9 @@ resource "azuread_application" "datadog_vending_machine" {
       id_token_issuance_enabled     = true
     }
   }
+
+  # Application metadata for better consent experience
+  notes = "This application enables users to deploy Datadog APM monitoring to their Azure App Services through a self-service web interface. It uses Azure Resource Manager templates to configure Datadog monitoring without requiring manual setup."
 
   # Optional API configuration for future extensibility
   api {

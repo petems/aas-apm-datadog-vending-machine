@@ -54,6 +54,28 @@ variable "github_repository" {
   default     = ""
 }
 
+variable "support_email" {
+  description = "Support email address for the application"
+  type        = string
+  default     = ""
+  
+  validation {
+    condition     = var.support_email == "" || can(regex("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", var.support_email))
+    error_message = "Support email must be a valid email address or empty string."
+  }
+}
+
+variable "app_logo_url" {
+  description = "URL to the application logo (PNG, max 256KB, 215x215 pixels recommended)"
+  type        = string
+  default     = ""
+  
+  validation {
+    condition     = var.app_logo_url == "" || can(regex("^https://", var.app_logo_url))
+    error_message = "App logo URL must be HTTPS or empty string."
+  }
+}
+
 variable "github_token" {
   description = "GitHub personal access token (optional - can use GITHUB_TOKEN env var)"
   type        = string
