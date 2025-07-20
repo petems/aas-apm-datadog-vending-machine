@@ -1,6 +1,6 @@
 output "application_client_id" {
   description = "The Application (client) ID of the Azure AD app registration"
-  value       = azuread_application.datadog_vending_machine.application_id
+  value       = azuread_application.datadog_vending_machine.client_id
   sensitive   = false
 }
 
@@ -36,7 +36,7 @@ output "terraform_workspace" {
 
 output "azure_portal_url" {
   description = "Direct link to the app registration in Azure Portal"
-  value       = "https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/~/Overview/appId/${azuread_application.datadog_vending_machine.application_id}"
+  value       = "https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/~/Overview/appId/${azuread_application.datadog_vending_machine.client_id}"
 }
 
 output "github_secret_created" {
@@ -58,28 +58,28 @@ output "next_steps" {
     "✅ GitHub repository secret configured automatically!",
     "",
     "📋 Next Steps:",
-    "1. Your Client ID (${azuread_application.datadog_vending_machine.application_id}) has been automatically added to GitHub secrets",
+    "1. Your Client ID (${azuread_application.datadog_vending_machine.client_id}) has been automatically added to GitHub secrets",
     "2. The .env.example file has been updated in your repository",
     "3. Deploy your React app - GitHub Actions will use the secret automatically",
-    "4. Grant admin consent in Azure Portal: https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/~/Overview/appId/${azuread_application.datadog_vending_machine.application_id}",
+    "4. Grant admin consent in Azure Portal: https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/~/Overview/appId/${azuread_application.datadog_vending_machine.client_id}",
     "",
-    "🔗 View in Azure Portal: https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/~/Overview/appId/${azuread_application.datadog_vending_machine.application_id}",
+    "🔗 View in Azure Portal: https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/~/Overview/appId/${azuread_application.datadog_vending_machine.client_id}",
     "🔗 View GitHub Repository: https://github.com/${var.github_owner}/${var.github_repository}",
     ""
-  ]) : join("\n", [
+    ]) : join("\n", [
     "",
     "✅ Azure AD App Registration created successfully!",
     "",
     "📋 Next Steps:",
-    "1. Copy the Client ID: ${azuread_application.datadog_vending_machine.application_id}",
+    "1. Copy the Client ID: ${azuread_application.datadog_vending_machine.client_id}",
     "2. Add it to your environment variables:",
     "   - For local development: Add REACT_APP_CLIENT_ID to your .env file",
     "   - For GitHub Pages: Add REACT_APP_CLIENT_ID to GitHub repository secrets",
     "3. Update your redirect URIs by running:",
     "   terraform apply -var='redirect_uris=[\"https://yourusername.github.io/your-repo-name/\"]'",
-    "4. Grant admin consent in Azure Portal: https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/~/Overview/appId/${azuread_application.datadog_vending_machine.application_id}",
+    "4. Grant admin consent in Azure Portal: https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/~/Overview/appId/${azuread_application.datadog_vending_machine.client_id}",
     "",
-    "🔗 View in Azure Portal: https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/~/Overview/appId/${azuread_application.datadog_vending_machine.application_id}",
+    "🔗 View in Azure Portal: https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/~/Overview/appId/${azuread_application.datadog_vending_machine.client_id}",
     "",
     "💡 Tip: Enable GitHub integration by setting github_owner and github_repository variables!",
     ""

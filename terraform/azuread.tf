@@ -4,13 +4,12 @@ resource "azuread_application" "datadog_vending_machine" {
   description      = "Self-service Azure vending machine for enabling Datadog APM monitoring on Azure App Services. Allows users to automatically deploy Datadog monitoring to their existing applications with ARM templates."
   sign_in_audience = "AzureADMultipleOrgs"
   owners           = [data.azuread_client_config.current.object_id]
-  
+
   # Enhanced branding for better consent experience
-  marketing_url    = length(local.all_redirect_uris) > 0 ? local.all_redirect_uris[0] : null
-  support_url      = var.github_owner != "" && var.github_repository != "" ? "https://github.com/${var.github_owner}/${var.github_repository}/issues" : null
+  marketing_url         = length(local.all_redirect_uris) > 0 ? local.all_redirect_uris[0] : null
+  support_url           = var.github_owner != "" && var.github_repository != "" ? "https://github.com/${var.github_owner}/${var.github_repository}/issues" : null
   privacy_statement_url = var.github_owner != "" && var.github_repository != "" ? "https://github.com/${var.github_owner}/${var.github_repository}#security-considerations" : null
   terms_of_service_url  = var.github_owner != "" && var.github_repository != "" ? "https://github.com/${var.github_owner}/${var.github_repository}/blob/master/LICENSE" : null
-  logo_url        = var.app_logo_url != "" ? var.app_logo_url : null
 
   # API permissions
   required_resource_access {
@@ -30,7 +29,7 @@ resource "azuread_application" "datadog_vending_machine" {
   # Web application configuration (if needed for hybrid scenarios)
   web {
     homepage_url = length(local.all_redirect_uris) > 0 ? local.all_redirect_uris[0] : null
-    
+
     implicit_grant {
       access_token_issuance_enabled = true
       id_token_issuance_enabled     = true
@@ -47,9 +46,9 @@ resource "azuread_application" "datadog_vending_machine" {
   }
 
   tags = [
-    "terraform", 
-    "datadog", 
-    "apm", 
+    "terraform",
+    "datadog",
+    "apm",
     "vending-machine",
     var.environment
   ]
@@ -57,13 +56,13 @@ resource "azuread_application" "datadog_vending_machine" {
 
 # Service Principal for the application
 resource "azuread_service_principal" "datadog_vending_machine" {
-  application_id                = azuread_application.datadog_vending_machine.application_id
-  app_role_assignment_required  = false
-  owners                        = [data.azuread_client_config.current.object_id]
+  client_id                    = azuread_application.datadog_vending_machine.client_id
+  app_role_assignment_required = false
+  owners                       = [data.azuread_client_config.current.object_id]
 
   tags = [
-    "terraform", 
-    "datadog", 
+    "terraform",
+    "datadog",
     "apm",
     var.environment
   ]
@@ -71,7 +70,7 @@ resource "azuread_service_principal" "datadog_vending_machine" {
 
 # Get the Azure Service Management API service principal
 data "azuread_service_principal" "azure_service_management" {
-  application_id = "797f4846-ba00-4fd7-ba43-dac1f8f63013"
+  client_id = "797f4846-ba00-4fd7-ba43-dac1f8f63013"
 }
 
 # Admin consent for the API permissions (requires admin privileges)

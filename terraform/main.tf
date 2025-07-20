@@ -3,15 +3,15 @@ terraform {
   required_providers {
     azuread = {
       source  = "hashicorp/azuread"
-      version = "~> 2.47"
+      version = "~> 3.0"
     }
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 3.0"
+      version = "~> 4.0"
     }
     github = {
       source  = "integrations/github"
-      version = "~> 5.0"
+      version = "~> 6.0"
     }
   }
 }
@@ -39,21 +39,21 @@ data "azuread_client_config" "current" {}
 locals {
   # Naming convention: project-environment-purpose
   app_name_formatted = "${var.app_name}${var.environment != "prod" ? " (${title(var.environment)})" : ""}"
-  
+
   # Consistent tagging strategy
   common_tags = merge(var.tags, {
-    Environment   = var.environment
-    CreatedBy     = data.azuread_client_config.current.object_id
-    CreatedDate   = timestamp()
-    Workspace     = terraform.workspace
+    Environment = var.environment
+    CreatedBy   = data.azuread_client_config.current.object_id
+    CreatedDate = timestamp()
+    Workspace   = terraform.workspace
   })
-  
+
   # Determine redirect URIs based on environment
   default_redirect_uris = var.environment == "dev" ? [
     "http://localhost:3000",
     "http://localhost:3001"
   ] : []
-  
+
   # Combine provided URIs with defaults
   all_redirect_uris = distinct(concat(var.redirect_uris, local.default_redirect_uris))
 }

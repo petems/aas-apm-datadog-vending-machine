@@ -26,8 +26,10 @@ github_repository    = "your-repo-name"
 
 # Enhanced Branding (Optional)
 # Improves the Azure AD consent screen experience - makes approval requests clearer
-support_email = "your-email@example.com"
-app_logo_url = "https://yourusername.github.io/your-repo-name/assets/logo.png"  # PNG, max 256KB, 215x215px
+# support_email = "your-email@example.com"
+
+# Note: App logos must be uploaded manually through Azure Portal → App registrations → Branding
+# The generated logo is available at: public/assets/logo.png (215x215px)
 
 # GitHub token (optional - can use GITHUB_TOKEN environment variable instead)
 # github_token = "github_pat_..."
