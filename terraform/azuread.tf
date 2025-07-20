@@ -49,7 +49,6 @@ resource "azuread_application" "datadog_vending_machine" {
     "terraform",
     "datadog",
     "apm",
-    "vending-machine",
     var.environment
   ]
 }
