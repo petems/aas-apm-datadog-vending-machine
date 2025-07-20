@@ -31,9 +31,7 @@ github_repository    = "your-repo-name"
 # Note: App logos must be uploaded manually through Azure Portal → App registrations → Branding
 # The generated logo is available at: public/assets/logo.png (215x215px)
 
-# GitHub token (optional - can use GITHUB_TOKEN environment variable instead)
-# github_token = "github_pat_..."
-# 
+# GitHub authentication uses GITHUB_TOKEN environment variable
 # To get a token automatically with GitHub CLI:
 # gh auth login --scopes repo
 # export GITHUB_TOKEN=$(gh auth token) 

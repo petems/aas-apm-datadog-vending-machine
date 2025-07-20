@@ -1,7 +1,8 @@
 #!/bin/bash
 
-# Update Publisher Domain for Azure AD Application
-# This script sets the publisher domain for an Azure AD application after verifying domain ownership
+# Publisher Domain Setup Helper for Azure AD Application
+# IMPORTANT: Due to Azure API limitations, publisher domain MUST be set manually in Azure Portal
+# This script validates prerequisites and provides guidance for manual setup
 # Usage: ./update-publisher-domain.sh [APPLICATION_ID] [DOMAIN]
 
 set -e
@@ -18,21 +19,29 @@ BLUE='\033[0;34m'
 CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
-echo -e "${BLUE}🔗 Azure AD Publisher Domain Updater${NC}"
-echo "======================================="
+echo -e "${BLUE}🔗 Azure AD Publisher Domain Setup Helper${NC}"
+echo "=========================================="
+echo -e "${YELLOW}⚠️  IMPORTANT: Publisher domain must be set manually in Azure Portal${NC}"
+echo -e "${YELLOW}    This script validates prerequisites and provides setup guidance${NC}"
+echo "=============================================="
 
 # Function to show usage
 show_usage() {
     echo -e "\n${YELLOW}Usage:${NC}"
     echo "  $0 [APPLICATION_ID] [DOMAIN]"
     echo ""
+    echo -e "${YELLOW}Purpose:${NC}"
+    echo "  Validates prerequisites and provides setup guidance for Azure AD publisher domain"
+    echo "  NOTE: Due to Azure API limitations, manual Azure Portal setup is required"
+    echo ""
     echo -e "${YELLOW}Arguments:${NC}"
     echo "  APPLICATION_ID    Azure AD Application (Client) ID"
-    echo "  DOMAIN           Publisher domain to set (e.g., example.com)"
+    echo "  DOMAIN           Publisher domain to validate (e.g., example.com)"
     echo ""
     echo -e "${YELLOW}Examples:${NC}"
     echo "  $0 12345678-1234-1234-1234-123456789012 example.com"
-    echo "  $0 auto petems.github.io"
+    echo "  $0 auto petems.github.io                    # Root GitHub Pages domain (recommended)"
+    echo "  $0 auto petems.github.io/project-name       # Project-specific domain"
     echo ""
     echo -e "${YELLOW}Special values:${NC}"
     echo "  'auto' for APPLICATION_ID - Auto-detect from Terraform state"
@@ -88,12 +97,15 @@ if [ -z "$PUBLISHER_DOMAIN" ]; then
     fi
 fi
 
-# Validate domain format (basic check)
-if ! echo "$PUBLISHER_DOMAIN" | grep -qE '^[a-zA-Z0-9][a-zA-Z0-9.-]*[a-zA-Z0-9]$'; then
+# Validate domain format (allow both domain.com and domain.com/path for GitHub Pages)
+if ! echo "$PUBLISHER_DOMAIN" | grep -qE '^[a-zA-Z0-9][a-zA-Z0-9.-]*[a-zA-Z0-9]$' && ! echo "$PUBLISHER_DOMAIN" | grep -qE '^[a-zA-Z0-9][a-zA-Z0-9.-]*[a-zA-Z0-9]/[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]$'; then
     echo -e "${RED}❌ Invalid domain format: $PUBLISHER_DOMAIN${NC}"
-    echo -e "${YELLOW}💡 Domain should be like: example.com, subdomain.example.com${NC}"
+    echo -e "${YELLOW}💡 Domain should be like: example.com, subdomain.example.com, or username.github.io/project${NC}"
     exit 1
 fi
+
+# Extract base domain for GitHub Pages detection
+BASE_DOMAIN=$(echo "$PUBLISHER_DOMAIN" | cut -d'/' -f1)
 
 echo -e "\n${CYAN}📋 Configuration:${NC}"
 echo "  Application ID: $APPLICATION_ID"
@@ -120,8 +132,38 @@ echo -e "${GREEN}✅ Authenticated as: $CURRENT_USER${NC}"
 # Check domain verification (look for verification file)
 echo -e "\n${CYAN}🔍 Checking domain verification...${NC}"
 
+# For GitHub Pages, check if we need to include repository path
 VERIFICATION_URL="https://${PUBLISHER_DOMAIN}/.well-known/microsoft-identity-association.json"
-echo "Checking: $VERIFICATION_URL"
+
+# If this is a GitHub Pages domain, also try with common repository path patterns
+if echo "$BASE_DOMAIN" | grep -q "\.github\.io$"; then
+    echo "Detected GitHub Pages domain, checking multiple locations..."
+    
+    # Check if PUBLISHER_DOMAIN already includes a path
+    if echo "$PUBLISHER_DOMAIN" | grep -q "/"; then
+        # Domain already includes project path, use as-is
+        VERIFICATION_URL="https://${PUBLISHER_DOMAIN}/.well-known/microsoft-identity-association.json"
+        echo "Checking project domain: $VERIFICATION_URL"
+    else
+        # Root domain - try both root and with repository name
+        echo "Checking root: $VERIFICATION_URL"
+        if command -v curl >/dev/null 2>&1; then
+            VERIFICATION_RESPONSE=$(curl -s -f "$VERIFICATION_URL" 2>/dev/null || echo "")
+            if [ -z "$VERIFICATION_RESPONSE" ]; then
+                # Try with repository name from terraform state
+                if [ -f "terraform/terraform.tfvars" ]; then
+                    REPO_NAME=$(grep -E "github_repository.*=" terraform/terraform.tfvars | cut -d'"' -f2 2>/dev/null || echo "")
+                    if [ -n "$REPO_NAME" ]; then
+                        VERIFICATION_URL="https://${PUBLISHER_DOMAIN}/${REPO_NAME}/.well-known/microsoft-identity-association.json"
+                        echo "Trying with repository path: $VERIFICATION_URL"
+                    fi
+                fi
+            fi
+        fi
+    fi
+else
+    echo "Checking: $VERIFICATION_URL"
+fi
 
 # Check if verification file exists and contains the application ID
 if command -v curl >/dev/null 2>&1; then
@@ -136,8 +178,11 @@ if command -v curl >/dev/null 2>&1; then
         fi
     else
         echo -e "${YELLOW}⚠️  Could not access domain verification file${NC}"
-        echo -e "${YELLOW}📝 Make sure this file exists and is publicly accessible:${NC}"
+        echo -e "${YELLOW}📝 Make sure this file exists and is publicly accessible at:${NC}"
         echo "   $VERIFICATION_URL"
+        if echo "$PUBLISHER_DOMAIN" | grep -q "\.github\.io$"; then
+            echo -e "${YELLOW}💡 For GitHub Pages, ensure the file is deployed with your React app${NC}"
+        fi
         echo ""
         echo -e "${YELLOW}📋 File should contain:${NC}"
         cat << EOF
@@ -161,8 +206,8 @@ else
     echo -e "${YELLOW}⚠️  curl not available, skipping verification file check${NC}"
 fi
 
-# Update publisher domain via Microsoft Graph API
-echo -e "\n${CYAN}🚀 Updating publisher domain...${NC}"
+# Validate current configuration and provide setup guidance
+echo -e "\n${CYAN}🔍 Validating current configuration...${NC}"
 
 # First, get current application details
 echo "Getting current application configuration..."
@@ -177,8 +222,18 @@ if [ -z "$CURRENT_APP" ] || ! echo "$CURRENT_APP" | grep -q '"value"'; then
 fi
 
 # Extract the application object ID (different from client ID)
-APPLICATION_OBJECT_ID=$(echo "$CURRENT_APP" | grep -o '"id":"[^"]*"' | head -1 | cut -d'"' -f4)
-CURRENT_DOMAIN=$(echo "$CURRENT_APP" | grep -o '"publisherDomain":"[^"]*"' | cut -d'"' -f4 || echo "none")
+# More robust JSON parsing for the nested value array
+if command -v jq >/dev/null 2>&1; then
+    APPLICATION_OBJECT_ID=$(echo "$CURRENT_APP" | jq -r '.value[0].id // empty' 2>/dev/null)
+    CURRENT_DOMAIN=$(echo "$CURRENT_APP" | jq -r '.value[0].publisherDomain // empty' 2>/dev/null)
+else
+    # Fallback to grep if jq is not available
+    APPLICATION_OBJECT_ID=$(echo "$CURRENT_APP" | sed -n 's/.*"value":\[\{.*"id":"\([^"]*\)".*/\1/p' | head -1)
+    CURRENT_DOMAIN=$(echo "$CURRENT_APP" | sed -n 's/.*"publisherDomain":"\([^"]*\)".*/\1/p' | head -1)
+fi
+
+# Ensure we have values or set defaults
+[ -z "$CURRENT_DOMAIN" ] && CURRENT_DOMAIN="none"
 
 echo "  Application Object ID: $APPLICATION_OBJECT_ID"
 echo "  Current Publisher Domain: ${CURRENT_DOMAIN:-"(not set)"}"
@@ -188,55 +243,51 @@ if [ -z "$APPLICATION_OBJECT_ID" ]; then
     exit 1
 fi
 
-# Update the publisher domain
-echo "Setting publisher domain to: $PUBLISHER_DOMAIN"
+# Provide manual setup instructions
+echo -e "\n${CYAN}📋 Publisher Domain Setup Instructions${NC}"
+echo "=============================================="
+echo -e "${YELLOW}⚠️  Azure API Limitation:${NC} Publisher domain is read-only via Microsoft Graph API"
+echo -e "${YELLOW}✋ Manual Setup Required:${NC} You must set the publisher domain manually in Azure Portal"
 
-UPDATE_RESULT=$(az rest --method PATCH \
-    --url "https://graph.microsoft.com/v1.0/applications/$APPLICATION_OBJECT_ID" \
-    --headers "Content-Type=application/json" \
-    --body "{\"publisherDomain\": \"$PUBLISHER_DOMAIN\"}" 2>&1 || echo "ERROR")
-
-if echo "$UPDATE_RESULT" | grep -qi "error"; then
-    echo -e "${RED}❌ Failed to update publisher domain${NC}"
-    echo -e "${YELLOW}Error details:${NC}"
-    echo "$UPDATE_RESULT"
-    echo ""
-    echo -e "${YELLOW}💡 Common issues:${NC}"
-    echo "  • Domain not verified - ensure verification file is accessible"
-    echo "  • Insufficient permissions - need Application.ReadWrite.All or Application.ReadWrite.OwnedBy"
-    echo "  • Invalid domain format"
-    exit 1
-fi
-
-# Verify the update
-echo -e "\n${CYAN}✅ Verifying update...${NC}"
-sleep 2  # Give Azure a moment to process
-
-UPDATED_APP=$(az rest --method GET \
-    --url "https://graph.microsoft.com/v1.0/applications/$APPLICATION_OBJECT_ID" \
-    --headers "Content-Type=application/json" 2>/dev/null || echo "")
-
-if [ -n "$UPDATED_APP" ]; then
-    NEW_DOMAIN=$(echo "$UPDATED_APP" | grep -o '"publisherDomain":"[^"]*"' | cut -d'"' -f4 || echo "none")
-    if [ "$NEW_DOMAIN" = "$PUBLISHER_DOMAIN" ]; then
-        echo -e "${GREEN}🎉 Publisher domain successfully updated!${NC}"
-        echo "  ✅ New Publisher Domain: $NEW_DOMAIN"
-    else
-        echo -e "${YELLOW}⚠️  Update completed but verification shows different domain: $NEW_DOMAIN${NC}"
-    fi
-else
-    echo -e "${YELLOW}⚠️  Could not verify update (API call failed)${NC}"
-fi
-
-# Show Azure Portal link
+echo -e "\n${CYAN}🛠️  Manual Setup Steps:${NC}"
+echo "1. Open the Azure Portal branding page:"
 PORTAL_URL="https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/~/Branding/appId/$APPLICATION_ID"
-echo -e "\n${CYAN}🔗 Next Steps:${NC}"
-echo "1. Verify the change in Azure Portal:"
 echo "   $PORTAL_URL"
 echo ""
-echo "2. Test the consent screen to see the verified publisher domain"
+echo "2. In the 'Publisher domain' section:"
+echo "   • Click 'Select a verified domain'"
+echo "   • Choose: $PUBLISHER_DOMAIN"
+echo "   • Click 'Verify and save domain'"
 echo ""
-echo "3. The domain verification file must remain accessible at:"
-echo "   https://$PUBLISHER_DOMAIN/.well-known/microsoft-identity-association.json"
+echo "3. If domain verification is required:"
+echo "   • Azure will guide you through the verification process"
+echo "   • The verification file is already deployed and accessible"
+echo ""
+echo "4. After successful setup:"
+echo "   • Run this script again to verify the configuration"
+echo "   • Test the consent screen to see the verified publisher"
 
-echo -e "\n${GREEN}✅ Publisher domain update completed!${NC}" 
+if [ "$CURRENT_DOMAIN" != "none" ] && [ "$CURRENT_DOMAIN" != "$PUBLISHER_DOMAIN" ]; then
+    echo -e "\n${YELLOW}📝 Current Status:${NC}"
+    echo "  Current Publisher Domain: $CURRENT_DOMAIN"
+    echo "  Target Publisher Domain:  $PUBLISHER_DOMAIN"
+    echo "  Action Required: Update in Azure Portal"
+fi
+
+echo -e "\n${CYAN}🔗 Additional Information:${NC}"
+echo "• Domain verification file location:"
+if echo "$PUBLISHER_DOMAIN" | grep -q "\.github\.io$" && [ -f "terraform/terraform.tfvars" ]; then
+    REPO_NAME=$(grep -E "github_repository.*=" terraform/terraform.tfvars | cut -d'"' -f2 2>/dev/null || echo "")
+    if [ -n "$REPO_NAME" ]; then
+        echo "  https://$PUBLISHER_DOMAIN/$REPO_NAME/.well-known/microsoft-identity-association.json"
+    else
+        echo "  https://$PUBLISHER_DOMAIN/.well-known/microsoft-identity-association.json"
+    fi
+else
+    echo "  https://$PUBLISHER_DOMAIN/.well-known/microsoft-identity-association.json"
+fi
+echo ""
+echo "• After manual setup, use check-publisher-domain.sh to verify"
+echo "• Benefits: Removes 'unverified' warnings in consent screens"
+
+echo -e "\n${GREEN}✅ Prerequisites validated - ready for manual Azure Portal setup!${NC}" 

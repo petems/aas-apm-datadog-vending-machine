@@ -29,7 +29,6 @@ provider "azurerm" {
 # Configure the GitHub Provider
 provider "github" {
   # Uses GITHUB_TOKEN environment variable by default
-  # Or configure with token = var.github_token
 }
 
 # Get current Azure client configuration

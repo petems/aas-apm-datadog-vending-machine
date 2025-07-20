@@ -7,7 +7,7 @@ resource "azuread_application" "datadog_vending_machine" {
 
   # Enhanced branding for better consent experience
   marketing_url         = length(local.all_redirect_uris) > 0 ? local.all_redirect_uris[0] : null
-  support_url           = var.github_owner != "" && var.github_repository != "" ? "https://github.com/${var.github_owner}/${var.github_repository}/issues" : null
+  support_url           = var.support_email != "" ? "mailto:${var.support_email}" : (var.github_owner != "" && var.github_repository != "" ? "https://github.com/${var.github_owner}/${var.github_repository}/issues" : null)
   privacy_statement_url = var.github_owner != "" && var.github_repository != "" ? "https://github.com/${var.github_owner}/${var.github_repository}#security-considerations" : null
   terms_of_service_url  = length(local.all_redirect_uris) > 0 ? "${local.all_redirect_uris[0]}terms-of-service.html" : null
 
@@ -45,12 +45,12 @@ resource "azuread_application" "datadog_vending_machine" {
     requested_access_token_version = 2
   }
 
-  tags = [
+  tags = concat([
     "terraform",
-    "datadog",
+    "datadog", 
     "apm",
     var.environment
-  ]
+  ], [for k, v in local.common_tags : "${k}:${v}"])
 }
 
 # Service Principal for the application
@@ -59,12 +59,12 @@ resource "azuread_service_principal" "datadog_vending_machine" {
   app_role_assignment_required = false
   owners                       = [data.azuread_client_config.current.object_id]
 
-  tags = [
+  tags = concat([
     "terraform",
-    "datadog",
+    "datadog", 
     "apm",
     var.environment
-  ]
+  ], [for k, v in local.common_tags : "${k}:${v}"])
 }
 
 # Get the Azure Service Management API service principal

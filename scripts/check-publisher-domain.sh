@@ -83,11 +83,24 @@ if [ -z "$CURRENT_APP" ] || ! echo "$CURRENT_APP" | grep -q '"value"'; then
     exit 1
 fi
 
-# Extract application details
-APPLICATION_OBJECT_ID=$(echo "$CURRENT_APP" | grep -o '"id":"[^"]*"' | head -1 | cut -d'"' -f4)
-APP_NAME=$(echo "$CURRENT_APP" | grep -o '"displayName":"[^"]*"' | cut -d'"' -f4)
-CURRENT_DOMAIN=$(echo "$CURRENT_APP" | grep -o '"publisherDomain":"[^"]*"' | cut -d'"' -f4 || echo "")
-VERIFICATION_STATUS=$(echo "$CURRENT_APP" | grep -o '"isVerified":[^,}]*' | cut -d':' -f2 || echo "false")
+# Extract application details with robust JSON parsing
+if command -v jq >/dev/null 2>&1; then
+    APPLICATION_OBJECT_ID=$(echo "$CURRENT_APP" | jq -r '.value[0].id // empty' 2>/dev/null)
+    APP_NAME=$(echo "$CURRENT_APP" | jq -r '.value[0].displayName // empty' 2>/dev/null)
+    CURRENT_DOMAIN=$(echo "$CURRENT_APP" | jq -r '.value[0].publisherDomain // empty' 2>/dev/null)
+    VERIFICATION_STATUS=$(echo "$CURRENT_APP" | jq -r '.value[0].isVerified // false' 2>/dev/null)
+else
+    # Fallback to sed if jq is not available
+    APPLICATION_OBJECT_ID=$(echo "$CURRENT_APP" | sed -n 's/.*"value":\[\{.*"id":"\([^"]*\)".*/\1/p' | head -1)
+    APP_NAME=$(echo "$CURRENT_APP" | sed -n 's/.*"displayName":"\([^"]*\)".*/\1/p' | head -1)
+    CURRENT_DOMAIN=$(echo "$CURRENT_APP" | sed -n 's/.*"publisherDomain":"\([^"]*\)".*/\1/p' | head -1)
+    VERIFICATION_STATUS=$(echo "$CURRENT_APP" | sed -n 's/.*"isVerified":\([^,}]*\).*/\1/p' | head -1)
+fi
+
+# Ensure we have values or set defaults
+[ -z "$APP_NAME" ] && APP_NAME="(unknown)"
+[ -z "$CURRENT_DOMAIN" ] && CURRENT_DOMAIN=""
+[ -z "$VERIFICATION_STATUS" ] && VERIFICATION_STATUS="false"
 
 echo -e "\n${CYAN}📊 Application Details:${NC}"
 echo "  Name: $APP_NAME"
@@ -99,8 +112,31 @@ echo "  Verification Status: $VERIFICATION_STATUS"
 if [ -n "$CURRENT_DOMAIN" ] && [ "$CURRENT_DOMAIN" != "null" ]; then
     echo -e "\n${CYAN}🔍 Checking domain verification file...${NC}"
     
+    # For GitHub Pages, check if we need to include repository path
     VERIFICATION_URL="https://${CURRENT_DOMAIN}/.well-known/microsoft-identity-association.json"
-    echo "Checking: $VERIFICATION_URL"
+    
+    # If this is a GitHub Pages domain, also try with common repository path patterns
+    if echo "$CURRENT_DOMAIN" | grep -q "\.github\.io$"; then
+        echo "Detected GitHub Pages domain, checking multiple locations..."
+        
+        # Try the root domain first
+        echo "Checking root: $VERIFICATION_URL"
+        if command -v curl >/dev/null 2>&1; then
+            VERIFICATION_RESPONSE=$(curl -s -f "$VERIFICATION_URL" 2>/dev/null || echo "")
+            if [ -z "$VERIFICATION_RESPONSE" ]; then
+                # Try with repository name from terraform state
+                if [ -f "terraform/terraform.tfvars" ]; then
+                    REPO_NAME=$(grep -E "github_repository.*=" terraform/terraform.tfvars | cut -d'"' -f2 2>/dev/null || echo "")
+                    if [ -n "$REPO_NAME" ]; then
+                        VERIFICATION_URL="https://${CURRENT_DOMAIN}/${REPO_NAME}/.well-known/microsoft-identity-association.json"
+                        echo "Trying with repository path: $VERIFICATION_URL"
+                    fi
+                fi
+            fi
+        fi
+    else
+        echo "Checking: $VERIFICATION_URL"
+    fi
     
     if command -v curl >/dev/null 2>&1; then
         VERIFICATION_RESPONSE=$(curl -s -f "$VERIFICATION_URL" 2>/dev/null || echo "")
