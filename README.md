@@ -35,6 +35,18 @@ This React application provides a streamlined interface for:
 
 3. **Datadog API Key**: Users need a valid Datadog API key for their organization
 
+## Authentication
+
+This application supports **organizational accounts only** (work/school accounts from any Azure AD tenant). Personal Microsoft accounts are not supported.
+
+📖 **For detailed authentication information, troubleshooting, and multi-tenant access:** See [AUTHENTICATION.md](./AUTHENTICATION.md)
+
+### Quick Authentication Summary:
+- ✅ **Supported**: Work/school accounts from any organization 
+- ❌ **Not supported**: Personal Microsoft accounts (Outlook.com, Hotmail.com, etc.)
+- 🌐 **Multi-tenant**: Users from external organizations can use this app
+- 🔐 **Permissions required**: Azure subscription access with ARM template deployment rights
+
 ## Setup Instructions
 
 ### 1. Clone and Install

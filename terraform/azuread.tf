@@ -2,7 +2,7 @@
 resource "azuread_application" "datadog_vending_machine" {
   display_name     = local.app_name_formatted
   description      = "Self-service Azure vending machine for enabling Datadog APM monitoring on Azure App Services. Allows users to automatically deploy Datadog monitoring to their existing applications with ARM templates."
-  sign_in_audience = "AzureADandPersonalMicrosoftAccount"
+  sign_in_audience = "AzureADMultipleOrgs"
   owners           = [data.azuread_client_config.current.object_id]
 
   # Enhanced branding for better consent experience
