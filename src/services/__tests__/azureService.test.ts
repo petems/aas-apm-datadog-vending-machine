@@ -334,6 +334,25 @@ describe('AzureService', () => {
     });
   });
 
+  describe('restartAppService', () => {
+    it('should call restart on the client', async () => {
+      const mockRestart = jest.fn();
+      (service as any).getWebSiteClient = jest.fn(() => ({
+        webApps: { restart: mockRestart },
+      }));
+
+      await service.restartAppService('sub', 'rg', 'site');
+
+      expect(mockRestart).toHaveBeenCalledWith('rg', 'site');
+    });
+
+    it('should validate required parameters', async () => {
+      await expect(service.restartAppService('', 'rg', 'site')).rejects.toThrow(
+        'All parameters are required'
+      );
+    });
+  });
+
   describe('edge and negative cases', () => {
     it('should throw on invalid method calls', async () => {
       // @ts-expect-error: purposely calling with no args
