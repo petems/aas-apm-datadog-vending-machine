@@ -1,505 +1,123 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useMsal } from '@azure/msal-react';
-import { loginRequest, armApiRequest } from '../authConfig';
-import { AzureService } from '../services/azureService';
-import { DATADOG_SITES } from '../types/index';
-import {
-  AzureSubscription,
-  AzureAppService,
-  DeploymentParameters,
-  ResourceGroup,
-} from '../types/index';
-import LoadingSpinner from './LoadingSpinner';
-import ErrorAlert from './ErrorAlert';
+import React from 'react';
+
+/**
+ * 🚧 UNDER CONSTRUCTION 🚧
+ * 
+ * This component is temporarily disabled due to significant challenges with MSAL (Microsoft Authentication Library)
+ * authentication in hosted multi-tenant Azure AD environments.
+ * 
+ * ## MSAL Authentication Challenges
+ * 
+ * ### Multi-Tenant Application Issues
+ * - **Untrusted Application Status**: When deployed to hosting platforms (GitHub Pages, Vercel, etc.), 
+ *   the application is considered "untrusted" by Azure AD
+ * - **Publisher Domain Verification**: Azure AD requires verified publisher domains for production apps,
+ *   which is complex to achieve for hosted applications
+ * - **Redirect URI Restrictions**: Azure AD has strict requirements for redirect URIs that must match
+ *   the application's domain exactly
+ * 
+ * ### Technical Limitations
+ * - **CORS Restrictions**: Cross-origin requests to Azure AD endpoints are heavily restricted
+ * - **Token Acquisition**: Silent token acquisition fails in untrusted contexts
+ * - **Popup/Redirect Issues**: Authentication flows are blocked or unreliable in hosted environments
+ * - **Session Management**: MSAL session persistence doesn't work reliably across domains
+ * 
+ * ### Alternative Approaches Considered
+ * - **Service Principal Authentication**: Requires storing credentials (security risk)
+ * - **Managed Identity**: Only works within Azure environment
+ * - **API Gateway Pattern**: Adds complexity and potential security vulnerabilities
+ * - **Desktop Application Flow**: Not suitable for web applications
+ * 
+ * ### Current Status
+ * The authentication layer has been removed and the component is being redesigned to use
+ * alternative authentication methods that work reliably in hosted environments.
+ * 
+ * ### Next Steps
+ * 1. Implement Azure CLI-based authentication flow
+ * 2. Use Azure SDK for JavaScript with service principal credentials
+ * 3. Consider implementing a backend API gateway for secure token handling
+ * 4. Explore Azure Static Web Apps with built-in authentication
+ */
 
 const DatadogAPMForm: React.FC = () => {
-  const { instance, accounts } = useMsal();
-
-  // State management
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [accessToken, setAccessToken] = useState<string | null>(null);
-  const [subscriptions, setSubscriptions] = useState<AzureSubscription[]>([]);
-  const [selectedSubscription, setSelectedSubscription] = useState('');
-  const [appServices, setAppServices] = useState<AzureAppService[]>([]);
-  const [selectedAppService, setSelectedAppService] = useState('');
-  const [selectedDatadogSite, setSelectedDatadogSite] =
-    useState('datadoghq.com');
-  const [ddApiKey, setDdApiKey] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [deploymentStatus, setDeploymentStatus] = useState<
-    'idle' | 'deploying' | 'success' | 'error'
-  >('idle');
-  const [resourceGroups, setResourceGroups] = useState<ResourceGroup[]>([]);
-  const [selectedResourceGroup, setSelectedResourceGroup] = useState('');
-
-  const acquireToken = useCallback(async () => {
-    try {
-      const firstAccount = accounts[0];
-      if (!firstAccount) {
-        throw new Error('No account available');
-      }
-
-      const response = await instance.acquireTokenSilent({
-        ...armApiRequest,
-        account: firstAccount,
-      });
-      setAccessToken(response.accessToken);
-      await loadSubscriptions(response.accessToken);
-    } catch (error) {
-      console.error(
-        'Silent token acquisition failed, falling back to redirect',
-        error
-      );
-      try {
-        const response = await instance.acquireTokenPopup(armApiRequest);
-        setAccessToken(response.accessToken);
-        await loadSubscriptions(response.accessToken);
-      } catch (popupError) {
-        console.error('Token acquisition failed', popupError);
-        setError('Failed to acquire access token for Azure API');
-      }
-    }
-  }, [instance, accounts]);
-
-  useEffect(() => {
-    if (accounts.length > 0) {
-      setIsAuthenticated(true);
-      acquireToken();
-    }
-  }, [accounts, acquireToken]);
-
-  const handleLogin = async () => {
-    try {
-      await instance.loginPopup(loginRequest);
-    } catch (error) {
-      console.error('Login failed', error);
-      setError('Authentication failed. Please try again.');
-    }
-  };
-
-  const handleLogout = () => {
-    instance.logoutPopup();
-    setIsAuthenticated(false);
-    setAccessToken(null);
-    resetForm();
-  };
-
-  const resetForm = () => {
-    setSubscriptions([]);
-    setSelectedSubscription('');
-    setAppServices([]);
-    setSelectedAppService('');
-    setDdApiKey('');
-    setError(null);
-    setDeploymentStatus('idle');
-  };
-
-  const loadSubscriptions = async (token: string) => {
-    try {
-      setIsLoading(true);
-      const azureService = new AzureService(token);
-      const subs = await azureService.getSubscriptions();
-      setSubscriptions(subs);
-    } catch (error) {
-      console.error('Failed to load subscriptions', error);
-      setError(
-        'Failed to load Azure subscriptions. Please check your permissions.'
-      );
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const loadResourceGroups = async (token: string, subscriptionId: string) => {
-    try {
-      setIsLoading(true);
-      const azureService = new AzureService(token);
-      const groups = await azureService.getResourceGroups(subscriptionId);
-
-      // Map Azure SDK ResourceGroup to component expected format
-      const mappedGroups = groups
-        .filter(group => group.name && group.id) // Filter out groups without name or id
-        .map(group => ({
-          id: group.id!,
-          name: group.name!,
-        }));
-
-      setResourceGroups(mappedGroups);
-    } catch (error) {
-      setError(
-        'Failed to load resource groups. Please check your permissions.'
-      );
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const loadAppServices = async (subscriptionId: string) => {
-    if (!accessToken) return;
-
-    try {
-      setIsLoading(true);
-      const azureService = new AzureService(accessToken);
-      const services = await azureService.getAppServices(subscriptionId);
-      setAppServices(services);
-    } catch (error) {
-      console.error('Failed to load app services', error);
-      setError('Failed to load App Services. Please check your permissions.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const loadAppServicesInResourceGroup = async (
-    subscriptionId: string,
-    resourceGroupName: string
-  ) => {
-    if (!accessToken) return;
-
-    try {
-      setIsLoading(true);
-      const azureService = new AzureService(accessToken);
-      const services = await azureService.getAppServicesInResourceGroup(
-        subscriptionId,
-        resourceGroupName
-      );
-      setAppServices(services);
-    } catch (error) {
-      console.error('Failed to load app services in resource group', error);
-      setError(
-        'Failed to load App Services in the selected resource group. Please check your permissions.'
-      );
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleSubscriptionChange = (subscriptionId: string) => {
-    setSelectedSubscription(subscriptionId);
-    setSelectedResourceGroup('');
-    setResourceGroups([]);
-    setSelectedAppService('');
-    setAppServices([]);
-    if (subscriptionId && accessToken) {
-      loadResourceGroups(accessToken, subscriptionId);
-    }
-  };
-
-  const handleResourceGroupChange = (resourceGroupName: string) => {
-    setSelectedResourceGroup(resourceGroupName);
-    setSelectedAppService('');
-    setAppServices([]);
-    if (resourceGroupName && accessToken && selectedSubscription) {
-      loadAppServicesInResourceGroup(selectedSubscription, resourceGroupName);
-    }
-  };
-
-  const handleDeploy = async () => {
-    if (!accessToken || !selectedAppService || !ddApiKey) {
-      setError('Please fill in all required fields');
-      return;
-    }
-
-    try {
-      setDeploymentStatus('deploying');
-      setIsLoading(true);
-      setError(null);
-
-      const azureService = new AzureService(accessToken);
-      const selectedApp = appServices.find(
-        app => app.id === selectedAppService
-      );
-
-      if (!selectedApp) {
-        throw new Error('Selected app service not found');
-      }
-
-      // Extract resource group from the app service ID
-      const resourceGroupMatch = selectedApp.id.match(
-        /resourceGroups\/([^/]+)/
-      );
-      const resourceGroupName = resourceGroupMatch ? resourceGroupMatch[1] : '';
-
-      if (!resourceGroupName) {
-        throw new Error('Could not determine resource group name');
-      }
-
-      // Determine if it's Windows or Linux
-      const isWindows = azureService.isWindowsAppService(selectedApp);
-      const templateUri = azureService.getARMTemplateUri(isWindows);
-
-      const deploymentParameters: DeploymentParameters = {
-        siteName: selectedApp.name,
-        location: selectedApp.location,
-        ddApiKey: ddApiKey,
-        ddSite: selectedDatadogSite,
-      };
-
-      const deploymentName = `datadog-apm-${selectedApp.name}-${Date.now()}`;
-
-      await azureService.deployDatadogAPM(
-        selectedSubscription,
-        resourceGroupName,
-        deploymentName,
-        templateUri,
-        deploymentParameters
-      );
-
-      setDeploymentStatus('success');
-    } catch (error) {
-      console.error('Deployment failed', error);
-      setError(
-        `Deployment failed: ${error instanceof Error ? error.message : 'Unknown error'}`
-      );
-      setDeploymentStatus('error');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  if (!isAuthenticated) {
-    return (
-      <div className="max-w-md mx-auto bg-white rounded-lg shadow-lg p-8">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
-            Azure Authentication Required
-          </h2>
-          <p className="text-gray-600 mb-6">
-            Please sign in to your Azure account to access your subscriptions
-            and app services.
-          </p>
-          <button
-            onClick={handleLogin}
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors duration-200"
-          >
-            Sign in with Azure
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-lg p-8">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">
-          Datadog APM for Azure
+    <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-8">
+      <div className="text-center mb-8">
+        <div className="text-6xl mb-4">🚧</div>
+        <h1 className="text-3xl font-bold text-gray-900 mb-4">
+          Under Construction
         </h1>
-        <button
-          onClick={handleLogout}
-          className="text-sm text-gray-600 hover:text-gray-800"
-        >
-          Sign out
-        </button>
+        <p className="text-lg text-gray-600 mb-6">
+          This component is being redesigned to address MSAL authentication challenges
+        </p>
       </div>
 
-      {error && <ErrorAlert message={error} onDismiss={() => setError(null)} />}
-
-      {deploymentStatus === 'success' && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
-          <div className="flex">
-            <div className="flex-shrink-0">
-              <svg
-                className="h-5 w-5 text-green-400"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </div>
-            <div className="ml-3">
-              <h3 className="text-sm font-medium text-green-800">
-                Deployment Successful!
-              </h3>
-              <div className="mt-2 text-sm text-green-700">
-                <p>
-                  Datadog APM has been successfully enabled on your App Service.
-                </p>
-              </div>
+      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mb-6">
+        <div className="flex">
+          <div className="flex-shrink-0">
+            <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+            </svg>
+          </div>
+          <div className="ml-3">
+            <h3 className="text-sm font-medium text-yellow-800">
+              Authentication System Redesign Required
+            </h3>
+            <div className="mt-2 text-sm text-yellow-700">
+              <p>
+                The original MSAL-based authentication system has been removed due to compatibility 
+                issues with hosted multi-tenant Azure AD applications.
+              </p>
             </div>
           </div>
         </div>
-      )}
+      </div>
 
-      <form
-        onSubmit={e => {
-          e.preventDefault();
-          handleDeploy();
-        }}
-        className="space-y-6"
-        aria-label="Datadog APM Configuration Form"
-        data-testid="datadog-form"
-      >
-        {/* Subscription Selection */}
-        <div>
-          <label
-            htmlFor="subscription"
-            className="block text-sm font-medium text-gray-700 mb-2"
-          >
-            Azure Subscription *
-          </label>
-          {isLoading && subscriptions.length === 0 ? (
-            <LoadingSpinner size="small" message="Loading subscriptions..." />
-          ) : (
-            <select
-              id="subscription"
-              value={selectedSubscription}
-              onChange={e => handleSubscriptionChange(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              required
-            >
-              <option value="">Select a subscription</option>
-              {subscriptions?.map(sub => (
-                <option key={sub.subscriptionId} value={sub.subscriptionId}>
-                  {sub.displayName} ({sub.subscriptionId})
-                </option>
-              ))}
-            </select>
-          )}
+      <div className="grid md:grid-cols-2 gap-6">
+        <div className="bg-gray-50 rounded-lg p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Challenges Faced</h3>
+          <ul className="space-y-2 text-sm text-gray-700">
+            <li>• Untrusted application status in hosted environments</li>
+            <li>• Publisher domain verification requirements</li>
+            <li>• CORS restrictions on Azure AD endpoints</li>
+            <li>• Token acquisition failures in untrusted contexts</li>
+            <li>• Session management issues across domains</li>
+          </ul>
         </div>
 
-        {/* Resource Group Selection */}
-        {selectedSubscription && (
-          <div>
-            <label
-              htmlFor="resourceGroup"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
-              Resource Group *
-            </label>
-            {isLoading && resourceGroups.length === 0 ? (
-              <LoadingSpinner
-                size="small"
-                message="Loading resource groups..."
-              />
-            ) : (
-              <select
-                id="resourceGroup"
-                value={selectedResourceGroup}
-                onChange={e => handleResourceGroupChange(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                disabled={!selectedSubscription}
-                required
-              >
-                <option value="">Select a resource group</option>
-                {resourceGroups?.map(group => (
-                  <option key={group.id} value={group.name}>
-                    {group.name}
-                  </option>
-                ))}
-              </select>
-            )}
-          </div>
-        )}
-
-        {/* App Service Selection */}
-        {selectedResourceGroup && (
-          <div>
-            <label
-              htmlFor="appService"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
-              App Service / Function App *
-            </label>
-            {isLoading && selectedResourceGroup && appServices.length === 0 ? (
-              <LoadingSpinner size="small" message="Loading app services..." />
-            ) : (
-              <select
-                id="appService"
-                value={selectedAppService}
-                onChange={e => setSelectedAppService(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                disabled={!selectedResourceGroup}
-                required
-              >
-                <option value="">Select an app service</option>
-                {appServices?.map(app => (
-                  <option key={app.id} value={app.id}>
-                    {app.name} ({app.kind || 'app'}) - {app.location}
-                  </option>
-                ))}
-              </select>
-            )}
-          </div>
-        )}
-
-        {/* Datadog Site Selection */}
-        <div>
-          <label
-            htmlFor="datadogSite"
-            className="block text-sm font-medium text-gray-700 mb-2"
-          >
-            Datadog Site *
-          </label>
-          <select
-            id="datadogSite"
-            value={selectedDatadogSite}
-            onChange={e => setSelectedDatadogSite(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            required
-          >
-            {DATADOG_SITES.map(site => (
-              <option key={site.value} value={site.value}>
-                {site.label}
-              </option>
-            ))}
-          </select>
+        <div className="bg-gray-50 rounded-lg p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Alternative Approaches</h3>
+          <ul className="space-y-2 text-sm text-gray-700">
+            <li>• Azure CLI-based authentication flow</li>
+            <li>• Service principal with secure credential handling</li>
+            <li>• Backend API gateway for token management</li>
+            <li>• Azure Static Web Apps integration</li>
+            <li>• Managed identity (Azure-only)</li>
+          </ul>
         </div>
+      </div>
 
-        {/* Datadog API Key */}
-        <div>
-          <label
-            htmlFor="ddApiKey"
-            className="block text-sm font-medium text-gray-700 mb-2"
-          >
-            Datadog API Key *
-          </label>
-          <input
-            type="password"
-            id="ddApiKey"
-            value={ddApiKey}
-            onChange={e => setDdApiKey(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="Enter your Datadog API key"
-            required
-          />
-          <p className="mt-1 text-xs text-gray-500">
-            You can find your API key in your Datadog account under Organization
-            Settings → API Keys
+      <div className="mt-8 p-6 bg-blue-50 border border-blue-200 rounded-lg">
+        <h3 className="text-lg font-semibold text-blue-900 mb-3">Technical Details</h3>
+        <div className="text-sm text-blue-800 space-y-2">
+          <p>
+            <strong>Multi-Tenant Application Issues:</strong> When deployed to hosting platforms, 
+            the application is considered "untrusted" by Azure AD, causing authentication flows to fail.
+          </p>
+          <p>
+            <strong>Publisher Domain Verification:</strong> Azure AD requires verified publisher domains 
+            for production apps, which is complex to achieve for hosted applications without a custom domain.
+          </p>
+          <p>
+            <strong>Redirect URI Restrictions:</strong> Azure AD has strict requirements for redirect URIs 
+            that must match the application's domain exactly, making development and deployment challenging.
           </p>
         </div>
+      </div>
 
-        {/* Deploy Button */}
-        <button
-          type="submit"
-          disabled={
-            isLoading ||
-            deploymentStatus === 'deploying' ||
-            !selectedAppService ||
-            !ddApiKey
-          }
-          className="w-full bg-purple-600 text-white py-3 px-4 rounded-lg hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors duration-200 flex items-center justify-center"
-        >
-          {deploymentStatus === 'deploying' ? (
-            <>
-              <LoadingSpinner size="small" />
-              <span className="ml-2">Deploying...</span>
-            </>
-          ) : (
-            'Enable Datadog APM'
-          )}
-        </button>
-      </form>
-
-      <div className="mt-6 text-xs text-gray-500">
-        <p>
-          * Required fields. This will deploy ARM templates to configure Datadog
-          APM monitoring on your selected App Service.
+      <div className="mt-6 text-center">
+        <p className="text-sm text-gray-500">
+          Expected completion: TBC
         </p>
       </div>
     </div>

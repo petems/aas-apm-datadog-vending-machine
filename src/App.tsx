@@ -8,15 +8,15 @@ import {
 } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { PublicClientApplication } from '@azure/msal-browser';
-import { MsalProvider } from '@azure/msal-react';
-import { msalConfig } from './authConfig';
+// import { PublicClientApplication } from '@azure/msal-browser'; // REMOVED: MSAL dependency
+// import { MsalProvider } from '@azure/msal-react'; // REMOVED: MSAL dependency
+// import { msalConfig } from './authConfig'; // REMOVED: MSAL dependency
 import DatadogAPMForm from './components/DatadogAPMForm';
 import DatadogConfigPage from './components/DatadogConfigPage';
 import './App.css';
 
 // Initialize MSAL instance
-const msalInstance = new PublicClientApplication(msalConfig);
+// const msalInstance = new PublicClientApplication(msalConfig); // REMOVED: MSAL dependency
 
 // Initialize React Query client
 const queryClient = new QueryClient({
@@ -442,7 +442,7 @@ const ARMTemplatePage: React.FC = () => {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <MsalProvider instance={msalInstance}>
+      {/* <MsalProvider instance={msalInstance}> REMOVED: MSAL dependency */}
         <Router>
           <div className="App">
             <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -456,7 +456,7 @@ function App() {
             </div>
           </div>
         </Router>
-      </MsalProvider>
+      {/* </MsalProvider> REMOVED: MSAL dependency */}
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );
