@@ -99,3 +99,23 @@ export const mockAuthResponse = {
   idToken: 'mock-id-token',
   fromCache: false,
 };
+
+export const mockAppServicePlan = {
+  id: 'plan1',
+  name: 'test-plan',
+  location: 'East US',
+  provisioningState: 'Succeeded',
+  status: 'Ready',
+  hostingEnvironmentProfile: {
+    id: 'env1',
+    name: 'env',
+    type: 'type',
+  },
+  sku: {
+    name: 'B1',
+    tier: 'Basic',
+    size: 'B1',
+    family: 'B',
+    capacity: 1,
+  },
+};

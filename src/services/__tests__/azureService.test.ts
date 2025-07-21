@@ -200,6 +200,51 @@ describe('AzureService', () => {
     });
   });
 
+  describe('getAppServicePlan', () => {
+    it('validates required parameters', async () => {
+      await expect(
+        // @ts-expect-error testing invalid params
+        service.getAppServicePlan('', 'rg', 'plan')
+      ).rejects.toThrow('All parameters are required');
+    });
+
+    it('fetches and maps plan details', async () => {
+      const mockClient = {
+        appServicePlans: {
+          get: jest.fn().mockResolvedValue(mockAppServicePlan),
+        },
+      };
+      jest
+        .spyOn(service as any, 'getWebSiteClient')
+        .mockReturnValue(mockClient as any);
+
+      const result = await service.getAppServicePlan('sub', 'rg', 'plan1');
+
+      expect(mockClient.appServicePlans.get).toHaveBeenCalledWith('rg', 'plan1');
+      expect(result).toEqual({
+        id: 'plan1',
+        name: 'test-plan',
+        location: 'East US',
+        properties: {
+          provisioningState: 'Succeeded',
+          status: 'Ready',
+          hostingEnvironmentProfile: {
+            id: 'env1',
+            name: 'env',
+            type: 'type',
+          },
+          sku: {
+            name: 'B1',
+            tier: 'Basic',
+            size: 'B1',
+            family: 'B',
+            capacity: 1,
+          },
+        },
+      });
+    });
+  });
+
   describe.skip('deployDatadogAPM @integration', () => {
     const deploymentParams = {
       subscriptionId: 'test-sub',
