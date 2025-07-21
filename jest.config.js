@@ -3,6 +3,17 @@ module.exports = {
   setupFilesAfterEnv: ['<rootDir>/src/setupTests.ts'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
+    // Handle ESM imports from react-syntax-highlighter
+    '^react-syntax-highlighter/dist/esm/(.*)$': 'react-syntax-highlighter/dist/cjs/$1',
+    // Mock react-router-dom
+    '^react-router-dom$': '<rootDir>/src/__mocks__/react-router-dom.js',
+    // Mock Azure SDK modules that cause issues in tests
+    '^@azure/logger$': '<rootDir>/src/__mocks__/@azure/logger.js',
+    '^@azure/core-rest-pipeline$': '<rootDir>/src/__mocks__/@azure/core-rest-pipeline.js',
+    '^@azure/core-client$': '<rootDir>/src/__mocks__/@azure/core-client.js',
+    '^@azure/arm-appservice$': '<rootDir>/src/__mocks__/@azure/arm-appservice.js',
+    '^@azure/arm-resources$': '<rootDir>/src/__mocks__/@azure/arm-resources.js',
+    '^@azure/identity$': '<rootDir>/src/__mocks__/@azure/identity.js',
   },
   collectCoverageFrom: [
     'src/**/*.{ts,tsx}',
@@ -30,10 +41,8 @@ module.exports = {
   restoreMocks: true,
   clearMocks: true,
   testTimeout: 15000,
-  // Use the default transform from react-scripts instead of ts-jest
-  // This avoids conflicts with React 19 and modern JSX transform
+  // Transform patterns to handle ESM modules and Azure SDK
   transformIgnorePatterns: [
-    '[/\\\\]node_modules[/\\\\].+\\.(js|jsx|mjs|cjs|ts|tsx)$',
-    '^.+\\.module\\.(css|sass|scss)$',
+    'node_modules/(?!(react-syntax-highlighter|highlight.js|prismjs)/)',
   ],
 }; 
