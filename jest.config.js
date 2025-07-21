@@ -41,8 +41,4 @@ module.exports = {
   restoreMocks: true,
   clearMocks: true,
   testTimeout: 15000,
-  // Transform patterns to handle ESM modules and Azure SDK
-  transformIgnorePatterns: [
-    'node_modules/(?!(react-syntax-highlighter|highlight.js|prismjs)/)',
-  ],
 }; 
