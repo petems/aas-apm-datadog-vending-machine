@@ -143,10 +143,14 @@ jobs:
       - name: Initialize TFLint
         run: tflint --init
         working-directory: ${{ env.TERRAFORM_DIR }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run TFLint
         run: tflint --format compact
         working-directory: ${{ env.TERRAFORM_DIR }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   tfsec:
     name: tfsec Security Analysis
