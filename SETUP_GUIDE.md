@@ -261,16 +261,48 @@ The project includes scripts to manage Azure AD publisher domain verification fo
 - Displays verification status and Azure Portal links
 - Auto-detects Application ID from Terraform state
 
-**Update Publisher Domain:**
+**Publisher Domain Setup Helper:**
 ```bash
 ./scripts/update-publisher-domain.sh [APPLICATION_ID] [DOMAIN]
 ```
-- Sets publisher domain for Azure AD application
-- Validates domain verification file before update
-- Uses Microsoft Graph API for secure updates
-- Provides detailed progress and error reporting
+- Validates prerequisites for publisher domain setup
+- Checks domain verification file accessibility
+- Provides step-by-step Azure Portal setup instructions
+- Explains Azure API limitations and manual requirements
 
 ### Publisher Domain Setup Process
+
+#### Option A: Root GitHub Pages Domain (Recommended)
+
+1. **Configure Root Domain in Terraform**
+   ```bash
+   # Update terraform/terraform.tfvars:
+   publisher_domain_repo = "yourusername.github.io"
+   publisher_domain      = "yourusername.github.io"
+   ```
+
+2. **Deploy Verification File to Root Repository**
+   ```bash
+   terraform apply
+   # This creates a PR to add .well-known/microsoft-identity-association.json to your root GitHub Pages repo
+   ```
+
+3. **Validate Setup Prerequisites**
+   ```bash
+   ./scripts/update-publisher-domain.sh auto yourusername.github.io
+   ```
+
+4. **Set Publisher Domain Manually**
+   - Open Azure Portal branding page (link provided by script)
+   - Select verified domain: `yourusername.github.io`
+   - Complete verification process if required
+
+5. **Verify Configuration**
+   ```bash
+   ./scripts/check-publisher-domain.sh
+   ```
+
+#### Option B: Project-Specific Domain
 
 1. **Create Domain Verification File**
    ```bash
@@ -278,21 +310,13 @@ The project includes scripts to manage Azure AD publisher domain verification fo
    # public/.well-known/microsoft-identity-association.json
    ```
 
-2. **Deploy to GitHub Pages**
+2. **Deploy to Project GitHub Pages**
    ```bash
    # The file is automatically deployed with your React app
-   # Accessible at: https://yourdomain/.well-known/microsoft-identity-association.json
+   # Accessible at: https://yourdomain/project-name/.well-known/microsoft-identity-association.json
    ```
 
-3. **Set Publisher Domain**
-   ```bash
-   ./scripts/update-publisher-domain.sh auto petems.github.io
-   ```
-
-4. **Verify Configuration**
-   ```bash
-   ./scripts/check-publisher-domain.sh
-   ```
+3. **Follow steps 3-5 from Option A** (using the project domain instead)
 
 ### Benefits
 
@@ -306,6 +330,10 @@ The project includes scripts to manage Azure AD publisher domain verification fo
 - Azure CLI installed and authenticated (`az login`)
 - Proper permissions for the Azure AD application
 - Domain verification file deployed and accessible
+
+### Important Note
+
+⚠️ **Azure API Limitation**: Publisher domain configuration is read-only via Microsoft Graph API and cannot be automated. Manual setup through Azure Portal is required.
 
 ## 🛡️ Security Notes
 

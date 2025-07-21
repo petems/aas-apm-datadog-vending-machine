@@ -65,13 +65,6 @@ variable "support_email" {
   }
 }
 
-variable "github_token" {
-  description = "GitHub personal access token (optional - can use GITHUB_TOKEN env var)"
-  type        = string
-  default     = ""
-  sensitive   = true
-}
-
 variable "create_github_secret" {
   description = "Whether to create GitHub repository secret for REACT_APP_CLIENT_ID"
   type        = bool
