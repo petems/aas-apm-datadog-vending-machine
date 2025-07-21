@@ -13,6 +13,20 @@ The Terraform configuration provisions:
 - **SPA Configuration** - Single Page Application settings with redirect URIs
 - **GitHub Repository Secret** - Automatically adds `REACT_APP_CLIENT_ID` to your GitHub repository (optional)
 - **Environment File** - Updates `.env.example` with the client ID (optional)
+- **Publisher Domain Verification** - Optional verification file for root GitHub Pages domain
+
+## 🚀 CI/CD Workflows
+
+The project includes a GitHub Actions workflow for Terraform validation:
+
+### 🔍 Validation Workflow (`terraform-validate.yml`)
+- **Trigger**: On push/PR to terraform files
+- **Features**:
+  - Format checking with `terraform fmt`
+  - Configuration validation
+  - Security scanning with Trivy, Checkov, and tfsec
+  - TFLint analysis for best practices
+  - Auto-comments on PRs with issues
 
 ## 📋 Prerequisites
 
