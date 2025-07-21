@@ -69,4 +69,15 @@ variable "create_github_secret" {
   description = "Whether to create GitHub repository secret for REACT_APP_CLIENT_ID"
   type        = bool
   default     = false
+}
+
+variable "terms_of_service_url" {
+  description = "Custom Terms of Service URL for the Azure AD application. If not specified, defaults to GitHub Pages terms-of-service.html"
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = var.terms_of_service_url == "" || can(regex("^https://", var.terms_of_service_url))
+    error_message = "Terms of service URL must be a valid HTTPS URL or empty string."
+  }
 } 
