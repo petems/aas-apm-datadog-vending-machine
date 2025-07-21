@@ -98,6 +98,15 @@ export class AzureService {
     this.credential = new ExistingTokenCredential(accessToken);
   }
 
+  private validateParams(params: unknown[], message: string): void {
+    const hasMissing = params.some(
+      p => p === undefined || p === null || p === ''
+    );
+    if (hasMissing) {
+      throw new AzureApiError(message, 400, 'INVALID_INPUT');
+    }
+  }
+
   /**
    * Get or create a WebSiteManagementClient for a subscription
    */
@@ -162,13 +171,7 @@ export class AzureService {
    * Fetch all App Services and Function Apps in a subscription
    */
   async getAppServices(subscriptionId: string): Promise<AzureAppService[]> {
-    if (!subscriptionId) {
-      throw new AzureApiError(
-        'Subscription ID is required',
-        400,
-        'INVALID_INPUT'
-      );
-    }
+    this.validateParams([subscriptionId], 'Subscription ID is required');
 
     try {
       const client = this.getWebSiteClient(subscriptionId);
@@ -198,13 +201,10 @@ export class AzureService {
     subscriptionId: string,
     resourceGroupName: string
   ): Promise<AzureAppService[]> {
-    if (!subscriptionId || !resourceGroupName) {
-      throw new AzureApiError(
-        'Both subscription ID and resource group name are required',
-        400,
-        'INVALID_INPUT'
-      );
-    }
+    this.validateParams(
+      [subscriptionId, resourceGroupName],
+      'Both subscription ID and resource group name are required'
+    );
 
     try {
       const client = this.getWebSiteClient(subscriptionId);
@@ -237,13 +237,10 @@ export class AzureService {
     resourceGroupName: string,
     siteName: string
   ): Promise<AzureAppService> {
-    if (!subscriptionId || !resourceGroupName || !siteName) {
-      throw new AzureApiError(
-        'All parameters are required',
-        400,
-        'INVALID_INPUT'
-      );
-    }
+    this.validateParams(
+      [subscriptionId, resourceGroupName, siteName],
+      'All parameters are required'
+    );
 
     try {
       const client = this.getWebSiteClient(subscriptionId);
@@ -348,23 +345,26 @@ export class AzureService {
     templateUri: string,
     parameters: DeploymentParameters
   ): Promise<unknown> {
-    if (
-      !subscriptionId ||
-      !resourceGroupName ||
-      !deploymentName ||
-      !templateUri ||
-      !parameters ||
-      typeof parameters.siteName === 'undefined' ||
-      typeof parameters.location === 'undefined' ||
-      typeof parameters.ddApiKey === 'undefined' ||
-      typeof parameters.ddSite === 'undefined'
-    ) {
-      throw new AzureApiError(
-        'All deployment parameters are required',
-        400,
-        'INVALID_INPUT'
-      );
-    }
+    this.validateParams(
+      [
+        subscriptionId,
+        resourceGroupName,
+        deploymentName,
+        templateUri,
+        parameters,
+      ],
+      'All deployment parameters are required'
+    );
+
+    this.validateParams(
+      [
+        parameters.siteName,
+        parameters.location,
+        parameters.ddApiKey,
+        parameters.ddSite,
+      ],
+      'All deployment parameters are required'
+    );
 
     // This method is now handled by the ARM client, but we keep the interface
     // For now, we'll just return a placeholder or throw an error if not implemented
@@ -382,13 +382,10 @@ export class AzureService {
     resourceGroupName: string,
     deploymentName: string
   ): Promise<unknown> {
-    if (!subscriptionId || !resourceGroupName || !deploymentName) {
-      throw new AzureApiError(
-        'All parameters are required',
-        400,
-        'INVALID_INPUT'
-      );
-    }
+    this.validateParams(
+      [subscriptionId, resourceGroupName, deploymentName],
+      'All parameters are required'
+    );
 
     // This method is now handled by the ARM client, but we keep the interface
     // For now, we'll just return a placeholder or throw an error if not implemented
@@ -408,13 +405,7 @@ export class AzureService {
   async getResourceGroups(
     subscriptionId: string
   ): Promise<AzureResourceGroup[]> {
-    if (!subscriptionId) {
-      throw new AzureApiError(
-        'Subscription ID is required',
-        400,
-        'INVALID_INPUT'
-      );
-    }
+    this.validateParams([subscriptionId], 'Subscription ID is required');
 
     try {
       const client = this.getResourceClient(subscriptionId);
@@ -443,13 +434,10 @@ export class AzureService {
     resourceGroupName: string,
     planName: string
   ): Promise<AppServicePlan> {
-    if (!subscriptionId || !resourceGroupName || !planName) {
-      throw new AzureApiError(
-        'All parameters are required',
-        400,
-        'INVALID_INPUT'
-      );
-    }
+    this.validateParams(
+      [subscriptionId, resourceGroupName, planName],
+      'All parameters are required'
+    );
 
     try {
       const client = this.getWebSiteClient(subscriptionId);
@@ -511,13 +499,10 @@ export class AzureService {
     resourceGroupName: string,
     siteName: string
   ): Promise<AppSettings> {
-    if (!subscriptionId || !resourceGroupName || !siteName) {
-      throw new AzureApiError(
-        'All parameters are required',
-        400,
-        'INVALID_INPUT'
-      );
-    }
+    this.validateParams(
+      [subscriptionId, resourceGroupName, siteName],
+      'All parameters are required'
+    );
 
     try {
       const client = this.getWebSiteClient(subscriptionId);
@@ -546,13 +531,10 @@ export class AzureService {
     siteName: string,
     settings: AppSettings
   ): Promise<void> {
-    if (!subscriptionId || !resourceGroupName || !siteName) {
-      throw new AzureApiError(
-        'All parameters are required',
-        400,
-        'INVALID_INPUT'
-      );
-    }
+    this.validateParams(
+      [subscriptionId, resourceGroupName, siteName],
+      'All parameters are required'
+    );
 
     try {
       const client = this.getWebSiteClient(subscriptionId);
@@ -660,13 +642,10 @@ export class AzureService {
       allowAccessToAllAppSettings?: boolean;
     }
   ): Promise<void> {
-    if (!subscriptionId || !resourceGroupName || !siteName) {
-      throw new AzureApiError(
-        'All parameters are required',
-        400,
-        'INVALID_INPUT'
-      );
-    }
+    this.validateParams(
+      [subscriptionId, resourceGroupName, siteName],
+      'All parameters are required'
+    );
 
     try {
       const client = this.getWebSiteClient(subscriptionId);
@@ -829,13 +808,10 @@ export class AzureService {
     resourceGroupName: string,
     siteName: string
   ): Promise<void> {
-    if (!subscriptionId || !resourceGroupName || !siteName) {
-      throw new AzureApiError(
-        'All parameters are required',
-        400,
-        'INVALID_INPUT'
-      );
-    }
+    this.validateParams(
+      [subscriptionId, resourceGroupName, siteName],
+      'All parameters are required'
+    );
 
     try {
       const client = this.getWebSiteClient(subscriptionId);
@@ -913,13 +889,10 @@ export class AzureService {
     resourceGroupName: string,
     siteName: string
   ): Promise<any> {
-    if (!subscriptionId || !resourceGroupName || !siteName) {
-      throw new AzureApiError(
-        'All parameters are required',
-        400,
-        'INVALID_INPUT'
-      );
-    }
+    this.validateParams(
+      [subscriptionId, resourceGroupName, siteName],
+      'All parameters are required'
+    );
 
     try {
       const client = this.getWebSiteClient(subscriptionId);
@@ -942,13 +915,10 @@ export class AzureService {
     resourceGroupName: string,
     siteName: string
   ): Promise<any[]> {
-    if (!subscriptionId || !resourceGroupName || !siteName) {
-      throw new AzureApiError(
-        'All parameters are required',
-        400,
-        'INVALID_INPUT'
-      );
-    }
+    this.validateParams(
+      [subscriptionId, resourceGroupName, siteName],
+      'All parameters are required'
+    );
 
     try {
       const client = this.getWebSiteClient(subscriptionId);
@@ -977,13 +947,10 @@ export class AzureService {
     siteName: string,
     slotName?: string
   ): Promise<SiteContainer[]> {
-    if (!subscriptionId || !resourceGroupName || !siteName) {
-      throw new AzureApiError(
-        'All parameters are required',
-        400,
-        'INVALID_INPUT'
-      );
-    }
+    this.validateParams(
+      [subscriptionId, resourceGroupName, siteName],
+      'All parameters are required'
+    );
 
     try {
       const client = this.getWebSiteClient(subscriptionId);
@@ -1019,13 +986,10 @@ export class AzureService {
     containerName: string,
     slotName?: string
   ): Promise<any> {
-    if (!subscriptionId || !resourceGroupName || !siteName || !containerName) {
-      throw new AzureApiError(
-        'All parameters are required',
-        400,
-        'INVALID_INPUT'
-      );
-    }
+    this.validateParams(
+      [subscriptionId, resourceGroupName, siteName, containerName],
+      'All parameters are required'
+    );
 
     try {
       const client = this.getWebSiteClient(subscriptionId);
@@ -1059,13 +1023,10 @@ export class AzureService {
     containerName: string,
     slotName?: string
   ): Promise<any> {
-    if (!subscriptionId || !resourceGroupName || !siteName || !containerName) {
-      throw new AzureApiError(
-        'All parameters are required',
-        400,
-        'INVALID_INPUT'
-      );
-    }
+    this.validateParams(
+      [subscriptionId, resourceGroupName, siteName, containerName],
+      'All parameters are required'
+    );
 
     try {
       const client = this.getWebSiteClient(subscriptionId);
