@@ -1,6 +1,6 @@
-# Datadog APM Azure Vending Machine
+# Datadog Azure App Service Vending Machine
 
-A GitHub-hosted "vending machine" UI for enabling Datadog APM on existing Azure App Services (.NET 8, Linux/Windows).
+A GitHub-hosted "vending machine" UI for enabling Datadog APM on existing Azure App Services (Starting with .NET 8, Linux and Windows.
 
 ## Overview
 
@@ -53,7 +53,7 @@ This application supports **organizational accounts only** (work/school accounts
 
 ```bash
 git clone <your-repo-url>
-cd datadog-apm-azure-vending-machine
+cd aas-apm-datadog-vending-machine
 yarn install
 ```
 

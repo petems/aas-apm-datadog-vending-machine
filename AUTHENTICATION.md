@@ -139,7 +139,7 @@ For authentication issues:
 - **Check this documentation first**
 - **Verify your account type** (work/school vs. personal)
 - **Contact your IT administrator** if you need organizational approval
-- **Create a GitHub issue** for technical problems: [Issues](https://github.com/petems/azure-app-services-for-datadog-vending-machine/issues)
+- **Create a GitHub issue** for technical problems: [Issues](https://github.com/petems/aas-apm-datadog-vending-machine/issues)
 
 ---
 

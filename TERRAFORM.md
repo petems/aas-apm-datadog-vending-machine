@@ -66,13 +66,13 @@ The project includes a GitHub Actions workflow for Terraform validation:
 
 Click the button below to get started immediately:
 
-[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://shell.azure.com/bash?resource=https://github.com/peter-souter/azure-app-services-for-datadog-vending-machine)
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://shell.azure.com/bash?resource=https://github.com/peter-souter/aas-apm-datadog-vending-machine)
 
 💡 **Azure Cloud Shell has Terraform and GitHub CLI pre-installed** - no setup required!
 
 After clicking, run these commands in Azure Cloud Shell:
 ```bash
-cd azure-app-services-for-datadog-vending-machine/terraform
+cd aas-apm-datadog-vending-machine/terraform
 terraform init
 cp terraform.tfvars.example terraform.tfvars
 
