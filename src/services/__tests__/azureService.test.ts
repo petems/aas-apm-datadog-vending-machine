@@ -184,6 +184,33 @@ describe('AzureService', () => {
     });
   });
 
+  describe('getAppServiceLanguage', () => {
+    it('parses runtime info from Linux app services', () => {
+      const result = service.getAppServiceLanguage(mockLinuxAppService);
+      expect(result).toEqual({
+        language: 'Node.js',
+        version: '18-lts',
+        rawRuntime: 'NODE|18-lts',
+      });
+    });
+
+    it('handles unknown runtimes gracefully', () => {
+      const customApp = {
+        ...mockAppService,
+        properties: {
+          ...mockAppService.properties,
+          siteConfig: { windowsFxVersion: 'CUSTOM|1.0' },
+        },
+      };
+      const result = service.getAppServiceLanguage(customApp);
+      expect(result).toEqual({
+        language: 'Unknown',
+        version: 'CUSTOM|1.0',
+        rawRuntime: 'CUSTOM|1.0',
+      });
+    });
+  });
+
   describe('getARMTemplateUri', () => {
     it('should return Windows template URI', () => {
       const uri = service.getARMTemplateUri(true);

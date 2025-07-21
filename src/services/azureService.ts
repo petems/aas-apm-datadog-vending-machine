@@ -1240,7 +1240,7 @@ export class AzureService {
    */
   private parseRuntimeString(
     runtimeString: string,
-    serviceType: 'Windows' | 'Linux' | 'Container'
+    _serviceType: 'Windows' | 'Linux' | 'Container'
   ): {
     language: string;
     version: string;
@@ -1249,69 +1249,37 @@ export class AzureService {
 
     const runtime = runtimeString.toUpperCase();
 
-    // Helper function to split on either : or |
     const splitRuntime = (pattern: string): string => {
       if (runtime.includes(`${pattern}:`)) {
         return runtime.split(`${pattern}:`)[1] || '';
-      } else if (runtime.includes(`${pattern}|`)) {
+      }
+      if (runtime.includes(`${pattern}|`)) {
         return runtime.split(`${pattern}|`)[1] || '';
       }
       return '';
     };
 
-    // .NET Core patterns (Linux: "DOTNETCORE:9.0" or "DOTNETCORE|9.0", Windows: "dotnet:9" or "dotnet|9")
-    if (runtime.includes('DOTNETCORE')) {
-      const version = splitRuntime('DOTNETCORE');
-      if (version) return { language: '.NET Core', version };
-    }
-    if (runtime.includes('DOTNET')) {
-      const version = splitRuntime('DOTNET');
-      if (version) return { language: '.NET', version };
+    const runtimePatterns = [
+      { pattern: 'DOTNETCORE', language: '.NET Core' },
+      { pattern: 'DOTNET', language: '.NET' },
+      { pattern: 'ASPNET', language: 'ASP.NET' },
+      { pattern: 'NODE', language: 'Node.js' },
+      { pattern: 'PYTHON', language: 'Python' },
+      { pattern: 'PHP', language: 'PHP' },
+      { pattern: 'JAVA', language: 'Java' },
+      { pattern: 'TOMCAT', language: 'Tomcat' },
+      { pattern: 'JBOSSEAP', language: 'JBoss EAP' },
+    ];
+
+    for (const { pattern, language } of runtimePatterns) {
+      if (runtime.includes(pattern)) {
+        const version = splitRuntime(pattern);
+        if (version) {
+          return { language, version };
+        }
+      }
     }
 
-    // ASP.NET patterns (Windows: "ASPNET:V4.8" or "ASPNET|V4.8")
-    if (runtime.includes('ASPNET')) {
-      const version = splitRuntime('ASPNET');
-      if (version) return { language: 'ASP.NET', version };
-    }
-
-    // Node.js patterns (Linux: "NODE:22-lts" or "NODE|22-lts", Windows: "NODE:22LTS" or "NODE|22LTS")
-    if (runtime.includes('NODE')) {
-      const version = splitRuntime('NODE');
-      if (version) return { language: 'Node.js', version };
-    }
-
-    // Python patterns (Linux: "PYTHON:3.13" or "PYTHON|3.13")
-    if (runtime.includes('PYTHON')) {
-      const version = splitRuntime('PYTHON');
-      if (version) return { language: 'Python', version };
-    }
-
-    // PHP patterns (Linux: "PHP:8.4" or "PHP|8.4")
-    if (runtime.includes('PHP')) {
-      const version = splitRuntime('PHP');
-      if (version) return { language: 'PHP', version };
-    }
-
-    // Java patterns (Linux: "JAVA:21-java21" or "JAVA|21-java21", Windows: "JAVA:21" or "JAVA|21")
-    if (runtime.includes('JAVA')) {
-      const version = splitRuntime('JAVA');
-      if (version) return { language: 'Java', version };
-    }
-
-    // Tomcat patterns (both: "TOMCAT:11.0-java21" or "TOMCAT|11.0-java21")
-    if (runtime.includes('TOMCAT')) {
-      const version = splitRuntime('TOMCAT');
-      if (version) return { language: 'Tomcat', version };
-    }
-
-    // JBoss EAP patterns (Linux: "JBOSSEAP:8-java21" or "JBOSSEAP|8-java21")
-    if (runtime.includes('JBOSSEAP')) {
-      const version = splitRuntime('JBOSSEAP');
-      if (version) return { language: 'JBoss EAP', version };
-    }
-
-    // If no known pattern matches, return the original string
     return { language: 'Unknown', version: runtimeString };
   }
 
