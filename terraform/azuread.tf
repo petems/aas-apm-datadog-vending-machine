@@ -8,7 +8,7 @@ resource "azuread_application" "datadog_vending_machine" {
   # Enhanced branding for better consent experience
   marketing_url         = length(local.all_redirect_uris) > 0 ? local.all_redirect_uris[0] : null
   support_url           = var.support_email != "" ? "mailto:${var.support_email}" : (var.github_owner != "" && var.github_repository != "" ? "https://github.com/${var.github_owner}/${var.github_repository}/issues" : null)
-  privacy_statement_url = var.github_owner != "" && var.github_repository != "" ? "https://github.com/${var.github_owner}/${var.github_repository}#security-considerations" : null
+  privacy_statement_url = length(local.all_redirect_uris) > 0 ? "${local.all_redirect_uris[0]}privacy-statement.html" : null
   terms_of_service_url  = length(local.all_redirect_uris) > 0 ? "${local.all_redirect_uris[0]}terms-of-service.html" : null
 
   # API permissions
