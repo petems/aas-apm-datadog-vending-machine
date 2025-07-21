@@ -1,5 +1,7 @@
+// REMOVED: MSAL dependency - entire file commented out
+/*
 import { useState, useEffect, useCallback } from 'react';
-import { useMsal } from '@azure/msal-react';
+// import { useMsal } from '@azure/msal-react'; // REMOVED: MSAL dependency
 import { loginRequest, armApiRequest } from '../authConfig';
 
 interface AuthState {
@@ -108,12 +110,7 @@ export const useAuth = () => {
     if (instance) {
       instance.logoutPopup();
     }
-    setAuthState({
-      isAuthenticated: false,
-      accessToken: null,
-      isLoading: false,
-      error: null,
-    });
+    setAuthState(prev => ({ ...prev, isAuthenticated: false, accessToken: null, isLoading: false, error: null }));
   }, [instance]);
 
   const clearError = useCallback(() => {
@@ -128,3 +125,16 @@ export const useAuth = () => {
     refreshToken: acquireToken,
   };
 };
+*/
+
+// Placeholder hook that returns default values
+export const useAuth = () => ({
+  isAuthenticated: false,
+  accessToken: null,
+  isLoading: false,
+  error: null,
+  login: async () => {},
+  logout: () => {},
+  clearError: () => {},
+  refreshToken: async () => {},
+});

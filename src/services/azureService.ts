@@ -143,18 +143,35 @@ export class AzureService {
       );
 
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.error?.message || `HTTP ${response.status}: ${response.statusText}`;
+        throw new AzureApiError(errorMessage, response.status, 'API_ERROR');
       }
 
       const data = await response.json();
       return data.value || [];
     } catch (error) {
       console.error('Error fetching subscriptions:', error);
-      throw new AzureApiError(
-        'Failed to fetch subscriptions',
-        500,
-        'SUBSCRIPTIONS_FETCH_ERROR'
-      );
+      if (error instanceof AzureApiError) {
+        throw error;
+      }
+      
+      let errorMessage = 'Failed to fetch subscriptions';
+      let status = 500;
+      let code = 'SUBSCRIPTIONS_FETCH_ERROR';
+      
+      if (error instanceof Error) {
+        errorMessage = error.message;
+        if (error.name === 'AbortError' || error.message.includes('aborted')) {
+          errorMessage = 'Request timeout';
+          code = 'TIMEOUT_ERROR';
+        } else if (error.message.includes('Network') || error.message.includes('fetch')) {
+          errorMessage = 'Network error';
+          code = 'NETWORK_ERROR';
+        }
+      }
+      
+      throw new AzureApiError(errorMessage, status, code);
     }
   }
 
@@ -183,8 +200,12 @@ export class AzureService {
       return sites;
     } catch (error) {
       console.error('Error fetching app services:', error);
+      if (error instanceof AzureApiError) {
+        throw error;
+      }
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch app services';
       throw new AzureApiError(
-        'Failed to fetch app services',
+        errorMessage,
         500,
         'APP_SERVICES_FETCH_ERROR'
       );
@@ -325,17 +346,6 @@ export class AzureService {
    */
   isWindowsAppService(appService: AzureAppService): boolean {
     return this.getAppServiceType(appService) === 'Windows';
-  }
-
-  /**
-   * Get ARM template URI based on platform
-   */
-  getARMTemplateUri(isWindows: boolean): string {
-    const { origin, pathname } = window.location;
-    const basePath = pathname.endsWith('/') ? pathname : `${pathname}/`;
-    return `${origin}${basePath}arm/${
-      isWindows ? 'windows' : 'linux'
-    }-appservice-datadog.json`;
   }
 
   /**

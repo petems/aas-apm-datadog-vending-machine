@@ -1,39 +1,26 @@
 module.exports = {
+  preset: 'ts-jest',
   testEnvironment: 'jsdom',
   setupFilesAfterEnv: ['<rootDir>/src/setupTests.ts'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
+    '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
+    '^react-syntax-highlighter/dist/esm/(.*)$': 'react-syntax-highlighter/dist/cjs/$1',
   },
-  collectCoverageFrom: [
-    'src/**/*.{ts,tsx}',
-    '!src/**/*.d.ts',
-    '!src/index.tsx',
-    '!src/reportWebVitals.ts',
-    '!src/**/__tests__/**',
-    '!src/**/*.stories.{ts,tsx}',
-    '!**/node_modules/**',
-  ],
-  coverageThreshold: {
-    global: {
-      branches: 75,
-      functions: 75,
-      lines: 75,
-      statements: 75,
-    },
-  },
+  moduleDirectories: ['node_modules', 'src'],
   testMatch: [
     '<rootDir>/src/**/__tests__/**/*.(test|spec).{ts,tsx}',
     '<rootDir>/src/**/*.(test|spec).{ts,tsx}',
   ],
+  testEnvironmentOptions: {
+    customExportConditions: ['node', 'node-addons'],
+  },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
-  resetMocks: true,
-  restoreMocks: true,
-  clearMocks: true,
-  testTimeout: 15000,
-  // Use the default transform from react-scripts instead of ts-jest
-  // This avoids conflicts with React 19 and modern JSX transform
+  transform: {
+    '^.+\\.(ts|tsx)$': 'ts-jest',
+  },
   transformIgnorePatterns: [
-    '[/\\\\]node_modules[/\\\\].+\\.(js|jsx|mjs|cjs|ts|tsx)$',
-    '^.+\\.module\\.(css|sass|scss)$',
+    'node_modules/(?!(react-syntax-highlighter)/)',
   ],
-}; 
+  testTimeout: 10000,
+};

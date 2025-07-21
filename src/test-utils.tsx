@@ -2,18 +2,18 @@
 import React, { ReactElement } from 'react';
 import { render, RenderOptions } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { MsalProvider } from '@azure/msal-react';
-import { PublicClientApplication } from '@azure/msal-browser';
+// import { MsalProvider } from '@azure/msal-react'; // REMOVED: MSAL dependency
+// import { PublicClientApplication } from '@azure/msal-browser'; // REMOVED: MSAL dependency
 
 // Mock MSAL instance
-const mockMsalInstance = {
-  acquireTokenSilent: jest.fn(),
-  acquireTokenPopup: jest.fn(),
-  loginPopup: jest.fn(),
-  logoutPopup: jest.fn(),
-  addEventCallback: jest.fn(),
-  removeEventCallback: jest.fn(),
-} as unknown as PublicClientApplication;
+// const mockMsalInstance = { // REMOVED: MSAL dependency
+//   acquireTokenSilent: jest.fn(),
+//   acquireTokenPopup: jest.fn(),
+//   loginPopup: jest.fn(),
+//   logoutPopup: jest.fn(),
+//   addEventCallback: jest.fn(),
+//   removeEventCallback: jest.fn(),
+// } as unknown as PublicClientApplication;
 
 // Create a custom render function that includes providers
 const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
@@ -31,7 +31,9 @@ const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <MsalProvider instance={mockMsalInstance}>{children}</MsalProvider>
+      {/* <MsalProvider instance={mockMsalInstance}> REMOVED: MSAL dependency */}
+        {children}
+      {/* </MsalProvider> REMOVED: MSAL dependency */}
     </QueryClientProvider>
   );
 };
@@ -45,13 +47,13 @@ export * from '@testing-library/react';
 export { customRender as render };
 
 // Helper for creating properly typed MSAL context mocks
-export const createMockMsalContext = (overrides = {}) => ({
-  instance: {} as any,
-  accounts: [] as any,
-  inProgress: 'none' as any,
-  logger: {} as any,
-  ...overrides,
-});
+// export const createMockMsalContext = (overrides = {}) => ({ // REMOVED: MSAL dependency
+//   instance: {} as any,
+//   accounts: [] as any,
+//   inProgress: 'none' as any,
+//   logger: {} as any,
+//   ...overrides,
+// });
 
 // Mock data generators
 export const mockSubscription = {
