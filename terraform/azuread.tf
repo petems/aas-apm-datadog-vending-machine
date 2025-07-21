@@ -47,7 +47,7 @@ resource "azuread_application" "datadog_vending_machine" {
 
   tags = concat([
     "terraform",
-    "datadog", 
+    "datadog",
     "apm",
     var.environment
   ], [for k, v in local.common_tags : "${k}:${v}"])
@@ -61,7 +61,7 @@ resource "azuread_service_principal" "datadog_vending_machine" {
 
   tags = concat([
     "terraform",
-    "datadog", 
+    "datadog",
     "apm",
     var.environment
   ], [for k, v in local.common_tags : "${k}:${v}"])
