@@ -161,13 +161,12 @@ jobs:
         with:
           working_directory: ${{ env.TERRAFORM_DIR }}
           format: sarif
-          out: tfsec-results.sarif
           soft_fail: true
 
       - name: Upload tfsec results
         uses: github/codeql-action/upload-sarif@v3
         if: always()
         with:
-          sarif_file: tfsec-results.sarif
+          sarif_file: results.sarif.json
           category: tfsec
 
