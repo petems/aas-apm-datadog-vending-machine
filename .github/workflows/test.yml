@@ -36,6 +36,20 @@ jobs:
       - name: ESLint check
         run: yarn lint
 
+      - name: ESLint accessibility check
+        run: |
+          echo "🔍 Checking for accessibility violations..."
+          yarn lint --format=compact > eslint-results.txt || true
+          A11Y_ISSUES=$(grep -c "jsx-a11y" eslint-results.txt || echo "0")
+          if [ "$A11Y_ISSUES" -gt 0 ]; then
+            echo "❌ Found $A11Y_ISSUES accessibility issues:"
+            grep "jsx-a11y" eslint-results.txt
+            echo "Please fix accessibility issues before merging."
+            exit 1
+          else
+            echo "✅ No accessibility issues found!"
+          fi
+
       - name: Prettier format check
         run: yarn format:check
 
