@@ -100,10 +100,13 @@ export class AzureService {
 
   private validateRequiredParams(
     params: Record<string, unknown>,
-    message: string
+    message: string,
+    allowEmptyStrings: boolean = false
   ): void {
     if (
-      Object.values(params).some(v => v === undefined || v === null || v === '')
+      Object.values(params).some(
+        v => v === undefined || v === null || (!allowEmptyStrings && v === '')
+      )
     ) {
       throw new AzureApiError(message, 400, 'INVALID_INPUT');
     }
