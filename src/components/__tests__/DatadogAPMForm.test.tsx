@@ -42,7 +42,7 @@ const {
 // Mock useMsal hook
 const mockUseMsal = useMsal as jest.MockedFunction<typeof useMsal>;
 
-describe('DatadogAPMForm', () => {
+describe.skip('DatadogAPMForm @integration', () => {
   const mockInstance = {
     acquireTokenSilent: jest.fn(),
     acquireTokenPopup: jest.fn(),

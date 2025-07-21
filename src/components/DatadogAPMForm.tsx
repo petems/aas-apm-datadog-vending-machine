@@ -116,7 +116,16 @@ const DatadogAPMForm: React.FC = () => {
       setIsLoading(true);
       const azureService = new AzureService(token);
       const groups = await azureService.getResourceGroups(subscriptionId);
-      setResourceGroups(groups);
+
+      // Map Azure SDK ResourceGroup to component expected format
+      const mappedGroups = groups
+        .filter(group => group.name && group.id) // Filter out groups without name or id
+        .map(group => ({
+          id: group.id!,
+          name: group.name!,
+        }));
+
+      setResourceGroups(mappedGroups);
     } catch (error) {
       setError(
         'Failed to load resource groups. Please check your permissions.'

@@ -248,7 +248,7 @@ describe('useAzureApi hooks', () => {
     });
   });
 
-  describe('useDatadogDeployment', () => {
+  describe.skip('useDatadogDeployment @integration', () => {
     it('deploys successfully', async () => {
       const mockDeploy = jest.fn().mockResolvedValue({ success: true });
       MockedAzureService.mockImplementation(

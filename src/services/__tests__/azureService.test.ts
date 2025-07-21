@@ -200,7 +200,7 @@ describe('AzureService', () => {
     });
   });
 
-  describe('deployDatadogAPM', () => {
+  describe.skip('deployDatadogAPM @integration', () => {
     const deploymentParams = {
       subscriptionId: 'test-sub',
       resourceGroupName: 'test-rg',

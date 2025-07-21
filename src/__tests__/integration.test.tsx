@@ -12,7 +12,7 @@ const mockAzureService = AzureService as jest.Mocked<typeof AzureService>;
 // Mock useMsal hook
 const mockUseMsal = useMsal as jest.MockedFunction<typeof useMsal>;
 
-describe.skip('Integration Tests', () => {
+describe.skip('Integration Tests @integration', () => {
   const mockInstance = {
     acquireTokenSilent: jest.fn(),
     acquireTokenPopup: jest.fn(),
