@@ -56,8 +56,8 @@ This is a frontend web app built with **React 19**, **TypeScript**, and **Create
 ### 🛠️ Local Setup
 
 ```bash
-git clone https://github.com/petems/azure-app-services-for-datadog-vending-machine
-cd azure-app-services-for-datadog-vending-machine
+git clone https://github.com/petems/aas-apm-datadog-vending-machine
+cd aas-apm-datadog-vending-machine
 yarn install
 yarn start
 ```
@@ -105,7 +105,7 @@ yarn build      # Production build
 yarn deploy     # Deploy to GitHub Pages
 ```
 
-Pages are auto-hosted at: `https://<username>.github.io/azure-app-services-for-datadog-vending-machine`
+Pages are auto-hosted at: `https://<username>.github.io/aas-apm-datadog-vending-machine`
 
 ## 🔐 Authentication
 

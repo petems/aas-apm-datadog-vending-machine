@@ -1,5 +1,5 @@
 {
-  "name": "datadog-apm-azure-vending-machine",
+  "name": "aas-apm-datadog-vending-machine",
   "version": "1.0.0",
   "description": "GitHub-hosted vending machine UI for enabling Datadog APM on Azure App Services",
   "main": "index.js",
@@ -107,5 +107,5 @@
       "last 1 safari version"
     ]
   },
-  "homepage": "."
+  "homepage": "https://petems.github.io/aas-apm-datadog-vending-machine"
 }

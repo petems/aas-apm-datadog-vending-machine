@@ -14,7 +14,7 @@ Choose one of the following methods to create the Azure AD App Registration:
 
 Click the button below to open this repository in Azure Cloud Shell and deploy automatically:
 
-[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://shell.azure.com/bash?resource=https://github.com/peter-souter/azure-app-services-for-datadog-vending-machine)
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://shell.azure.com/bash?resource=https://github.com/peter-souter/aas-apm-datadog-vending-machine)
 
 This will:
 - Open Azure Cloud Shell in your browser
@@ -24,7 +24,7 @@ This will:
 
 After clicking the button, run these commands in Azure Cloud Shell:
 ```bash
-cd azure-app-services-for-datadog-vending-machine/terraform
+cd aas-apm-datadog-vending-machine/terraform
 terraform init
 cp terraform.tfvars.example terraform.tfvars
 # Edit the terraform.tfvars file with your redirect URIs
