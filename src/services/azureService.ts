@@ -161,11 +161,9 @@ export class AzureService {
       return data.value || [];
     } catch (error) {
       console.error('Error fetching subscriptions:', error);
-      throw new AzureApiError(
-        'Failed to fetch subscriptions',
-        500,
-        'SUBSCRIPTIONS_FETCH_ERROR'
-      );
+      const message =
+        (error as Error).message || 'Failed to fetch subscriptions';
+      throw new AzureApiError(message, 500, 'SUBSCRIPTIONS_FETCH_ERROR');
     }
   }
 
@@ -191,11 +189,9 @@ export class AzureService {
       return sites;
     } catch (error) {
       console.error('Error fetching app services:', error);
-      throw new AzureApiError(
-        'Failed to fetch app services',
-        500,
-        'APP_SERVICES_FETCH_ERROR'
-      );
+      const message =
+        (error as Error).message || 'Failed to fetch app services';
+      throw new AzureApiError(message, 500, 'APP_SERVICES_FETCH_ERROR');
     }
   }
 
@@ -226,8 +222,11 @@ export class AzureService {
       return sites;
     } catch (error) {
       console.error('Error fetching app services in resource group:', error);
+      const message =
+        (error as Error).message ||
+        'Failed to fetch app services in resource group';
       throw new AzureApiError(
-        'Failed to fetch app services in resource group',
+        message,
         500,
         'RESOURCE_GROUP_APP_SERVICES_FETCH_ERROR'
       );
@@ -282,11 +281,9 @@ export class AzureService {
       return this.mapSiteToAppService(enrichedSite);
     } catch (error) {
       console.error('Error fetching app service details:', error);
-      throw new AzureApiError(
-        'Failed to fetch app service details',
-        500,
-        'APP_SERVICE_DETAILS_FETCH_ERROR'
-      );
+      const message =
+        (error as Error).message || 'Failed to fetch app service details';
+      throw new AzureApiError(message, 500, 'APP_SERVICE_DETAILS_FETCH_ERROR');
     }
   }
 
@@ -429,11 +426,9 @@ export class AzureService {
       return resourceGroups;
     } catch (error) {
       console.error('Error fetching resource groups:', error);
-      throw new AzureApiError(
-        'Failed to fetch resource groups',
-        500,
-        'RESOURCE_GROUPS_FETCH_ERROR'
-      );
+      const message =
+        (error as Error).message || 'Failed to fetch resource groups';
+      throw new AzureApiError(message, 500, 'RESOURCE_GROUPS_FETCH_ERROR');
     }
   }
 
@@ -494,11 +489,9 @@ export class AzureService {
       };
     } catch (error) {
       console.error('Error fetching app service plan:', error);
-      throw new AzureApiError(
-        'Failed to fetch app service plan',
-        500,
-        'APP_SERVICE_PLAN_FETCH_ERROR'
-      );
+      const message =
+        (error as Error).message || 'Failed to fetch app service plan';
+      throw new AzureApiError(message, 500, 'APP_SERVICE_PLAN_FETCH_ERROR');
     }
   }
 
@@ -525,11 +518,9 @@ export class AzureService {
       return appSettings.properties || {};
     } catch (error) {
       console.error('Error fetching app settings:', error);
-      throw new AzureApiError(
-        'Failed to fetch app settings',
-        500,
-        'APP_SETTINGS_FETCH_ERROR'
-      );
+      const message =
+        (error as Error).message || 'Failed to fetch app settings';
+      throw new AzureApiError(message, 500, 'APP_SETTINGS_FETCH_ERROR');
     }
   }
 

@@ -5,6 +5,7 @@ module.exports = {
     '^@/(.*)$': '<rootDir>/src/$1',
     '^react-syntax-highlighter$': 'react-syntax-highlighter/dist/cjs',
     '^react-syntax-highlighter/(.*)$': 'react-syntax-highlighter/dist/cjs/$1',
+    '^react-router-dom$': 'react-router-dom/dist/index.js',
   },
   collectCoverageFrom: [
     'src/**/*.{ts,tsx}',
@@ -35,7 +36,7 @@ module.exports = {
   // Use the default transform from react-scripts instead of ts-jest
   // This avoids conflicts with React 19 and modern JSX transform
   transformIgnorePatterns: [
-    '[/\\\\]node_modules[/\\\\](?!(react-syntax-highlighter|highlight\\.js)[/\\\\]).+\\.(js|jsx|mjs|cjs|ts|tsx)$',
+    '[/\\]node_modules[/\\](?!(react-syntax-highlighter|highlight\\.js|react-router-dom|@azure|@typespec)[/\\]).+\\.(js|jsx|mjs|cjs|ts|tsx)$',
     '^.+\\.module\\.(css|sass|scss)$',
   ],
-}; 
+};
