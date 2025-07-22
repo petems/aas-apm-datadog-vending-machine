@@ -1681,56 +1681,7 @@ const DatadogConfigPage: React.FC = () => {
           <p className="text-gray-700 mb-3">
             First, obtain an access token using the Azure CLI:
           </p>
-          <div className="bg-gray-900 text-green-400 rounded-lg font-mono text-sm relative w-full max-w-4xl">
-            <div className="flex items-center justify-between p-4 pb-2">
-              <div className="flex items-center">
-                <div className="flex space-x-2 mr-3">
-                  <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                  <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                </div>
-                <span className="text-gray-400 text-xs">Terminal</span>
-              </div>
-              <button
-                type="button"
-                onClick={() => {
-                  const commands = `# Login to Azure
-az login
-
-# Get access token for Azure Resource Manager
-az account get-access-token --resource https://management.azure.com/ --query accessToken --output tsv`;
-                  navigator.clipboard.writeText(commands);
-                  setDebugInfo('Commands copied to clipboard! 📋');
-                }}
-                className="text-gray-400 hover:text-white text-xs px-2 py-1 rounded hover:bg-gray-700 transition-colors"
-              >
-                📋 Copy
-              </button>
-            </div>
-            <div className="px-4 pb-4 space-y-2 overflow-x-auto">
-              <div className="flex min-w-max">
-                <span className="text-blue-400 mr-2">$</span>
-                <span className="text-gray-300"># Login to Azure</span>
-              </div>
-              <div className="flex min-w-max">
-                <span className="text-blue-400 mr-2">$</span>
-                <span>az login</span>
-              </div>
-              <div className="flex min-w-max">
-                <span className="text-blue-400 mr-2">$</span>
-                <span className="text-gray-300">
-                  # Get access token for Azure Resource Manager
-                </span>
-              </div>
-              <div className="flex min-w-max">
-                <span className="text-blue-400 mr-2">$</span>
-                <span className="whitespace-nowrap">
-                  az account get-access-token --resource https://management.azure.com/ --query accessToken --output tsv
-                </span>
-              </div>
-            </div>
-          </div>
-          <p className="text-gray-600 text-sm mt-3 text-left">
+          <p className="text-gray-600 text-sm mt-3 text-center">
             Copy the access token from the command output and paste it in the
             form below.
           </p>
@@ -3618,7 +3569,7 @@ az account get-access-token --resource https://management.azure.com/ --query acc
                   Prefer using the command line? Use the datadog-ci CLI to
                   instrument your App Service:
                 </p>
-                <div className="bg-gray-900 text-green-400 rounded-lg font-mono text-sm relative w-full max-w-4xl">
+                <div className="bg-gray-900 text-green-400 rounded-lg font-mono text-xs relative w-full max-w-5xl">
                   <div className="flex items-center justify-between p-4 pb-2">
                     <div className="flex items-center">
                       <div className="flex space-x-2 mr-3">
