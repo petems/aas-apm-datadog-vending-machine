@@ -24,7 +24,12 @@
     "check-peers:solutions": "npx check-peer-dependencies --findSolutions",
     "explain-peer-requirements": "./scripts/yarn-explain-peer-requirements.sh",
     "audit-fix": "./scripts/yarn-audit-fix.sh",
-    "npm-audit-fix-force": "./scripts/npm-audit-fix-force.sh"
+    "npm-audit-fix-force": "./scripts/npm-audit-fix-force.sh",
+    "percy:test": "percy exec -- yarn start",
+    "percy:snapshot": "percy snapshot",
+    "percy:build": "yarn build && percy snapshot build",
+    "visual:test": "node visual-test.js",
+    "visual:compare": "node compare-screenshots.js"
   },
   "keywords": [
     "datadog",
