@@ -1,0 +1,110 @@
+name: 'Accessibility Checks'
+
+on:
+  push:
+    branches: [ master, main ]
+    paths:
+      - 'src/**'
+      - '*.json'
+      - 'eslint.config.mjs'
+      - '.github/workflows/accessibility.yml'
+  pull_request:
+    branches: [ master, main ]
+    paths:
+      - 'src/**'
+      - '*.json'
+      - 'eslint.config.mjs'
+      - '.github/workflows/accessibility.yml'
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  accessibility-lint:
+    name: 'ESLint Accessibility Check'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js and Dependencies
+        uses: ./.github/actions/setup-node-deps
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Run ESLint with accessibility focus
+        run: |
+          echo "🔍 Running ESLint with jsx-a11y rules..."
+          yarn lint --format=compact > eslint-results.txt || true
+          
+          # Extract accessibility-related issues
+          echo "### 🚨 Accessibility Issues Found" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if grep -q "jsx-a11y" eslint-results.txt; then
+            echo "The following accessibility issues were detected:" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            grep "jsx-a11y" eslint-results.txt >> $GITHUB_STEP_SUMMARY || echo "No jsx-a11y issues found" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "✅ No accessibility issues found!" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📊 Full ESLint Report" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          cat eslint-results.txt >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+
+      - name: Check for accessibility violations
+        run: |
+          # Count accessibility issues
+          A11Y_ISSUES=$(grep -c "jsx-a11y" eslint-results.txt || echo "0")
+          echo "Found $A11Y_ISSUES accessibility issues"
+          
+          if [ "$A11Y_ISSUES" -gt 0 ]; then
+            echo "❌ $A11Y_ISSUES accessibility issues found"
+            echo "Please fix the accessibility issues above before merging."
+            exit 1
+          else
+            echo "✅ No accessibility issues found!"
+          fi
+
+      - name: Upload ESLint results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eslint-accessibility-results
+          path: eslint-results.txt
+          retention-days: 30
+
+  accessibility-audit:
+    name: 'Accessibility Guidelines Summary'
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [accessibility-lint]
+    steps:
+      - name: Accessibility Guidelines
+        run: |
+          echo "### 📋 Accessibility Guidelines Enforced" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "This workflow enforces the following accessibility standards:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**WCAG 2.1 AA Compliance Rules:**" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ All images must have alt text" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ ARIA attributes must be valid and properly used" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Interactive elements must be keyboard accessible" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Form labels must be associated with controls" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Page must have a language attribute" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Headings must have content" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ iframes must have titles" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ No positive tabindex values allowed" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ No access keys (deprecated)" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Mouse events must have keyboard equivalents" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Resources:**" >> $GITHUB_STEP_SUMMARY
+          echo "- [WCAG 2.1 Guidelines](https://www.w3.org/WAI/WCAG21/quickref/)" >> $GITHUB_STEP_SUMMARY
+          echo "- [jsx-a11y Plugin Rules](https://github.com/jsx-eslint/eslint-plugin-jsx-a11y#supported-rules)" >> $GITHUB_STEP_SUMMARY
+          echo "- [React Accessibility Docs](https://react.dev/learn/accessibility)" >> $GITHUB_STEP_SUMMARY

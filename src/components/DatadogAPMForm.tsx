@@ -398,35 +398,39 @@ const DatadogAPMForm: React.FC = () => {
         )}
 
         {/* App Service Selection */}
-        {selectedResourceGroup && (
-          <div>
-            <label
-              htmlFor="appService"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
-              App Service / Function App *
-            </label>
-            {isLoading && selectedResourceGroup && appServices.length === 0 ? (
-              <LoadingSpinner size="small" message="Loading app services..." />
+        <div>
+          <label
+            htmlFor="appService"
+            className="block text-sm font-medium text-gray-700 mb-2"
+          >
+            App Service / Function App *
+          </label>
+          <label htmlFor="appService" className="sr-only">App Service / Function App *</label>
+          <select
+            id="appService"
+            value={selectedAppService}
+            onChange={e => setSelectedAppService(e.target.value)}
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            disabled={!selectedResourceGroup || isLoading || appServices.length === 0}
+            aria-disabled={!selectedResourceGroup || isLoading || appServices.length === 0}
+            required
+          >
+            {!selectedResourceGroup ? (
+              <option value="">Select a resource group first</option>
+            ) : isLoading || appServices.length === 0 ? (
+              <option value="">Loading app services...</option>
             ) : (
-              <select
-                id="appService"
-                value={selectedAppService}
-                onChange={e => setSelectedAppService(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                disabled={!selectedResourceGroup}
-                required
-              >
+              <>
                 <option value="">Select an app service</option>
                 {appServices?.map(app => (
                   <option key={app.id} value={app.id}>
                     {app.name} ({app.kind || 'app'}) - {app.location}
                   </option>
                 ))}
-              </select>
+              </>
             )}
-          </div>
-        )}
+          </select>
+        </div>
 
         {/* Datadog Site Selection */}
         <div>

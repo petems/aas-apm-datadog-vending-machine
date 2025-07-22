@@ -1821,7 +1821,7 @@ az account get-access-token --resource https://management.azure.com/ --query acc
             {/* Access Token Section */}
             <div>
               <div className="flex justify-between items-center mb-2">
-                <label className="block text-sm font-medium text-gray-700">
+                <label htmlFor="accessToken" className="block text-sm font-medium text-gray-700">
                   Azure Access Token *
                 </label>
                 <div className="flex space-x-2">
@@ -1848,6 +1848,7 @@ az account get-access-token --resource https://management.azure.com/ --query acc
               {!watchAccessToken ? (
                 <>
                   <textarea
+                    id="accessToken"
                     {...register('accessToken')}
                     rows={3}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
@@ -1948,18 +1949,20 @@ az account get-access-token --resource https://management.azure.com/ --query acc
             {/* Azure Resources Section */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="relative">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                {/* Subscription Search */}
+                <label htmlFor="subscriptionSearch" className="block text-sm font-medium text-gray-700 mb-2">
                   Subscription *
                   <span className="text-gray-500 text-xs ml-1">
                     ({subscriptions?.length || 0} total)
                   </span>
                 </label>
+                <label htmlFor="subscriptionSearch" className="sr-only">Subscription *</label>
                 <input
+                  id="subscriptionSearch"
                   type="text"
                   value={subscriptionSearch}
                   onChange={e => handleSubscriptionSearch(e.target.value)}
                   onFocus={() => {
-                    // Show dropdown if there's a search term and results exist, or show preview if no search term
                     if (subscriptionSearch.length > 0) {
                       const hasResults =
                         subscriptions.filter(
@@ -1973,13 +1976,12 @@ az account get-access-token --resource https://management.azure.com/ --query acc
                         ).length > 0;
                       setShowSubscriptionDropdown(hasResults);
                     } else if (subscriptions.length > 0) {
-                      // Show preview when focused but no search term
                       setShowSubscriptionDropdown(true);
                     }
                   }}
                   onBlur={() =>
                     setTimeout(() => setShowSubscriptionDropdown(false), 200)
-                  } // Delay to allow clicking dropdown items
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder={
                     loadingSubscriptions
@@ -1992,7 +1994,7 @@ az account get-access-token --resource https://management.azure.com/ --query acc
                 />
 
                 {/* Hidden input for form validation */}
-                <input type="hidden" {...register('subscription')} />
+                <input type="hidden" {...register('subscription')} aria-label="Subscription form validation" />
 
                 {/* Searchable Dropdown */}
                 {showSubscriptionDropdown && subscriptionSearch.length > 0 && (
@@ -2118,18 +2120,20 @@ az account get-access-token --resource https://management.azure.com/ --query acc
               </div>
 
               <div className="relative">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                {/* Resource Group Search */}
+                <label htmlFor="resourceGroupSearch" className="block text-sm font-medium text-gray-700 mb-2">
                   Resource Group *
                   <span className="text-gray-500 text-xs ml-1">
                     ({resourceGroups?.length || 0} total)
                   </span>
                 </label>
+                <label htmlFor="resourceGroupSearch" className="sr-only">Resource Group *</label>
                 <input
+                  id="resourceGroupSearch"
                   type="text"
                   value={resourceGroupSearch}
                   onChange={e => handleResourceGroupSearch(e.target.value)}
                   onFocus={() => {
-                    // Show dropdown if there's a search term and results exist
                     if (resourceGroupSearch.length > 0) {
                       const hasResults =
                         resourceGroups.filter(rg =>
@@ -2142,7 +2146,7 @@ az account get-access-token --resource https://management.azure.com/ --query acc
                   }}
                   onBlur={() =>
                     setTimeout(() => setShowResourceGroupDropdown(false), 200)
-                  } // Delay to allow clicking dropdown items
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder={
                     loadingResourceGroups
@@ -2161,7 +2165,7 @@ az account get-access-token --resource https://management.azure.com/ --query acc
                 />
 
                 {/* Hidden input for form validation */}
-                <input type="hidden" {...register('resourceGroup')} />
+                <input type="hidden" {...register('resourceGroup')} aria-label="Resource group form validation" />
 
                 {/* Searchable Dropdown */}
                 {showResourceGroupDropdown && (
@@ -2221,18 +2225,20 @@ az account get-access-token --resource https://management.azure.com/ --query acc
             </div>
 
             <div className="relative">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              {/* App Service Search */}
+              <label htmlFor="appServiceSearch" className="block text-sm font-medium text-gray-700 mb-2">
                 App Service *
                 <span className="text-gray-500 text-xs ml-1">
                   ({appServices?.length || 0} total)
                 </span>
               </label>
+              <label htmlFor="appServiceSearch" className="sr-only">App Service *</label>
               <input
+                id="appServiceSearch"
                 type="text"
                 value={appServiceSearch}
                 onChange={e => handleAppServiceSearch(e.target.value)}
                 onFocus={() => {
-                  // Show dropdown if there's a search term and results exist, or show preview if no search term
                   if (appServiceSearch.length > 0) {
                     const hasResults =
                       appServices.filter(
@@ -2246,13 +2252,12 @@ az account get-access-token --resource https://management.azure.com/ --query acc
                       ).length > 0;
                     setShowAppServiceDropdown(hasResults);
                   } else if (appServices.length > 0) {
-                    // Show preview when focused but no search term
                     setShowAppServiceDropdown(true);
                   }
                 }}
                 onBlur={() =>
                   setTimeout(() => setShowAppServiceDropdown(false), 200)
-                } // Delay to allow clicking dropdown items
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder={
                   loadingAppServices
@@ -2269,7 +2274,7 @@ az account get-access-token --resource https://management.azure.com/ --query acc
               />
 
               {/* Hidden input for form validation */}
-              <input type="hidden" {...register('appService')} />
+              <input type="hidden" {...register('appService')} aria-label="App service form validation" />
 
               {/* Searchable Dropdown */}
               {showAppServiceDropdown && appServiceSearch.length > 0 && (
@@ -3150,13 +3155,15 @@ az account get-access-token --resource https://management.azure.com/ --query acc
               <div className="max-w-4xl mx-auto">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="apiKey" className="block text-sm font-medium text-gray-700 mb-2">
                       Datadog API Key *
                       <span className="ml-2 font-mono text-xs bg-gray-100 px-2 py-1 rounded">
                         DD_API_KEY
                       </span>
                     </label>
+                    <label htmlFor="apiKey" className="sr-only">Datadog API Key *</label>
                     <input
+                      id="apiKey"
                       type="password"
                       {...register('apiKey')}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -3171,13 +3178,14 @@ az account get-access-token --resource https://management.azure.com/ --query acc
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="datadogSite" className="block text-sm font-medium text-gray-700 mb-2">
                       Datadog Site *
                       <span className="ml-2 font-mono text-xs bg-gray-100 px-2 py-1 rounded">
                         DD_SITE
                       </span>
                     </label>
                     <select
+                      id="datadogSite"
                       {...register('datadogSite')}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       disabled={isConfiguring}
@@ -3196,13 +3204,14 @@ az account get-access-token --resource https://management.azure.com/ --query acc
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="serviceName" className="block text-sm font-medium text-gray-700 mb-2">
                       Service Name *
                       <span className="ml-2 font-mono text-xs bg-gray-100 px-2 py-1 rounded">
                         DD_SERVICE
                       </span>
                     </label>
                     <input
+                      id="serviceName"
                       type="text"
                       {...register('serviceName')}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -3217,13 +3226,14 @@ az account get-access-token --resource https://management.azure.com/ --query acc
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="environment" className="block text-sm font-medium text-gray-700 mb-2">
                       Environment *
                       <span className="ml-2 font-mono text-xs bg-gray-100 px-2 py-1 rounded">
                         DD_ENV
                       </span>
                     </label>
                     <input
+                      id="environment"
                       type="text"
                       {...register('environment')}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -3238,13 +3248,14 @@ az account get-access-token --resource https://management.azure.com/ --query acc
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="version" className="block text-sm font-medium text-gray-700 mb-2">
                       Version (Optional)
                       <span className="ml-2 font-mono text-xs bg-gray-100 px-2 py-1 rounded">
                         DD_VERSION
                       </span>
                     </label>
                     <input
+                      id="version"
                       type="text"
                       {...register('version')}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -3254,13 +3265,14 @@ az account get-access-token --resource https://management.azure.com/ --query acc
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="logPath" className="block text-sm font-medium text-gray-700 mb-2">
                       Log Path *
                       <span className="ml-2 font-mono text-xs bg-gray-100 px-2 py-1 rounded">
                         DD_SERVERLESS_LOG_PATH
                       </span>
                     </label>
                     <input
+                      id="logPath"
                       type="text"
                       {...register('logPath')}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -3278,13 +3290,14 @@ az account get-access-token --resource https://management.azure.com/ --query acc
 
               <div className="mt-6 space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="enableAppServiceStorage" className="block text-sm font-medium text-gray-700 mb-2">
                     Enable App Service Storage *
                     <span className="ml-2 font-mono text-xs bg-gray-100 px-2 py-1 rounded">
                       WEBSITES_ENABLE_APP_SERVICE_STORAGE
                     </span>
                   </label>
                   <select
+                    id="enableAppServiceStorage"
                     {...register('enableAppServiceStorage')}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     disabled={isConfiguring}
@@ -3302,6 +3315,7 @@ az account get-access-token --resource https://management.azure.com/ --query acc
                 <div>
                   <label className="flex items-center">
                     <input
+                      id="isDotNet"
                       type="checkbox"
                       {...register('isDotNet')}
                       className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
@@ -3328,13 +3342,14 @@ az account get-access-token --resource https://management.azure.com/ --query acc
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-blue-700 mb-2">
+                      <label htmlFor="dotnetTracerHome" className="block text-sm font-medium text-blue-700 mb-2">
                         Datadog Tracer Home *
                         <span className="ml-2 font-mono text-xs bg-blue-100 px-2 py-1 rounded">
                           DD_DOTNET_TRACER_HOME
                         </span>
                       </label>
                       <input
+                        id="dotnetTracerHome"
                         type="text"
                         {...register('dotnetTracerHome')}
                         className="w-full px-3 py-2 border border-blue-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
@@ -3347,13 +3362,14 @@ az account get-access-token --resource https://management.azure.com/ --query acc
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-blue-700 mb-2">
+                      <label htmlFor="dotnetTraceLogDirectory" className="block text-sm font-medium text-blue-700 mb-2">
                         Trace Log Directory *
                         <span className="ml-2 font-mono text-xs bg-blue-100 px-2 py-1 rounded">
                           DD_TRACE_LOG_DIRECTORY
                         </span>
                       </label>
                       <input
+                        id="dotnetTraceLogDirectory"
                         type="text"
                         {...register('dotnetTraceLogDirectory')}
                         className="w-full px-3 py-2 border border-blue-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
@@ -3366,13 +3382,14 @@ az account get-access-token --resource https://management.azure.com/ --query acc
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-blue-700 mb-2">
+                      <label htmlFor="coreclrEnableProfiling" className="block text-sm font-medium text-blue-700 mb-2">
                         CORECLR Enable Profiling *
                         <span className="ml-2 font-mono text-xs bg-blue-100 px-2 py-1 rounded">
                           CORECLR_ENABLE_PROFILING
                         </span>
                       </label>
                       <select
+                        id="coreclrEnableProfiling"
                         {...register('coreclrEnableProfiling')}
                         className="w-full px-3 py-2 border border-blue-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                         disabled={isConfiguring}
@@ -3386,13 +3403,14 @@ az account get-access-token --resource https://management.azure.com/ --query acc
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-blue-700 mb-2">
+                      <label htmlFor="coreclrProfiler" className="block text-sm font-medium text-blue-700 mb-2">
                         CORECLR Profiler GUID *
                         <span className="ml-2 font-mono text-xs bg-blue-100 px-2 py-1 rounded">
                           CORECLR_PROFILER
                         </span>
                       </label>
                       <select
+                        id="coreclrProfiler"
                         {...register('coreclrProfiler')}
                         className="w-full px-3 py-2 border border-blue-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white font-mono text-sm"
                         disabled={isConfiguring}
@@ -3408,13 +3426,14 @@ az account get-access-token --resource https://management.azure.com/ --query acc
                     </div>
 
                     <div className="md:col-span-2">
-                      <label className="block text-sm font-medium text-blue-700 mb-2">
+                      <label htmlFor="coreclrProfilerPath" className="block text-sm font-medium text-blue-700 mb-2">
                         CORECLR Profiler Path *
                         <span className="ml-2 font-mono text-xs bg-blue-100 px-2 py-1 rounded">
                           CORECLR_PROFILER_PATH
                         </span>
                       </label>
                       <input
+                        id="coreclrProfilerPath"
                         type="text"
                         {...register('coreclrProfilerPath')}
                         className="w-full px-3 py-2 border border-blue-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white font-mono text-sm"
@@ -3448,10 +3467,11 @@ az account get-access-token --resource https://management.azure.com/ --query acc
                   <div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-purple-700 mb-2">
+                        <label htmlFor="containerName" className="block text-sm font-medium text-purple-700 mb-2">
                           Container Name
                         </label>
                         <input
+                          id="containerName"
                           type="text"
                           value="datadog-sidecar"
                           className="w-full px-3 py-2 border border-purple-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 bg-gray-100"
@@ -3464,10 +3484,11 @@ az account get-access-token --resource https://management.azure.com/ --query acc
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-purple-700 mb-2">
+                        <label htmlFor="containerType" className="block text-sm font-medium text-purple-700 mb-2">
                           Container Type
                         </label>
                         <input
+                          id="containerType"
                           type="text"
                           value="Sidecar"
                           className="w-full px-3 py-2 border border-purple-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 bg-gray-100"
@@ -3480,10 +3501,12 @@ az account get-access-token --resource https://management.azure.com/ --query acc
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-purple-700 mb-2">
+                        <label htmlFor="sidecarRegistryUrl" className="block text-sm font-medium text-purple-700 mb-2">
                           Registry Server URL
                         </label>
+                        <label htmlFor="sidecarRegistryUrl" className="sr-only">Registry Server URL</label>
                         <input
+                          id="sidecarRegistryUrl"
                           type="text"
                           {...register('sidecarRegistryUrl')}
                           className="w-full px-3 py-2 border border-purple-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white"
@@ -3496,10 +3519,12 @@ az account get-access-token --resource https://management.azure.com/ --query acc
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-purple-700 mb-2">
+                        <label htmlFor="sidecarImage" className="block text-sm font-medium text-purple-700 mb-2">
                           Image and Tag
                         </label>
+                        <label htmlFor="sidecarImage" className="sr-only">Image and Tag</label>
                         <input
+                          id="sidecarImage"
                           type="text"
                           {...register('sidecarImage')}
                           className="w-full px-3 py-2 border border-purple-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white"
@@ -3512,10 +3537,11 @@ az account get-access-token --resource https://management.azure.com/ --query acc
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-purple-700 mb-2">
+                        <label htmlFor="sidecarPort" className="block text-sm font-medium text-purple-700 mb-2">
                           Port
                         </label>
                         <input
+                          id="sidecarPort"
                           type="text"
                           {...register('sidecarPort')}
                           className="w-full px-3 py-2 border border-purple-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white"
@@ -3528,10 +3554,11 @@ az account get-access-token --resource https://management.azure.com/ --query acc
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-purple-700 mb-2">
+                        <label htmlFor="sidecarStartupCommand" className="block text-sm font-medium text-purple-700 mb-2">
                           Startup Command
                         </label>
                         <input
+                          id="sidecarStartupCommand"
                           type="text"
                           {...register('sidecarStartupCommand')}
                           className="w-full px-3 py-2 border border-purple-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white"
@@ -3700,6 +3727,32 @@ datadog-ci aas instrument -s ${subscription} -r ${resourceGroup} -n ${appService
                               );
                             }
                           }}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault();
+                              const apiKey = watch('apiKey');
+                              if (apiKey && !apiKeyRevealed) {
+                                setApiKeyRevealed(true);
+                                setApiKeyCountdown(5);
+                              } else if (apiKey && apiKeyRevealed) {
+                                navigator.clipboard.writeText(apiKey);
+                                setDebugInfo('API key copied to clipboard! 🔑');
+                              } else if (!apiKey) {
+                                setDebugInfo(
+                                  'No API key set. Please enter your Datadog API key first.'
+                                );
+                              }
+                            }
+                          }}
+                          tabIndex={0}
+                          role="button"
+                          aria-label={
+                            apiKeyRevealed
+                              ? `API key revealed, hiding in ${apiKeyCountdown} seconds`
+                              : watch('apiKey')
+                                ? 'Click or press Enter to reveal API key for 5 seconds'
+                                : 'Enter your Datadog API key first'
+                          }
                         >
                           {watch('apiKey') && apiKeyRevealed ? (
                             <span className="text-green-400">

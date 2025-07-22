@@ -15,6 +15,7 @@
     "deploy": "gh-pages -d build",
     "lint": "eslint src --ignore-pattern \"**/*.test.*\" --ignore-pattern \"**/__tests__/**\" --ignore-pattern \"test-utils.tsx\" --ignore-pattern \"setupTests.ts\"",
     "lint:fix": "eslint src --fix --ignore-pattern \"**/*.test.*\" --ignore-pattern \"**/__tests__/**\" --ignore-pattern \"test-utils.tsx\" --ignore-pattern \"setupTests.ts\"",
+    "lint:a11y": "eslint src --ignore-pattern \"**/*.test.*\" --ignore-pattern \"**/__tests__/**\" --ignore-pattern \"test-utils.tsx\" --ignore-pattern \"setupTests.ts\" --format=compact | grep jsx-a11y || echo 'No accessibility issues found!'",
     "format": "prettier --write \"src/**/*.{ts,tsx,json,css,md}\" --ignore-path .prettierignore",
     "format:check": "prettier --check \"src/**/*.{ts,tsx,json,css,md}\" --ignore-path .prettierignore",
     "type-check": "tsc --noEmit --project tsconfig.prod.json",
