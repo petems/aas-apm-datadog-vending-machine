@@ -2,6 +2,13 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import App from '../App';
 
+// Simplified react-router-dom mocks for unit testing
+jest.mock('react-router-dom', () => ({
+  HashRouter: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  Routes: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  Route: () => <div />,
+}));
+
 // Mock the DatadogAPMForm component since we test it separately
 jest.mock('../components/DatadogAPMForm', () => {
   return function MockDatadogAPMForm() {

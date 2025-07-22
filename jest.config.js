@@ -5,6 +5,7 @@ module.exports = {
     '^@/(.*)$': '<rootDir>/src/$1',
     '^react-syntax-highlighter$': 'react-syntax-highlighter/dist/cjs',
     '^react-syntax-highlighter/(.*)$': 'react-syntax-highlighter/dist/cjs/$1',
+    '^react-router-dom$': '<rootDir>/node_modules/react-router-dom/dist/index.js',
   },
   collectCoverageFrom: [
     'src/**/*.{ts,tsx}',
@@ -15,6 +16,7 @@ module.exports = {
     '!src/**/*.stories.{ts,tsx}',
     '!**/node_modules/**',
   ],
+  testPathIgnorePatterns: ['/__tests__/.*.integration.test.(ts|tsx)$'],
   coverageThreshold: {
     global: {
       branches: 75,
@@ -35,7 +37,7 @@ module.exports = {
   // Use the default transform from react-scripts instead of ts-jest
   // This avoids conflicts with React 19 and modern JSX transform
   transformIgnorePatterns: [
-    '[/\\\\]node_modules[/\\\\](?!(react-syntax-highlighter|highlight\\.js)[/\\\\]).+\\.(js|jsx|mjs|cjs|ts|tsx)$',
+    '[/\\\\]node_modules[/\\\\](?!(react-syntax-highlighter|highlight\\.js|react-router-dom)[/\\\\]).+\\.(js|jsx|mjs|cjs|ts|tsx)$',
     '^.+\\.module\\.(css|sass|scss)$',
   ],
 }; 

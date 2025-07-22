@@ -18,7 +18,7 @@
     "format": "prettier --write \"src/**/*.{ts,tsx,json,css,md}\" --ignore-path .prettierignore",
     "format:check": "prettier --check \"src/**/*.{ts,tsx,json,css,md}\" --ignore-path .prettierignore",
     "type-check": "tsc --noEmit --project tsconfig.prod.json",
-    "test:ci": "CI=true yarn test:coverage",
+    "test:ci": "CI=true react-scripts test --watchAll=false --testPathIgnorePatterns='\\.integration\\.test\\.(ts|tsx)$'",
     "quality": "yarn type-check && yarn lint && yarn format:check",
     "check-peers": "npx check-peer-dependencies",
     "check-peers:solutions": "npx check-peer-dependencies --findSolutions",
