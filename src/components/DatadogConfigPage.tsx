@@ -1681,7 +1681,7 @@ const DatadogConfigPage: React.FC = () => {
           <p className="text-gray-700 mb-3">
             First, obtain an access token using the Azure CLI:
           </p>
-          <div className="bg-gray-900 text-green-400 rounded-lg font-mono text-sm relative">
+          <div className="bg-gray-900 text-green-400 rounded-lg font-mono text-sm relative w-full max-w-4xl">
             <div className="flex items-center justify-between p-4 pb-2">
               <div className="flex items-center">
                 <div className="flex space-x-2 mr-3">
@@ -1707,31 +1707,30 @@ az account get-access-token --resource https://management.azure.com/ --query acc
                 📋 Copy
               </button>
             </div>
-            <div className="px-4 pb-4 space-y-2">
-              <div className="flex">
+            <div className="px-4 pb-4 space-y-2 overflow-x-auto">
+              <div className="flex min-w-max">
                 <span className="text-blue-400 mr-2">$</span>
                 <span className="text-gray-300"># Login to Azure</span>
               </div>
-              <div className="flex">
+              <div className="flex min-w-max">
                 <span className="text-blue-400 mr-2">$</span>
                 <span>az login</span>
               </div>
-              <div className="flex">
+              <div className="flex min-w-max">
                 <span className="text-blue-400 mr-2">$</span>
                 <span className="text-gray-300">
                   # Get access token for Azure Resource Manager
                 </span>
               </div>
-              <div className="flex">
+              <div className="flex min-w-max">
                 <span className="text-blue-400 mr-2">$</span>
-                <span className="break-all">
-                  az account get-access-token --resource
-                  https://management.azure.com/ --query accessToken --output tsv
+                <span className="whitespace-nowrap">
+                  az account get-access-token --resource https://management.azure.com/ --query accessToken --output tsv
                 </span>
               </div>
             </div>
           </div>
-          <p className="text-gray-600 text-sm mt-3">
+          <p className="text-gray-600 text-sm mt-3 text-left">
             Copy the access token from the command output and paste it in the
             form below.
           </p>
@@ -3619,7 +3618,7 @@ az account get-access-token --resource https://management.azure.com/ --query acc
                   Prefer using the command line? Use the datadog-ci CLI to
                   instrument your App Service:
                 </p>
-                <div className="bg-gray-900 text-green-400 rounded-lg font-mono text-sm relative">
+                <div className="bg-gray-900 text-green-400 rounded-lg font-mono text-sm relative w-full max-w-4xl">
                   <div className="flex items-center justify-between p-4 pb-2">
                     <div className="flex items-center">
                       <div className="flex space-x-2 mr-3">
@@ -3666,14 +3665,14 @@ datadog-ci aas instrument -s ${subscription} -r ${resourceGroup} -n ${appService
                       📋 Copy
                     </button>
                   </div>
-                  <div className="px-4 pb-4 space-y-2">
-                    <div className="flex">
+                  <div className="px-4 pb-4 space-y-2 overflow-x-auto">
+                    <div className="flex min-w-max">
                       <span className="text-blue-400 mr-2">$</span>
                       <span className="text-gray-300">
                         # Set Datadog environment variables
                       </span>
                     </div>
-                    <div className="flex">
+                    <div className="flex min-w-max">
                       <span className="text-blue-400 mr-2">$</span>
                       <span>
                         export DD_API_KEY=
@@ -3723,7 +3722,7 @@ datadog-ci aas instrument -s ${subscription} -r ${resourceGroup} -n ${appService
                         </span>
                       </span>
                     </div>
-                    <div className="flex">
+                    <div className="flex min-w-max">
                       <span className="text-blue-400 mr-2">$</span>
                       <span>
                         export DD_SITE=
@@ -3732,15 +3731,15 @@ datadog-ci aas instrument -s ${subscription} -r ${resourceGroup} -n ${appService
                         </span>
                       </span>
                     </div>
-                    <div className="flex">
+                    <div className="flex min-w-max">
                       <span className="text-blue-400 mr-2">$</span>
                       <span className="text-gray-300">
                         # Instrument your App Service
                       </span>
                     </div>
-                    <div className="flex">
+                    <div className="flex min-w-max">
                       <span className="text-blue-400 mr-2">$</span>
-                      <span className="break-all">
+                      <span className="whitespace-nowrap">
                         datadog-ci aas instrument -s{' '}
                         <span className="text-yellow-400">
                           {watch('subscription') || 'SUBSCRIPTION_ID'}
