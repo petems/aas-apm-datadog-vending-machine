@@ -12,7 +12,7 @@ This React application provides a streamlined interface for:
 
 ## Features
 
-- **Azure Authentication**: Multi-tenant Azure AD authentication using MSAL
+- **Azure Authentication**: Uses the Azure CLI browser login for authentication
 - **Resource Discovery**: Automatically fetch and display Azure subscriptions and App Services
 - **Platform Detection**: Automatically detect Windows vs Linux App Services
 - **ARM Template Deployment**: Deploy appropriate ARM templates based on platform
@@ -21,12 +21,7 @@ This React application provides a streamlined interface for:
 
 ## Prerequisites
 
-1. **Azure AD App Registration**: You need to create an Azure AD app registration with the following settings:
-   - **Platform**: Single-page application (SPA)
-   - **Redirect URIs**: Your GitHub Pages URL (e.g., `https://yourusername.github.io/your-repo-name/`)
-   - **API Permissions**: 
-     - Azure Service Management - user_impersonation (delegated)
-   - **Authentication**: Enable public client flows
+1. **Azure CLI**: Install the Azure CLI and authenticate via `az login`.
 
 2. **Azure Permissions**: Users must have appropriate permissions on Azure subscriptions to:
    - List subscriptions
@@ -73,19 +68,9 @@ For more details about peer dependency management in this project, see [PEER_DEP
 
 ### 2. Configure Environment Variables
 
-Create a `.env` file in the root directory:
+No additional environment variables are required.
 
-```env
-REACT_APP_CLIENT_ID=your-azure-ad-client-id
-```
-
-Replace `your-azure-ad-client-id` with your Azure AD app registration client ID.
-
-### 3. Update Authentication Configuration
-
-If needed, update the `src/authConfig.ts` file with your specific Azure AD configuration.
-
-### 4. Development
+### 3. Development
 
 ```bash
 yarn start
@@ -123,18 +108,12 @@ This builds the app for production and deploys it to GitHub Pages.
    - **Source**: Select **"GitHub Actions"** (NOT "Deploy from a branch")
    - Save settings
 
-2. **Add GitHub Secret**:
-   - Go to **Settings** → **Secrets and variables** → **Actions**
-   - Add repository secret:
-     - Name: `REACT_APP_CLIENT_ID`
-     - Value: Your Azure AD application client ID
-
-3. **Deploy**:
+2. **Deploy**:
    ```bash
    git push origin master  # Triggers automatic deployment
    ```
 
-4. **Access**: Your app will be available at:
+3. **Access**: Your app will be available at:
    `https://yourusername.github.io/your-repo-name/`
 
 ### Troubleshooting Deployment
@@ -154,7 +133,7 @@ This builds the app for production and deploys it to GitHub Pages.
 ### Services
 
 - **AzureService**: Handles all Azure Resource Manager API calls
-- **authConfig**: MSAL authentication configuration
+- Authentication handled via the Azure CLI session
 
 ### ARM Templates
 
@@ -170,16 +149,9 @@ Both templates accept the following parameters:
 - `ddApiKey`: Datadog API key (secure string)
 - `ddSite`: Datadog site (default: datadoghq.com)
 
-## Environment Variables
-
-The following environment variables are supported:
-
-- `REACT_APP_CLIENT_ID`: Azure AD application client ID (required)
-
 ## Security Considerations
 
 - API keys are handled securely and not logged
-- Authentication tokens are stored in session storage
 - ARM deployments use secure string parameters for sensitive data
 - All API calls use HTTPS
 
@@ -188,9 +160,7 @@ The following environment variables are supported:
 ### Common Issues
 
 1. **Authentication Failures**
-   - Verify your Azure AD app registration configuration
-   - Check that redirect URIs match your deployment URL
-   - Ensure proper API permissions are granted
+   - Ensure you are logged in via `az login`
 
 2. **Permission Errors**
    - Verify the user has appropriate Azure RBAC permissions

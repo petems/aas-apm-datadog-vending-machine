@@ -1,3 +1,4 @@
+/* eslint-disable */
 module.exports = {
   BrowserRouter: ({ children }) => children,
   Routes: ({ children }) => children,

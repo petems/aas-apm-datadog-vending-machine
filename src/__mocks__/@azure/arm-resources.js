@@ -1,3 +1,4 @@
+/* eslint-disable */
 module.exports = {
   ResourceManagementClient: class ResourceManagementClient {
     constructor() {

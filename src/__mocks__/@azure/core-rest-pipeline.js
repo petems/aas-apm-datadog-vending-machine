@@ -1,3 +1,4 @@
+/* eslint-disable */
 module.exports = {
   createPipelineFromOptions: jest.fn(() => ({
     addPolicy: jest.fn(),
