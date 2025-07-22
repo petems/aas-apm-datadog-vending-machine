@@ -143,7 +143,10 @@ export class AzureService {
       );
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
+        const errorData = await response.json().catch((parseError) => {
+          console.error('Error parsing JSON response:', parseError);
+          return { error: { message: 'Failed to parse JSON response' } };
+        });
         const errorMessage =
           errorData.error?.message ||
           `HTTP ${response.status}: ${response.statusText}`;
