@@ -5,7 +5,8 @@ module.exports = {
     '^@/(.*)$': '<rootDir>/src/$1',
     '^react-syntax-highlighter$': 'react-syntax-highlighter/dist/cjs',
     '^react-syntax-highlighter/(.*)$': 'react-syntax-highlighter/dist/cjs/$1',
-    '^react-router-dom$': 'react-router-dom/dist/index.js',
+    '^react-router-dom$': '<rootDir>/node_modules/react-router-dom/dist/index.js',
+    '^@typespec/ts-http-runtime/internal/logger$': '<rootDir>/node_modules/@typespec/ts-http-runtime/dist/commonjs/logger',
   },
   collectCoverageFrom: [
     'src/**/*.{ts,tsx}',

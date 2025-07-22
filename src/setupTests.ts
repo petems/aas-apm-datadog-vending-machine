@@ -45,6 +45,44 @@ jest.mock('@azure/logger', () => ({
   setLogLevel: jest.fn(),
 }));
 
+// Mock Azure SDK modules used in AzureService
+jest.mock('@azure/arm-appservice', () => ({
+  WebSiteManagementClient: jest.fn().mockImplementation(() => ({
+    webApps: {
+      list: jest.fn().mockResolvedValue([]),
+      listByResourceGroup: jest.fn().mockResolvedValue([]),
+      get: jest.fn(),
+      getConfiguration: jest.fn(),
+      updateApplicationSettings: jest.fn(),
+      listApplicationSettings: jest.fn(),
+      createOrUpdateSiteContainer: jest.fn(),
+      listSiteExtensions: jest.fn().mockResolvedValue([]),
+      listSiteContainers: jest.fn().mockResolvedValue([]),
+      listSiteContainersSlot: jest.fn().mockResolvedValue([]),
+      getSiteContainer: jest.fn(),
+      getSiteContainerSlot: jest.fn(),
+      restart: jest.fn(),
+    },
+    appServicePlans: {
+      get: jest.fn(),
+    },
+  })),
+}));
+
+jest.mock('@azure/arm-resources', () => ({
+  ResourceManagementClient: jest.fn().mockImplementation(() => ({
+    deployments: {
+      createOrUpdate: jest.fn(),
+      get: jest.fn(),
+    },
+  })),
+  ResourceGroup: jest.fn(),
+}));
+
+jest.mock('@azure/identity', () => ({
+  InteractiveBrowserCredential: jest.fn().mockImplementation(() => ({})),
+}));
+
 jest.mock('@azure/msal-react', () => {
   return {
     useMsal: jest.fn(),
