@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '../../test-utils';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { useMsal } from '@azure/msal-react';
 import DatadogConfigPage from '../DatadogConfigPage';
 import { AzureService } from '../../services/azureService';

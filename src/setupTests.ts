@@ -29,11 +29,9 @@ jest.mock('@azure/msal-browser', () => ({
 }));
 
 jest.mock('@azure/msal-react', () => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const React = jest.requireActual('react');
   return {
     useMsal: jest.fn(),
-    MsalProvider: ({ children }: { children: React.ReactNode }) => children,
+    MsalProvider: jest.fn().mockImplementation((props) => props.children),
   };
 });
 
@@ -43,7 +41,7 @@ jest.setTimeout(10000);
 // Suppress console errors in tests unless explicitly testing them
 const originalError = console.error;
 beforeAll(() => {
-  console.error = (...args: any[]) => {
+  console.error = (...args) => {
     if (
       typeof args[0] === 'string' &&
       (args[0].includes('Warning: ReactDOM.render is deprecated') ||
