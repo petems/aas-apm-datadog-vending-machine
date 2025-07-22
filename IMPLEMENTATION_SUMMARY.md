@@ -6,9 +6,8 @@ This implementation provides a complete, self-contained React application that e
 
 ## 🏗️ Architecture
 
-### Frontend Stack
 - **React 18** with TypeScript
-- **Azure MSAL Browser** for authentication
+- **Azure CLI** for authentication
 - **Custom CSS** (no external UI framework dependencies)
 - **Responsive design** with mobile support
 
@@ -25,10 +24,6 @@ This implementation provides a complete, self-contained React application that e
    - Manages ARM template deployments
    - Includes Windows/Linux detection logic
 
-3. **Authentication Layer** (`src/authConfig.ts`)
-   - MSAL configuration for multi-tenant Azure AD
-   - Secure token management
-   - Proper scope handling for ARM API access
 
 4. **UI Components**
    - **LoadingSpinner**: Reusable loading indicator
@@ -49,10 +44,8 @@ This implementation provides a complete, self-contained React application that e
 ## 🔧 Technical Features
 
 ### Authentication & Authorization
-- Multi-tenant Azure AD authentication using MSAL
-- Automatic token refresh
-- Proper scope management for Azure Resource Manager API
-- Secure session storage
+- Uses the Azure CLI interactive browser login
+- Access tokens provided by the CLI session
 
 ### Resource Discovery
 - Dynamic subscription enumeration
@@ -168,13 +161,12 @@ yarn build  # Creates optimized build in ./build
 }
 ```
 
-### Environment Variables
-- `REACT_APP_CLIENT_ID`: Azure AD application client ID (required)
+
 
 ## 🚀 Deployment Workflow
 
-1. **User Authentication**: MSAL popup/redirect flow
-2. **Token Acquisition**: Azure Resource Manager scope
+1. **User Authentication**: `az login` browser flow
+2. **Token Acquisition**: Uses Azure CLI access token
 3. **Resource Discovery**: Parallel API calls for subscriptions and services
 4. **Configuration**: User input for Datadog settings
 5. **Template Selection**: Automatic Windows/Linux detection
@@ -183,7 +175,7 @@ yarn build  # Creates optimized build in ./build
 
 ## 🔒 Security Considerations
 
-- **Authentication**: Industry-standard MSAL implementation
+- **Authentication**: Auth via Azure CLI session
 - **Authorization**: Proper Azure RBAC enforcement
 - **Data Protection**: Secure string parameters for sensitive data
 - **Transport Security**: HTTPS-only communication
@@ -198,16 +190,14 @@ yarn build  # Creates optimized build in ./build
 
 ## ✅ Compliance with Requirements
 
-### ✅ Core Functionality
-- [x] User Authentication (MSAL multi-tenant)
+- [x] User Authentication via Azure CLI
 - [x] Subscription Listing
 - [x] App Service Listing
 - [x] Target Selection
 - [x] Datadog Site Selection
 - [x] ARM Deployment Initiation
 
-### ✅ Technical Requirements
-- [x] @azure/msal-browser for authentication
+- [x] Azure CLI for authentication
 - [x] fetch for ARM API calls
 - [x] https://management.azure.com/user_impersonation scope
 - [x] ARM deployment via HTTP PUT

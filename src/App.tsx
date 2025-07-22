@@ -8,15 +8,9 @@ import {
 } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-// import { PublicClientApplication } from '@azure/msal-browser'; // REMOVED: MSAL dependency
-// import { MsalProvider } from '@azure/msal-react'; // REMOVED: MSAL dependency
-// import { msalConfig } from './authConfig'; // REMOVED: MSAL dependency
 import DatadogAPMForm from './components/DatadogAPMForm';
 import DatadogConfigPage from './components/DatadogConfigPage';
 import './App.css';
-
-// Initialize MSAL instance
-// const msalInstance = new PublicClientApplication(msalConfig); // REMOVED: MSAL dependency
 
 // Initialize React Query client
 const queryClient = new QueryClient({
@@ -139,7 +133,7 @@ const LandingPage: React.FC = () => {
             <div className="flex items-start space-x-3">
               <span className="text-yellow-500 text-lg">⚠️</span>
               <span className="text-gray-700">
-                Automated authentication via Azure MSAL
+                Authentication via Azure CLI
               </span>
             </div>
             <div className="flex items-start space-x-3">
@@ -359,7 +353,7 @@ const ARMTemplatePage: React.FC = () => {
               </p>
               <ul className="list-disc list-inside space-y-1">
                 <li>Complex Azure RBAC permission requirements</li>
-                <li>Azure MSAL authentication challenges</li>
+                <li>Azure CLI authentication requirement</li>
                 <li>Inconsistent deployment reliability</li>
                 <li>Difficult troubleshooting for permission errors</li>
               </ul>
@@ -442,21 +436,19 @@ const ARMTemplatePage: React.FC = () => {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      {/* <MsalProvider instance={msalInstance}> REMOVED: MSAL dependency */}
-        <Router>
-          <div className="App">
-            <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 py-12 px-4 sm:px-6 lg:px-8">
-              <Navigation />
+      <Router>
+        <div className="App">
+          <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 py-12 px-4 sm:px-6 lg:px-8">
+            <Navigation />
 
-              <Routes>
-                <Route path="/" element={<LandingPage />} />
-                <Route path="/arm-template" element={<ARMTemplatePage />} />
-                <Route path="/direct-config" element={<DatadogConfigPage />} />
-              </Routes>
-            </div>
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/arm-template" element={<ARMTemplatePage />} />
+              <Route path="/direct-config" element={<DatadogConfigPage />} />
+            </Routes>
           </div>
-        </Router>
-      {/* </MsalProvider> REMOVED: MSAL dependency */}
+        </div>
+      </Router>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );

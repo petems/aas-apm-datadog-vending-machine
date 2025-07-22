@@ -12,7 +12,6 @@ This document outlines the improvements made to the testing, linting, and build 
 
 ### 2. New Test Files Added
 - `src/__tests__/App.test.tsx` - Main App component tests
-- `src/__tests__/authConfig.test.ts` - Authentication configuration tests
 - `src/__tests__/integration.test.tsx` - End-to-end integration tests
 - `src/components/__tests__/DatadogAPMForm.test.tsx` - Comprehensive form tests
 - `src/utils/__tests__/typeGuards.test.ts` - Type validation utility tests

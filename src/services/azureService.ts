@@ -143,8 +143,13 @@ export class AzureService {
       );
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        const errorMessage = errorData.error?.message || `HTTP ${response.status}: ${response.statusText}`;
+        const errorData = await response.json().catch((parseError) => {
+          console.error('Error parsing JSON response:', parseError);
+          return { error: { message: 'Failed to parse JSON response' } };
+        });
+        const errorMessage =
+          errorData.error?.message ||
+          `HTTP ${response.status}: ${response.statusText}`;
         throw new AzureApiError(errorMessage, response.status, 'API_ERROR');
       }
 
@@ -155,22 +160,25 @@ export class AzureService {
       if (error instanceof AzureApiError) {
         throw error;
       }
-      
+
       let errorMessage = 'Failed to fetch subscriptions';
       let status = 500;
       let code = 'SUBSCRIPTIONS_FETCH_ERROR';
-      
+
       if (error instanceof Error) {
         errorMessage = error.message;
         if (error.name === 'AbortError' || error.message.includes('aborted')) {
           errorMessage = 'Request timeout';
           code = 'TIMEOUT_ERROR';
-        } else if (error.message.includes('Network') || error.message.includes('fetch')) {
+        } else if (
+          error.message.includes('Network') ||
+          error.message.includes('fetch')
+        ) {
           errorMessage = 'Network error';
           code = 'NETWORK_ERROR';
         }
       }
-      
+
       throw new AzureApiError(errorMessage, status, code);
     }
   }
@@ -203,12 +211,9 @@ export class AzureService {
       if (error instanceof AzureApiError) {
         throw error;
       }
-      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch app services';
-      throw new AzureApiError(
-        errorMessage,
-        500,
-        'APP_SERVICES_FETCH_ERROR'
-      );
+      const errorMessage =
+        error instanceof Error ? error.message : 'Failed to fetch app services';
+      throw new AzureApiError(errorMessage, 500, 'APP_SERVICES_FETCH_ERROR');
     }
   }
 

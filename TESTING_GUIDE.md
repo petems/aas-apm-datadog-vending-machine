@@ -132,20 +132,7 @@ describe('LoadingSpinner', () => {
 
 ## Mocking Strategy
 
-### 1. Azure MSAL
-```typescript
-// Mocked in setupTests.ts
-jest.mock('@azure/msal-browser', () => ({
-  PublicClientApplication: jest.fn().mockImplementation(() => ({
-    acquireTokenSilent: jest.fn(),
-    acquireTokenPopup: jest.fn(),
-    loginPopup: jest.fn(),
-    logoutPopup: jest.fn(),
-  })),
-}));
-```
-
-### 2. Fetch API
+### 1. Fetch API
 ```typescript
 // Global fetch mock
 global.fetch = jest.fn();

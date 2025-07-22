@@ -82,11 +82,6 @@ Users need **Azure subscription access** with permissions to:
 sign_in_audience = "AzureADMultipleOrgs"
 ```
 
-### React App Authority
-```typescript
-// src/authConfig.ts
-authority: 'https://login.microsoftonline.com/common'
-```
 
 ### Required API Permissions
 - **Azure Service Management** (`https://management.azure.com/`)
