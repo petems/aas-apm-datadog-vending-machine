@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useMsal } from '@azure/msal-react';
 import { loginRequest, armApiRequest } from '../authConfig';
 
@@ -18,8 +18,8 @@ export const useAuth = () => {
   });
 
   let instance: any = null;
-  let accounts: any = [];
   let msalError = false;
+  let accounts: Array<any> = [];
 
   try {
     const msalData = useMsal();
@@ -30,10 +30,12 @@ export const useAuth = () => {
     msalError = true;
   }
 
-  const acquireToken = useCallback(async () => {
-    if (msalError || !instance || accounts.length === 0) return;
+  const memoizedAccounts = useMemo(() => accounts, [accounts]);
 
-    const firstAccount = accounts[0];
+  const acquireToken = useCallback(async () => {
+    if (msalError || !instance || memoizedAccounts.length === 0) return;
+
+    const firstAccount = memoizedAccounts[0];
     if (!firstAccount) return;
 
     setAuthState(prev => ({ ...prev, isLoading: true, error: null }));
@@ -70,15 +72,15 @@ export const useAuth = () => {
         }));
       }
     }
-  }, [instance, accounts, msalError]);
+  }, [instance, memoizedAccounts, msalError]);
 
   // Check if user is authenticated
   useEffect(() => {
-    if (!msalError && accounts.length > 0) {
+    if (!msalError && memoizedAccounts.length > 0) {
       setAuthState(prev => ({ ...prev, isAuthenticated: true }));
       acquireToken();
     }
-  }, [accounts, acquireToken, msalError]);
+  }, [memoizedAccounts, acquireToken, msalError]);
 
   const login = useCallback(async () => {
     if (msalError || !instance) {

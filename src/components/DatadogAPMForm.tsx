@@ -135,7 +135,7 @@ const DatadogAPMForm: React.FC = () => {
     }
   };
 
-  const loadAppServices = async (subscriptionId: string) => {
+  const _loadAppServices = async (subscriptionId: string) => {
     if (!accessToken) return;
 
     try {
@@ -405,14 +405,20 @@ const DatadogAPMForm: React.FC = () => {
           >
             App Service / Function App *
           </label>
-          <label htmlFor="appService" className="sr-only">App Service / Function App *</label>
+          <label htmlFor="appService" className="sr-only">
+            App Service / Function App *
+          </label>
           <select
             id="appService"
             value={selectedAppService}
             onChange={e => setSelectedAppService(e.target.value)}
             className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            disabled={!selectedResourceGroup || isLoading || appServices.length === 0}
-            aria-disabled={!selectedResourceGroup || isLoading || appServices.length === 0}
+            disabled={
+              !selectedResourceGroup || isLoading || appServices.length === 0
+            }
+            aria-disabled={
+              !selectedResourceGroup || isLoading || appServices.length === 0
+            }
             required
           >
             {!selectedResourceGroup ? (
@@ -471,6 +477,7 @@ const DatadogAPMForm: React.FC = () => {
             className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             placeholder="Enter your Datadog API key"
             required
+            aria-label="Enter your Datadog API key"
           />
           <p className="mt-1 text-xs text-gray-500">
             You can find your API key in your Datadog account under Organization

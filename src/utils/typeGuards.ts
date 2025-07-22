@@ -3,45 +3,60 @@ import { AzureSubscription, AzureAppService, DatadogSite } from '../types';
 /**
  * Type guard to check if an object is a valid Azure Subscription
  */
-export function isAzureSubscription(obj: any): obj is AzureSubscription {
+export function isAzureSubscription(obj: unknown): obj is AzureSubscription {
   return !!(
     obj &&
     typeof obj === 'object' &&
-    typeof obj.subscriptionId === 'string' &&
-    typeof obj.displayName === 'string' &&
-    typeof obj.state === 'string' &&
-    typeof obj.tenantId === 'string'
+    obj !== null &&
+    'subscriptionId' in obj &&
+    'displayName' in obj &&
+    'state' in obj &&
+    'tenantId' in obj &&
+    typeof (obj as any).subscriptionId === 'string' &&
+    typeof (obj as any).displayName === 'string' &&
+    typeof (obj as any).state === 'string' &&
+    typeof (obj as any).tenantId === 'string'
   );
 }
 
 /**
  * Type guard to check if an object is a valid Azure App Service
  */
-export function isAzureAppService(obj: any): obj is AzureAppService {
+export function isAzureAppService(obj: unknown): obj is AzureAppService {
   return !!(
     obj &&
     typeof obj === 'object' &&
-    typeof obj.id === 'string' &&
-    typeof obj.name === 'string' &&
-    typeof obj.resourceGroup === 'string' &&
-    typeof obj.location === 'string' &&
-    typeof obj.kind === 'string' &&
-    obj.properties &&
-    typeof obj.properties === 'object' &&
-    Array.isArray(obj.properties.hostNames) &&
-    typeof obj.properties.state === 'string'
+    obj !== null &&
+    'id' in obj &&
+    'name' in obj &&
+    'resourceGroup' in obj &&
+    'location' in obj &&
+    'kind' in obj &&
+    'properties' in obj &&
+    typeof (obj as any).id === 'string' &&
+    typeof (obj as any).name === 'string' &&
+    typeof (obj as any).resourceGroup === 'string' &&
+    typeof (obj as any).location === 'string' &&
+    typeof (obj as any).kind === 'string' &&
+    (obj as any).properties &&
+    typeof (obj as any).properties === 'object' &&
+    Array.isArray((obj as any).properties.hostNames) &&
+    typeof (obj as any).properties.state === 'string'
   );
 }
 
 /**
  * Type guard to check if an object is a valid Datadog Site
  */
-export function isDatadogSite(obj: any): obj is DatadogSite {
+export function isDatadogSite(obj: unknown): obj is DatadogSite {
   return !!(
     obj &&
     typeof obj === 'object' &&
-    typeof obj.value === 'string' &&
-    typeof obj.label === 'string'
+    obj !== null &&
+    'value' in obj &&
+    'label' in obj &&
+    typeof (obj as any).value === 'string' &&
+    typeof (obj as any).label === 'string'
   );
 }
 
@@ -93,7 +108,7 @@ export function extractResourceGroupFromId(resourceId: string): string | null {
  * Validates an array of Azure subscriptions
  */
 export function validateSubscriptions(
-  subscriptions: any[]
+  subscriptions: unknown[]
 ): AzureSubscription[] {
   return subscriptions.filter(isAzureSubscription);
 }
@@ -101,6 +116,6 @@ export function validateSubscriptions(
 /**
  * Validates an array of Azure app services
  */
-export function validateAppServices(appServices: any[]): AzureAppService[] {
+export function validateAppServices(appServices: unknown[]): AzureAppService[] {
   return appServices.filter(isAzureAppService);
 }

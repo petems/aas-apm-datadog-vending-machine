@@ -1,7 +1,6 @@
 import {
   WebSiteManagementClient,
   Site,
-  SiteConfigResource,
   StringDictionary,
   SiteContainer,
 } from '@azure/arm-appservice';
@@ -9,11 +8,7 @@ import {
   ResourceManagementClient,
   ResourceGroup as AzureResourceGroup,
 } from '@azure/arm-resources';
-import {
-  TokenCredential,
-  InteractiveBrowserCredential,
-  AccessToken,
-} from '@azure/identity';
+import { TokenCredential, AccessToken } from '@azure/identity';
 import {
   AzureSubscription,
   AzureAppService,
@@ -147,7 +142,7 @@ export class AzureService {
         'https://management.azure.com/subscriptions?api-version=2020-01-01',
         {
           headers: {
-            Authorization: `Bearer ${await (this.credential as any).getToken().then((t: any) => t.token)}`,
+            Authorization: `Bearer ${await this.credential.getToken('https://management.azure.com/.default').then((t: AccessToken | null) => t?.token || '')}`,
             'Content-Type': 'application/json',
           },
         }
@@ -452,7 +447,7 @@ export class AzureService {
         planName
       );
 
-      const properties: any = {
+      const properties: Record<string, unknown> = {
         provisioningState: plan.provisioningState,
         status: plan.status,
       };
@@ -737,7 +732,7 @@ export class AzureService {
 
         // Add startup command if provided
         if (config.sidecarStartupCommand) {
-          (sidecarContainerConfig as any).command = [
+          (sidecarContainerConfig as Record<string, unknown>).command = [
             config.sidecarStartupCommand,
           ];
         }
@@ -788,7 +783,7 @@ export class AzureService {
     }
   }
 
-  private arraysEqual(a: any[], b: any[]): boolean {
+  private arraysEqual(a: unknown[], b: unknown[]): boolean {
     if (a.length !== b.length) return false;
     const setA = new Set(a);
     const setB = new Set(b);
@@ -798,7 +793,7 @@ export class AzureService {
     );
   }
 
-  private objectsEqual(a: any, b: any): boolean {
+  private objectsEqual(a: unknown, b: unknown): boolean {
     return JSON.stringify(a) === JSON.stringify(b);
   }
 
@@ -902,10 +897,10 @@ export class AzureService {
         resourceGroupName,
         siteName
       );
-      return siteConfig;
+      return siteConfig as any;
     } catch (error) {
       console.error('Error getting sidecar configuration:', error);
-      return null;
+      return null as any;
     }
   }
 
@@ -1011,7 +1006,7 @@ export class AzureService {
       return container;
     } catch (error) {
       console.warn('Could not fetch sitecontainer details:', error);
-      return null;
+      return null as any;
     }
   }
 
@@ -1050,7 +1045,7 @@ export class AzureService {
       return status;
     } catch (error) {
       console.warn('Could not fetch sitecontainer status:', error);
-      return null;
+      return null as any;
     }
   }
 
@@ -1123,7 +1118,8 @@ export class AzureService {
             containerImage: containers,
             port:
               sidecarConfig?.properties?.siteConfig?.appSettings?.find(
-                (setting: any) => setting.name === 'WEBSITES_PORT'
+                (setting: Record<string, unknown>) =>
+                  setting.name === 'WEBSITES_PORT'
               )?.value || 'Not configured',
           },
         };
