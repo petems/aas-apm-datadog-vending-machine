@@ -28,12 +28,47 @@ jest.mock('@azure/msal-browser', () => ({
   },
 }));
 
+// Mock Azure logger to avoid ESM resolution issues in tests
+jest.mock('@azure/logger', () => ({
+  createClientLogger: jest.fn(() => ({
+    info: jest.fn(),
+    verbose: jest.fn(),
+    warning: jest.fn(),
+    error: jest.fn(),
+  })),
+  AzureLogger: {
+    info: jest.fn(),
+    verbose: jest.fn(),
+    warning: jest.fn(),
+    error: jest.fn(),
+  },
+  setLogLevel: jest.fn(),
+}));
+
 jest.mock('@azure/msal-react', () => {
   return {
     useMsal: jest.fn(),
     MsalProvider: jest.fn().mockImplementation((props) => props.children),
   };
 });
+
+// Mock Azure SDK modules to avoid ESM loading issues during tests
+jest.mock('@azure/arm-appservice', () => ({
+  WebSiteManagementClient: jest.fn().mockImplementation(() => ({
+    webApps: {},
+    appServicePlans: {},
+  })),
+}));
+
+jest.mock('@azure/arm-resources', () => ({
+  ResourceManagementClient: jest.fn().mockImplementation(() => ({
+    resourceGroups: {},
+  })),
+}));
+
+jest.mock('@azure/identity', () => ({
+  InteractiveBrowserCredential: jest.fn(),
+}));
 
 // Global test timeout
 jest.setTimeout(10000);

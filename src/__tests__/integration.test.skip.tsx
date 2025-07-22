@@ -1,6 +1,16 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '../test-utils';
 import { useMsal } from '@azure/msal-react';
+jest.mock(
+  'react-router-dom',
+  () => ({
+    HashRouter: ({ children }: any) => <div>{children}</div>,
+    Routes: ({ children }: any) => <div>{children}</div>,
+    Route: () => null,
+    Link: ({ children }: any) => <a>{children}</a>,
+  }),
+  { virtual: true }
+);
 import App from '../App';
 import { AzureService } from '../services/azureService';
 import { mockSubscription, mockAppService, mockAuthResponse } from '../test-utils';
