@@ -73,6 +73,7 @@
     "@types/node": "^24.0.14",
     "@typescript-eslint/eslint-plugin": "5.62.1-alpha.0",
     "@typescript-eslint/parser": "5.62.1-alpha.0",
+    "@typespec/ts-http-runtime": "^0.3.0",
     "audit-ci": "^6.6.1",
     "autoprefixer": "^10.4.21",
     "eslint": "^8.57.0",
@@ -93,7 +94,8 @@
   "resolutions": {
     "postcss": "^8.4.31",
     "nth-check": "^2.0.1",
-    "webpack-dev-server": "^4.15.1"
+    "webpack-dev-server": "^5.2.1",
+    "prismjs": "^1.30.0"
   },
   "browserslist": {
     "production": [
