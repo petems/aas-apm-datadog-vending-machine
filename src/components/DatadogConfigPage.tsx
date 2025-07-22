@@ -4,8 +4,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { DatadogSite, AzureSubscription } from '../types';
 import { Light as SyntaxHighlighter } from 'react-syntax-highlighter';
-import json from 'react-syntax-highlighter/dist/esm/languages/hljs/json';
-import { githubGist } from 'react-syntax-highlighter/dist/esm/styles/hljs';
+import json from 'react-syntax-highlighter/dist/cjs/languages/hljs/json';
+import { githubGist } from 'react-syntax-highlighter/dist/cjs/styles/hljs';
 
 // Register JSON language
 SyntaxHighlighter.registerLanguage('json', json);

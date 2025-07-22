@@ -54,7 +54,7 @@ jobs:
 
       - name: Run unit tests with coverage (excluding integration tests)
         run: |
-          CI=true yarn test --coverage --watchAll=false --testPathIgnorePatterns="integration.test.tsx|DatadogAPMForm.test.tsx|useAzureApi.test.tsx|azureService.test.ts|armTemplateService.test.ts"
+          CI=true yarn test --coverage --watchAll=false --testNamePattern="^(?!.*@integration)"
 
       - name: Upload coverage to Codecov
         if: success()
@@ -144,7 +144,7 @@ jobs:
 
       - name: Run unit tests (excluding integration tests)
         run: |
-          CI=true yarn test --watchAll=false --testPathIgnorePatterns="integration.test.tsx|DatadogAPMForm.test.tsx|useAzureApi.test.tsx|azureService.test.ts|armTemplateService.test.ts"
+          CI=true yarn test --watchAll=false --testNamePattern="^(?!.*@integration)"
 
   # Security audit
   security:

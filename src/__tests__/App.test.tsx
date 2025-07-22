@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '../test-utils';
+import { render, screen } from '@testing-library/react';
 import App from '../App';
 
 // Mock the DatadogAPMForm component since we test it separately
