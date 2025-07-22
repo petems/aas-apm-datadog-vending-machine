@@ -209,8 +209,10 @@ describe('useAuth', () => {
     mockUseMsal.mockImplementation(() => {
       throw new Error('Unexpected');
     });
-    const { result } = renderHook(() => useAuth());
-    expect(result.current.isAuthenticated).toBe(false);
-    expect(result.current.error).toBeNull();
+    
+    // Expect the hook to throw when useMsal throws
+    expect(() => {
+      renderHook(() => useAuth());
+    }).toThrow('Unexpected');
   });
 });

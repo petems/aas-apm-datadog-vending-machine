@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useMsal } from '@azure/msal-react';
 import { loginRequest, armApiRequest } from '../authConfig';
 
@@ -17,18 +17,13 @@ export const useAuth = () => {
     error: null,
   });
 
-  let instance: any = null;
-  let accounts: any = [];
-  let msalError = false;
+  const msalData = useMsal();
+  const instance = msalData?.instance || null;
+  const msalError = !msalData;
 
-  try {
-    const msalData = useMsal();
-    instance = msalData.instance;
-    accounts = msalData.accounts;
-  } catch (error) {
-    console.error('MSAL initialization error:', error);
-    msalError = true;
-  }
+  const accounts = useMemo(() => {
+    return msalData?.accounts || [];
+  }, [msalData?.accounts]);
 
   const acquireToken = useCallback(async () => {
     if (msalError || !instance || accounts.length === 0) return;

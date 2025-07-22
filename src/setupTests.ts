@@ -1,5 +1,4 @@
 import '@testing-library/jest-dom';
-import React from 'react';
 
 // Mock window.location methods
 Object.defineProperty(window, 'location', {

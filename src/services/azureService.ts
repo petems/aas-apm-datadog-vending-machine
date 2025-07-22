@@ -1,7 +1,6 @@
 import {
   WebSiteManagementClient,
   Site,
-  SiteConfigResource,
   StringDictionary,
   SiteContainer,
 } from '@azure/arm-appservice';
@@ -9,11 +8,7 @@ import {
   ResourceManagementClient,
   ResourceGroup as AzureResourceGroup,
 } from '@azure/arm-resources';
-import {
-  TokenCredential,
-  InteractiveBrowserCredential,
-  AccessToken,
-} from '@azure/identity';
+import { TokenCredential, AccessToken } from '@azure/identity';
 import {
   AzureSubscription,
   AzureAppService,

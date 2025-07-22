@@ -135,22 +135,6 @@ const DatadogAPMForm: React.FC = () => {
     }
   };
 
-  const loadAppServices = async (subscriptionId: string) => {
-    if (!accessToken) return;
-
-    try {
-      setIsLoading(true);
-      const azureService = new AzureService(accessToken);
-      const services = await azureService.getAppServices(subscriptionId);
-      setAppServices(services);
-    } catch (error) {
-      console.error('Failed to load app services', error);
-      setError('Failed to load App Services. Please check your permissions.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const loadAppServicesInResourceGroup = async (
     subscriptionId: string,
     resourceGroupName: string
@@ -405,14 +389,20 @@ const DatadogAPMForm: React.FC = () => {
           >
             App Service / Function App *
           </label>
-          <label htmlFor="appService" className="sr-only">App Service / Function App *</label>
+          <label htmlFor="appService" className="sr-only">
+            App Service / Function App *
+          </label>
           <select
             id="appService"
             value={selectedAppService}
             onChange={e => setSelectedAppService(e.target.value)}
             className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            disabled={!selectedResourceGroup || isLoading || appServices.length === 0}
-            aria-disabled={!selectedResourceGroup || isLoading || appServices.length === 0}
+            disabled={
+              !selectedResourceGroup || isLoading || appServices.length === 0
+            }
+            aria-disabled={
+              !selectedResourceGroup || isLoading || appServices.length === 0
+            }
             required
           >
             {!selectedResourceGroup ? (
@@ -466,6 +456,7 @@ const DatadogAPMForm: React.FC = () => {
           <input
             type="password"
             id="ddApiKey"
+            aria-label="Datadog API Key"
             value={ddApiKey}
             onChange={e => setDdApiKey(e.target.value)}
             className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"

@@ -601,7 +601,7 @@ const DatadogConfigPage: React.FC = () => {
       // Configure sidecar if requested
       if (appServiceType === 'Linux' && data.sidecarImage) {
         setConfigurationSteps(current =>
-          current.map((step, index) =>
+          current.map((step, _index) =>
             step.id === 'sidecar'
               ? { ...step, status: 'running' as const }
               : step
@@ -629,7 +629,7 @@ const DatadogConfigPage: React.FC = () => {
 
         // Mark sidecar step as complete
         setConfigurationSteps(current =>
-          current.map((step, index) =>
+          current.map((step, _index) =>
             step.id === 'sidecar'
               ? { ...step, status: 'completed' as const }
               : step
@@ -1320,7 +1320,7 @@ const DatadogConfigPage: React.FC = () => {
               <tbody>
         `;
 
-        container.environmentVariables.forEach((env: any, index: number) => {
+        container.environmentVariables.forEach((env: any, _index: number) => {
           html += `
             <tr class="border-b border-purple-100">
               <td class="px-4 py-2 font-medium text-purple-700 bg-purple-50 font-mono">${env.name}</td>
@@ -1357,7 +1357,7 @@ const DatadogConfigPage: React.FC = () => {
               <tbody>
         `;
 
-        container.volumeMounts.forEach((mount: any, index: number) => {
+        container.volumeMounts.forEach((mount: any, _index: number) => {
           html += `
             <tr class="border-b border-purple-100">
               <td class="px-4 py-2 font-medium text-purple-700 bg-purple-50">${mount.name || 'Unnamed'}</td>
@@ -1771,7 +1771,10 @@ const DatadogConfigPage: React.FC = () => {
             {/* Access Token Section */}
             <div>
               <div className="flex justify-between items-center mb-2">
-                <label htmlFor="accessToken" className="block text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="accessToken"
+                  className="block text-sm font-medium text-gray-700"
+                >
                   Azure Access Token *
                 </label>
                 <div className="flex space-x-2">
@@ -1900,16 +1903,22 @@ az account get-access-token --resource https://management.azure.com/ --query acc
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="relative">
                 {/* Subscription Search */}
-                <label htmlFor="subscriptionSearch" className="block text-sm font-medium text-gray-700 mb-2">
+                <label
+                  htmlFor="subscriptionSearch"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
                   Subscription *
                   <span className="text-gray-500 text-xs ml-1">
                     ({subscriptions?.length || 0} total)
                   </span>
                 </label>
-                <label htmlFor="subscriptionSearch" className="sr-only">Subscription *</label>
+                <label htmlFor="subscriptionSearch" className="sr-only">
+                  Subscription *
+                </label>
                 <input
                   id="subscriptionSearch"
                   type="text"
+                  aria-label="Search subscriptions"
                   value={subscriptionSearch}
                   onChange={e => handleSubscriptionSearch(e.target.value)}
                   onFocus={() => {
@@ -1944,7 +1953,11 @@ az account get-access-token --resource https://management.azure.com/ --query acc
                 />
 
                 {/* Hidden input for form validation */}
-                <input type="hidden" {...register('subscription')} aria-label="Subscription form validation" />
+                <input
+                  type="hidden"
+                  {...register('subscription')}
+                  aria-label="Subscription form validation"
+                />
 
                 {/* Searchable Dropdown */}
                 {showSubscriptionDropdown && subscriptionSearch.length > 0 && (
@@ -2071,16 +2084,22 @@ az account get-access-token --resource https://management.azure.com/ --query acc
 
               <div className="relative">
                 {/* Resource Group Search */}
-                <label htmlFor="resourceGroupSearch" className="block text-sm font-medium text-gray-700 mb-2">
+                <label
+                  htmlFor="resourceGroupSearch"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
                   Resource Group *
                   <span className="text-gray-500 text-xs ml-1">
                     ({resourceGroups?.length || 0} total)
                   </span>
                 </label>
-                <label htmlFor="resourceGroupSearch" className="sr-only">Resource Group *</label>
+                <label htmlFor="resourceGroupSearch" className="sr-only">
+                  Resource Group *
+                </label>
                 <input
                   id="resourceGroupSearch"
                   type="text"
+                  aria-label="Search resource groups"
                   value={resourceGroupSearch}
                   onChange={e => handleResourceGroupSearch(e.target.value)}
                   onFocus={() => {
@@ -2115,7 +2134,11 @@ az account get-access-token --resource https://management.azure.com/ --query acc
                 />
 
                 {/* Hidden input for form validation */}
-                <input type="hidden" {...register('resourceGroup')} aria-label="Resource group form validation" />
+                <input
+                  type="hidden"
+                  {...register('resourceGroup')}
+                  aria-label="Resource group form validation"
+                />
 
                 {/* Searchable Dropdown */}
                 {showResourceGroupDropdown && (
@@ -2176,16 +2199,22 @@ az account get-access-token --resource https://management.azure.com/ --query acc
 
             <div className="relative">
               {/* App Service Search */}
-              <label htmlFor="appServiceSearch" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="appServiceSearch"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 App Service *
                 <span className="text-gray-500 text-xs ml-1">
                   ({appServices?.length || 0} total)
                 </span>
               </label>
-              <label htmlFor="appServiceSearch" className="sr-only">App Service *</label>
+              <label htmlFor="appServiceSearch" className="sr-only">
+                App Service *
+              </label>
               <input
                 id="appServiceSearch"
                 type="text"
+                aria-label="Search app services"
                 value={appServiceSearch}
                 onChange={e => handleAppServiceSearch(e.target.value)}
                 onFocus={() => {
@@ -2224,7 +2253,11 @@ az account get-access-token --resource https://management.azure.com/ --query acc
               />
 
               {/* Hidden input for form validation */}
-              <input type="hidden" {...register('appService')} aria-label="App service form validation" />
+              <input
+                type="hidden"
+                {...register('appService')}
+                aria-label="App service form validation"
+              />
 
               {/* Searchable Dropdown */}
               {showAppServiceDropdown && appServiceSearch.length > 0 && (
@@ -3049,6 +3082,7 @@ az account get-access-token --resource https://management.azure.com/ --query acc
               <div className="mb-8">
                 <button
                   type="button"
+                  aria-label="Show current settings"
                   onClick={() => setIsCurrentSettingsCollapsed(false)}
                   className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
                 >
@@ -3105,13 +3139,18 @@ az account get-access-token --resource https://management.azure.com/ --query acc
               <div className="max-w-4xl mx-auto">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div>
-                    <label htmlFor="apiKey" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label
+                      htmlFor="apiKey"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
                       Datadog API Key *
                       <span className="ml-2 font-mono text-xs bg-gray-100 px-2 py-1 rounded">
                         DD_API_KEY
                       </span>
                     </label>
-                    <label htmlFor="apiKey" className="sr-only">Datadog API Key *</label>
+                    <label htmlFor="apiKey" className="sr-only">
+                      Datadog API Key *
+                    </label>
                     <input
                       id="apiKey"
                       type="password"
@@ -3128,7 +3167,10 @@ az account get-access-token --resource https://management.azure.com/ --query acc
                   </div>
 
                   <div>
-                    <label htmlFor="datadogSite" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label
+                      htmlFor="datadogSite"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
                       Datadog Site *
                       <span className="ml-2 font-mono text-xs bg-gray-100 px-2 py-1 rounded">
                         DD_SITE
@@ -3154,7 +3196,10 @@ az account get-access-token --resource https://management.azure.com/ --query acc
                   </div>
 
                   <div>
-                    <label htmlFor="serviceName" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label
+                      htmlFor="serviceName"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
                       Service Name *
                       <span className="ml-2 font-mono text-xs bg-gray-100 px-2 py-1 rounded">
                         DD_SERVICE
@@ -3176,7 +3221,10 @@ az account get-access-token --resource https://management.azure.com/ --query acc
                   </div>
 
                   <div>
-                    <label htmlFor="environment" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label
+                      htmlFor="environment"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
                       Environment *
                       <span className="ml-2 font-mono text-xs bg-gray-100 px-2 py-1 rounded">
                         DD_ENV
@@ -3198,7 +3246,10 @@ az account get-access-token --resource https://management.azure.com/ --query acc
                   </div>
 
                   <div>
-                    <label htmlFor="version" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label
+                      htmlFor="version"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
                       Version (Optional)
                       <span className="ml-2 font-mono text-xs bg-gray-100 px-2 py-1 rounded">
                         DD_VERSION
@@ -3215,7 +3266,10 @@ az account get-access-token --resource https://management.azure.com/ --query acc
                   </div>
 
                   <div>
-                    <label htmlFor="logPath" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label
+                      htmlFor="logPath"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
                       Log Path *
                       <span className="ml-2 font-mono text-xs bg-gray-100 px-2 py-1 rounded">
                         DD_SERVERLESS_LOG_PATH
@@ -3240,7 +3294,10 @@ az account get-access-token --resource https://management.azure.com/ --query acc
 
               <div className="mt-6 space-y-4">
                 <div>
-                  <label htmlFor="enableAppServiceStorage" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    htmlFor="enableAppServiceStorage"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
                     Enable App Service Storage *
                     <span className="ml-2 font-mono text-xs bg-gray-100 px-2 py-1 rounded">
                       WEBSITES_ENABLE_APP_SERVICE_STORAGE
@@ -3292,7 +3349,10 @@ az account get-access-token --resource https://management.azure.com/ --query acc
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label htmlFor="dotnetTracerHome" className="block text-sm font-medium text-blue-700 mb-2">
+                      <label
+                        htmlFor="dotnetTracerHome"
+                        className="block text-sm font-medium text-blue-700 mb-2"
+                      >
                         Datadog Tracer Home *
                         <span className="ml-2 font-mono text-xs bg-blue-100 px-2 py-1 rounded">
                           DD_DOTNET_TRACER_HOME
@@ -3312,7 +3372,10 @@ az account get-access-token --resource https://management.azure.com/ --query acc
                     </div>
 
                     <div>
-                      <label htmlFor="dotnetTraceLogDirectory" className="block text-sm font-medium text-blue-700 mb-2">
+                      <label
+                        htmlFor="dotnetTraceLogDirectory"
+                        className="block text-sm font-medium text-blue-700 mb-2"
+                      >
                         Trace Log Directory *
                         <span className="ml-2 font-mono text-xs bg-blue-100 px-2 py-1 rounded">
                           DD_TRACE_LOG_DIRECTORY
@@ -3332,7 +3395,10 @@ az account get-access-token --resource https://management.azure.com/ --query acc
                     </div>
 
                     <div>
-                      <label htmlFor="coreclrEnableProfiling" className="block text-sm font-medium text-blue-700 mb-2">
+                      <label
+                        htmlFor="coreclrEnableProfiling"
+                        className="block text-sm font-medium text-blue-700 mb-2"
+                      >
                         CORECLR Enable Profiling *
                         <span className="ml-2 font-mono text-xs bg-blue-100 px-2 py-1 rounded">
                           CORECLR_ENABLE_PROFILING
@@ -3353,7 +3419,10 @@ az account get-access-token --resource https://management.azure.com/ --query acc
                     </div>
 
                     <div>
-                      <label htmlFor="coreclrProfiler" className="block text-sm font-medium text-blue-700 mb-2">
+                      <label
+                        htmlFor="coreclrProfiler"
+                        className="block text-sm font-medium text-blue-700 mb-2"
+                      >
                         CORECLR Profiler GUID *
                         <span className="ml-2 font-mono text-xs bg-blue-100 px-2 py-1 rounded">
                           CORECLR_PROFILER
@@ -3376,7 +3445,10 @@ az account get-access-token --resource https://management.azure.com/ --query acc
                     </div>
 
                     <div className="md:col-span-2">
-                      <label htmlFor="coreclrProfilerPath" className="block text-sm font-medium text-blue-700 mb-2">
+                      <label
+                        htmlFor="coreclrProfilerPath"
+                        className="block text-sm font-medium text-blue-700 mb-2"
+                      >
                         CORECLR Profiler Path *
                         <span className="ml-2 font-mono text-xs bg-blue-100 px-2 py-1 rounded">
                           CORECLR_PROFILER_PATH
@@ -3417,11 +3489,15 @@ az account get-access-token --resource https://management.azure.com/ --query acc
                   <div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label htmlFor="containerName" className="block text-sm font-medium text-purple-700 mb-2">
+                        <label
+                          htmlFor="containerName"
+                          className="block text-sm font-medium text-purple-700 mb-2"
+                        >
                           Container Name
                         </label>
                         <input
                           id="containerName"
+                          aria-label="Container Name"
                           type="text"
                           value="datadog-sidecar"
                           className="w-full px-3 py-2 border border-purple-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 bg-gray-100"
@@ -3434,11 +3510,15 @@ az account get-access-token --resource https://management.azure.com/ --query acc
                       </div>
 
                       <div>
-                        <label htmlFor="containerType" className="block text-sm font-medium text-purple-700 mb-2">
+                        <label
+                          htmlFor="containerType"
+                          className="block text-sm font-medium text-purple-700 mb-2"
+                        >
                           Container Type
                         </label>
                         <input
                           id="containerType"
+                          aria-label="Container Type"
                           type="text"
                           value="Sidecar"
                           className="w-full px-3 py-2 border border-purple-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 bg-gray-100"
@@ -3451,10 +3531,15 @@ az account get-access-token --resource https://management.azure.com/ --query acc
                       </div>
 
                       <div>
-                        <label htmlFor="sidecarRegistryUrl" className="block text-sm font-medium text-purple-700 mb-2">
+                        <label
+                          htmlFor="sidecarRegistryUrl"
+                          className="block text-sm font-medium text-purple-700 mb-2"
+                        >
                           Registry Server URL
                         </label>
-                        <label htmlFor="sidecarRegistryUrl" className="sr-only">Registry Server URL</label>
+                        <label htmlFor="sidecarRegistryUrl" className="sr-only">
+                          Registry Server URL
+                        </label>
                         <input
                           id="sidecarRegistryUrl"
                           type="text"
@@ -3469,10 +3554,15 @@ az account get-access-token --resource https://management.azure.com/ --query acc
                       </div>
 
                       <div>
-                        <label htmlFor="sidecarImage" className="block text-sm font-medium text-purple-700 mb-2">
+                        <label
+                          htmlFor="sidecarImage"
+                          className="block text-sm font-medium text-purple-700 mb-2"
+                        >
                           Image and Tag
                         </label>
-                        <label htmlFor="sidecarImage" className="sr-only">Image and Tag</label>
+                        <label htmlFor="sidecarImage" className="sr-only">
+                          Image and Tag
+                        </label>
                         <input
                           id="sidecarImage"
                           type="text"
@@ -3487,7 +3577,10 @@ az account get-access-token --resource https://management.azure.com/ --query acc
                       </div>
 
                       <div>
-                        <label htmlFor="sidecarPort" className="block text-sm font-medium text-purple-700 mb-2">
+                        <label
+                          htmlFor="sidecarPort"
+                          className="block text-sm font-medium text-purple-700 mb-2"
+                        >
                           Port
                         </label>
                         <input
@@ -3504,7 +3597,10 @@ az account get-access-token --resource https://management.azure.com/ --query acc
                       </div>
 
                       <div>
-                        <label htmlFor="sidecarStartupCommand" className="block text-sm font-medium text-purple-700 mb-2">
+                        <label
+                          htmlFor="sidecarStartupCommand"
+                          className="block text-sm font-medium text-purple-700 mb-2"
+                        >
                           Startup Command
                         </label>
                         <input
@@ -3654,8 +3750,9 @@ datadog-ci aas instrument -s ${subscription} -r ${resourceGroup} -n ${appService
                       <span className="text-blue-400 mr-2">$</span>
                       <span>
                         export DD_API_KEY=
-                        <span
-                          className="text-red-400 cursor-pointer relative group"
+                        <button
+                          type="button"
+                          className="text-red-400 cursor-pointer relative group bg-transparent border-none p-0 font-mono text-sm"
                           title={
                             apiKeyRevealed
                               ? `Hiding in ${apiKeyCountdown}s`
@@ -3677,25 +3774,6 @@ datadog-ci aas instrument -s ${subscription} -r ${resourceGroup} -n ${appService
                               );
                             }
                           }}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' || e.key === ' ') {
-                              e.preventDefault();
-                              const apiKey = watch('apiKey');
-                              if (apiKey && !apiKeyRevealed) {
-                                setApiKeyRevealed(true);
-                                setApiKeyCountdown(5);
-                              } else if (apiKey && apiKeyRevealed) {
-                                navigator.clipboard.writeText(apiKey);
-                                setDebugInfo('API key copied to clipboard! 🔑');
-                              } else if (!apiKey) {
-                                setDebugInfo(
-                                  'No API key set. Please enter your Datadog API key first.'
-                                );
-                              }
-                            }
-                          }}
-                          tabIndex={0}
-                          role="button"
                           aria-label={
                             apiKeyRevealed
                               ? `API key revealed, hiding in ${apiKeyCountdown} seconds`
@@ -3723,7 +3801,7 @@ datadog-ci aas instrument -s ${subscription} -r ${resourceGroup} -n ${appService
                                 : 'Enter your Datadog API key first'}
                             </span>
                           )}
-                        </span>
+                        </button>
                       </span>
                     </div>
                     <div className="flex min-w-max">
