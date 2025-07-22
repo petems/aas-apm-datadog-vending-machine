@@ -1,0 +1,19 @@
+- name: "Main Page - Terminal Components"
+  url: "http://localhost:3000"
+  waitForTimeout: 2000
+  waitForSelector: ".bg-gray-50"
+
+- name: "Datadog CI CLI Terminal"
+  url: "http://localhost:3000"
+  waitForTimeout: 3000
+  waitForSelector: ".bg-blue-50"
+  executeScript: |
+    
+      document.querySelector('.bg-blue-50').scrollIntoView({ behavior: 'smooth' });
+      return new Promise(resolve => setTimeout(resolve, 1000));
+    
+
+- name: "Azure Access Token Section"
+  url: "http://localhost:3000"
+  waitForTimeout: 2000
+  waitForSelector: ".bg-gray-50"

@@ -1,0 +1,33 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Terminal Component Comparison</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .comparison { display: flex; margin: 20px 0; border: 1px solid #ccc; }
+        .side { flex: 1; padding: 10px; text-align: center; }
+        .side h3 { margin: 0 0 10px 0; }
+        img { max-width: 100%; height: auto; border: 1px solid #ddd; }
+        .feature { background-color: #e8f5e8; }
+        .master { background-color: #f5e8e8; }
+    </style>
+</head>
+<body>
+    <h1>Terminal Component Visual Comparison</h1>
+    <p>Feature Branch vs Master Branch</p>
+    
+    <div class="comparison">
+        <div class="side feature">
+            <h3>Feature Branch (Current)</h3>
+            <p>Changes: Removed Azure CLI terminal, wider Datadog terminal, smaller text</p>
+            <img src="screenshots/azure-access-token-section.png" alt="azure-access-token-section.png"><br><small>azure-access-token-section.png</small><img src="screenshots/full-page-terminal.png" alt="full-page-terminal.png"><br><small>full-page-terminal.png</small>
+        </div>
+        <div class="side master">
+            <h3>Master Branch (Original)</h3>
+            <p>Original: Both terminals present, standard width and text size</p>
+            <img src="screenshots-master/azure-access-token-section.png" alt="azure-access-token-section.png"><br><small>azure-access-token-section.png</small><img src="screenshots-master/full-page-terminal.png" alt="full-page-terminal.png"><br><small>full-page-terminal.png</small>
+        </div>
+    </div>
+</body>
+</html>
